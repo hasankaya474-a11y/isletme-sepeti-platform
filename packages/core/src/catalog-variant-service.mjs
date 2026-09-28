@@ -1,0 +1,6 @@
+import {newId} from "./id.mjs";
+export class CatalogVariantService{
+ constructor(store){this.store=store;}
+ create({actorId,masterProductId,variantKey,packageType=null,unit,quantity=null,sku=null,gtin=null,barcode=null}){if(!actorId||!masterProductId||!variantKey||!unit)throw new TypeError("VARIANT_FIELDS_REQUIRED");if(!this.store.get("masterProducts",masterProductId))throw new Error("MASTER_PRODUCT_NOT_FOUND");if(this.store.find("productVariants",x=>x.masterProductId===masterProductId&&x.variantKey===variantKey||gtin&&x.gtin===gtin||barcode&&x.barcode===barcode).length)throw new Error("VARIANT_DUPLICATE");const now=new Date().toISOString();return this.store.insert("productVariants",{id:newId("variant"),masterProductId,variantKey,packageType,unit,quantity,sku,gtin,barcode,status:"ACTIVE",createdAt:now,updatedAt:now});}
+ archive({id,actorId}){if(!actorId)throw new TypeError("ACTOR_REQUIRED");if(this.store.find("supplierOffers",x=>x.variantId===id&&x.offerStatus==="ACTIVE").length)throw new Error("ACTIVE_SUPPLIER_OFFERS_EXIST");return this.store.update("productVariants",id,x=>({...x,status:"ARCHIVED",updatedAt:new Date().toISOString()}));}
+}
