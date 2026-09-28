@@ -1,0 +1,6 @@
+import {newId} from "./id.mjs";
+export class DuplicateReviewService{
+ constructor(store){this.store=store;}
+ flag({leftProductId,rightProductId,confidence,scoreBasis={}}){if(leftProductId===rightProductId)throw new Error("DUPLICATE_SELF_PAIR");if(!Number.isFinite(confidence)||confidence<0||confidence>1)throw new Error("CONFIDENCE_INVALID");const existing=this.store.find("duplicateCandidates",x=>x.leftProductId===leftProductId&&x.rightProductId===rightProductId||x.leftProductId===rightProductId&&x.rightProductId===leftProductId)[0];if(existing)return existing;return this.store.insert("duplicateCandidates",{id:newId("dup"),leftProductId,rightProductId,confidence,scoreBasis,status:"OPEN",createdAt:new Date().toISOString(),reviewedAt:null,reviewedBy:null});}
+ review({id,actorId,decision}){if(!actorId)throw new TypeError("ACTOR_REQUIRED");if(!["CONFIRMED_DUPLICATE","NOT_DUPLICATE"].includes(decision))throw new Error("DUPLICATE_DECISION_INVALID");const row=this.store.update("duplicateCandidates",id,x=>{if(x.status!=="OPEN")throw new Error("DUPLICATE_ALREADY_REVIEWED");return {...x,status:decision,reviewedAt:new Date().toISOString(),reviewedBy:actorId};});this.store.insert("audit",{id:newId("audit"),actorId,action:"catalog.duplicate.review",resourceType:"duplicate_candidate",resourceId:id,occurredAt:new Date().toISOString(),metadata:{decision}});return row;}
+}
