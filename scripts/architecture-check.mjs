@@ -15,7 +15,7 @@ if (missing.length) {
 }
 
 const lock = readFileSync("docs/ARCHITECTURE_LOCK.md", "utf8");
-for (const rule of ["normal daily operation", "Help & Site Guide", "Production stays locked"]) {
+for (const rule of ["Normal daily operation", "Help & Site Guide", "Production stays locked"]) {
   if (!lock.includes(rule)) {
     console.error("Architecture gate FAIL. Missing constitutional rule:", rule);
     process.exit(1);
