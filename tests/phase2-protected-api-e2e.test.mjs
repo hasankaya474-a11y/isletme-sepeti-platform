@@ -6,7 +6,7 @@ import {registerControlPlaneRoutes} from "../apps/api/src/control-plane-routes.m
 import {registerVitrinRoutes} from "../apps/api/src/vitrin-routes.mjs";
 
 const csrf={csrf:"token"};
-function auth(permission){return {userId:"admin1",session:{mfaLevel:0},grants:[{permission,scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE"}};}
+function auth(permission){return {userId:"admin1",session:{mfaLevel:1},grants:[{permission,scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE"}};}
 function req(path,{permission,body={},token="token",authenticated=true}={}){return {method:"POST",path,body,requestId:"r1",cookies:csrf,headers:{"x-csrf-token":token},auth:authenticated?auth(permission):undefined};}
 
 test("phase2 protected API rejects unauthenticated and bad CSRF",async()=>{
