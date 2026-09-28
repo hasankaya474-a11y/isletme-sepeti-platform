@@ -1,0 +1,6 @@
+import {approveChange} from "./four-eyes.mjs";import {auditEvent} from "./audit.mjs";
+export class ChangeRequestService{
+ constructor(store){this.store=store;}
+ approve({requestId,approverId}){const r=this.store.update("changes",requestId,x=>approveChange(x,{approverId}));this.store.insert("audit",auditEvent({actorId:approverId,action:"change.approve",resourceType:"change_request",resourceId:requestId}));return r;}
+ reject({requestId,approverId,reason,now=new Date().toISOString()}){if(!reason?.trim())throw new Error("REJECTION_REASON_REQUIRED");const r=this.store.update("changes",requestId,x=>{if(x.status!=="PENDING_APPROVAL")throw new Error("CHANGE_NOT_PENDING");if(x.requestedBy===approverId)throw new Error("FOUR_EYES_SELF_DECISION_FORBIDDEN");return {...x,status:"REJECTED",decidedBy:approverId,decidedAt:now,rejectionReason:reason.trim()};});this.store.insert("audit",auditEvent({actorId:approverId,action:"change.reject",resourceType:"change_request",resourceId:requestId,metadata:{reason:reason.trim()}}));return r;}
+}
