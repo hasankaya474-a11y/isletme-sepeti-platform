@@ -1,0 +1,11 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {assertTenantAccess} from "../packages/core/src/tenant-guard.mjs";
+import {MemoryStore} from "../packages/core/src/memory-store.mjs";
+import {AdminIdentityService} from "../packages/core/src/admin-identity-service.mjs";
+import {MembershipService} from "../packages/core/src/membership-service.mjs";
+import {createIdentityController} from "../apps/admin/src/identity-controller.mjs";
+import {identityScreenModel} from "../apps/admin/src/identity-screen.mjs";
+test("tenant guard blocks cross tenant",()=>{const m={status:"ACTIVE",organizationType:"BUSINESS",organizationId:"a"};assert.equal(assertTenantAccess({membership:m,requiredType:"BUSINESS",requiredId:"a"}),true);assert.throws(()=>assertTenantAccess({membership:m,requiredType:"BUSINESS",requiredId:"b"}),/DENIED/);});
+test("platform membership may administer scoped resources",()=>assert.equal(assertTenantAccess({membership:{status:"ACTIVE",organizationType:"PLATFORM",organizationId:"platform"},requiredType:"SUPPLIER",requiredId:"s1"}),true));
+test("admin controller exposes codeless membership operation",async()=>{const s=new MemoryStore();const ms=new MembershipService(s);const as=new AdminIdentityService(s);const c=createIdentityController({membershipService:ms,adminService:as,identityService:null});const r=await c.invite({actorId:"a",userId:"u",organizationType:"BUSINESS",organizationId:"b"});assert.equal(r.ok,true);assert.equal(r.data.status,"INVITED");});
+test("identity screen has explicit empty states",()=>{const vm=identityScreenModel({});assert.equal(vm.state,"READY");assert.ok(vm.sections.every(x=>x.empty));});
