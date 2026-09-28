@@ -1,0 +1,7 @@
+import {newId} from "./id.mjs";
+export class DataQualityCenterService{
+ constructor(store,quality){this.store=store;this.quality=quality;}
+ scanProduct(productId){const p=this.store.get("masterProducts",productId);if(!p)throw new Error("MASTER_PRODUCT_NOT_FOUND");const existing=this.store.find("catalogQualityIssues",x=>x.entityId===productId&&x.status==="OPEN");const openCodes=new Set(existing.map(x=>x.issueCode));const created=[];for(const code of this.quality.inspect(p)){if(openCodes.has(code))continue;created.push(this.store.insert("catalogQualityIssues",{id:newId("quality"),entityType:"MASTER_PRODUCT",entityId:productId,issueCode:code,severity:code==="UNIT_MISSING"?"ERROR":"WARNING",status:"OPEN",details:{},createdAt:new Date().toISOString(),resolvedAt:null,resolvedBy:null}));}return created;}
+ resolve({id,actorId}){if(!actorId)throw new TypeError("ACTOR_REQUIRED");return this.store.update("catalogQualityIssues",id,x=>({...x,status:"RESOLVED",resolvedAt:new Date().toISOString(),resolvedBy:actorId}));}
+ summary(){const open=this.store.find("catalogQualityIssues",x=>x.status==="OPEN");return {open:open.length,errors:open.filter(x=>x.severity==="ERROR").length,warnings:open.filter(x=>x.severity==="WARNING").length};}
+}
