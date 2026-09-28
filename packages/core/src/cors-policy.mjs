@@ -1,0 +1,1 @@
+export function createCorsPolicy(origins=[]){const a=new Set(origins);return origin=>!origin?{allowed:true,origin:null}:a.has(origin)?{allowed:true,origin,credentials:true}:{allowed:false,origin:null};}
