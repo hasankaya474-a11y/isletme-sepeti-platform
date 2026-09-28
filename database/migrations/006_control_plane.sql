@@ -1,0 +1,9 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE configurations(id TEXT PRIMARY KEY,key TEXT NOT NULL,scope_type TEXT NOT NULL,scope_id TEXT,value_json TEXT NOT NULL,status TEXT NOT NULL CHECK(status IN('DRAFT','REVIEW','SCHEDULED','PUBLISHED','UNPUBLISHED','ARCHIVED')),version INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,updated_at TEXT NOT NULL,UNIQUE(key,scope_type,scope_id,version));
+CREATE TABLE feature_flags(id TEXT PRIMARY KEY,key TEXT NOT NULL,description TEXT,enabled INTEGER NOT NULL CHECK(enabled IN(0,1)),scope_type TEXT NOT NULL,scope_id TEXT,rollout_percent INTEGER NOT NULL DEFAULT 100 CHECK(rollout_percent BETWEEN 0 AND 100),created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
+CREATE TABLE content_entries(id TEXT PRIMARY KEY,content_key TEXT NOT NULL,content_type TEXT NOT NULL,locale TEXT NOT NULL DEFAULT 'tr-TR',status TEXT NOT NULL CHECK(status IN('DRAFT','REVIEW','SCHEDULED','PUBLISHED','UNPUBLISHED','ARCHIVED')),current_version INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
+CREATE TABLE content_versions(id TEXT PRIMARY KEY,content_id TEXT NOT NULL REFERENCES content_entries(id),version INTEGER NOT NULL,payload_json TEXT NOT NULL,created_by TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(content_id,version));
+CREATE TABLE help_articles(id TEXT PRIMARY KEY,help_key TEXT NOT NULL UNIQUE,title TEXT NOT NULL,body TEXT NOT NULL,context_route TEXT,role_scope TEXT,status TEXT NOT NULL CHECK(status IN('DRAFT','REVIEW','SCHEDULED','PUBLISHED','UNPUBLISHED','ARCHIVED')),version INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
+CREATE INDEX idx_config_scope ON configurations(scope_type,scope_id,key,status);
+CREATE INDEX idx_flags_scope ON feature_flags(scope_type,scope_id,key);
+CREATE INDEX idx_content_key ON content_entries(content_key,locale,status);
