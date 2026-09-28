@@ -1,0 +1,21 @@
+export const ADMIN_NAVIGATION = Object.freeze([
+  "Genel Bakış",
+  "Ticaret",
+  "Katalog",
+  "Fiyat & Stok",
+  "Teslimat",
+  "İşletmeciler",
+  "Toptancılar",
+  "Üyelik & Yetki",
+  "Vitrin Studio",
+  "Kampanya & Reklam",
+  "Raporlama",
+  "Pazar Radarı",
+  "Destek / Çağrı Merkezi",
+  "Yardım & Site Kılavuzu",
+  "Sözleşmeler",
+  "Entegrasyonlar",
+  "Güvenlik & KVKK",
+  "Audit / Hareketler",
+  "Engine Room"
+]);
