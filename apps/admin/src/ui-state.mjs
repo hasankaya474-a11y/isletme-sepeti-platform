@@ -1,0 +1,2 @@
+export function createUiState(){return {loading:false,loadingLabel:null,error:null,announcement:null};}
+export function reduceUiState(state,event){switch(event.type){case"LOADING":return {...state,loading:event.value,loadingLabel:event.value?event.label:null,error:event.value?null:state.error};case"ERROR":return {...state,error:{code:event.code,message:event.message},loading:false};case"ANNOUNCE":return {...state,announcement:event.message,error:null};default:return state;}}
