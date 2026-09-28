@@ -1,34 +1,11 @@
 # Phase 1 Gate
+Current status: FINAL VERIFICATION
 
-Current status: IN PROGRESS
+Implemented: identity/company/business/supplier tenancy; branch/warehouse schema; membership; RBAC/scope; password hashing/rotation; email verification; recovery + revoke-all; sessions; TOTP + encrypted secret adapter; MFA policy; tenant/object guard; CSRF; CORS; security headers; rate limiting primitive; audit/security events; four-eyes; Admin identity services/API/UI components; contextual help; responsive/accessibility contracts; SQLite adapter/migration runner; real SQLite E2E; audit immutability DB triggers; protected HTTP E2E; CI workflow.
 
-## Implemented foundation
-- Identity/organization schema
-- Business/supplier tenancy
-- Memberships
-- Role/permission/scope schema
-- Password derivation
-- Session token hashing and policy
-- MFA policy
-- Audit schema
-- Security event schema
-- Four-eyes change-request primitive
-- Admin control contract
-- Contextual help seed
-- Privacy engineering touchpoints
-- Automated unit tests
+Final checks before PASS:
+1. CI green on commit containing protected HTTP E2E + audit immutability.
+2. Record final Phase 1 engineering security review outcome.
+3. Freeze Phase 1 status and open Phase 2.
 
-## Remaining before PASS
-- Repository-level test execution in CI
-- Persistent repository adapters/services
-- Login/email-verification/recovery application services
-- MFA enrollment/challenge implementation
-- Session/device admin service
-- Membership invitation/approval service
-- Security-event persistence and throttling
-- Admin API/UI shell wired to services
-- End-to-end tenant-isolation and authorization tests
-- Error/loading/empty UI states
-- Accessibility/responsive checks
-
-Do not mark Phase 1 PASS until all remaining gates are complete.
+Production remains locked. Phase PASS is not production authorization.
