@@ -1,7 +1,9 @@
 import {newId} from "./id.mjs";
+import {catalogPublishReadiness} from "./catalog-publish-policy.mjs";
 export class CatalogAdminService{
- constructor(store,catalog){this.store=store;this.catalog=catalog;}
+ constructor(store,catalog,impact=null){this.store=store;this.catalog=catalog;this.impact=impact;}
  createCategory({actorId,name,slug,parentId=null}){if(!actorId||!name||!slug)throw new TypeError("CATEGORY_FIELDS_REQUIRED");const now=new Date().toISOString(),x={id:newId("category"),parentId,name,slug,status:"DRAFT",createdAt:now,updatedAt:now};this.store.insert("audit",{id:newId("audit"),actorId,action:"catalog.category.create",resourceType:"category",resourceId:x.id,occurredAt:now});return this.store.insert("categories",x);}
  createBrand({actorId,name,slug}){if(!actorId||!name||!slug)throw new TypeError("BRAND_FIELDS_REQUIRED");const now=new Date().toISOString(),x={id:newId("brand"),name,slug,status:"DRAFT",createdAt:now,updatedAt:now};this.store.insert("audit",{id:newId("audit"),actorId,action:"catalog.brand.create",resourceType:"brand",resourceId:x.id,occurredAt:now});return this.store.insert("brands",x);}
- publishProduct({actorId,id}){const p=this.store.get("masterProducts",id);if(!p||p.status!=="REVIEW")throw new Error("PRODUCT_NOT_READY");return this.catalog.transition({id,to:"PUBLISHED",actorId});}
+ publishProduct({actorId,id}){const p=this.store.get("masterProducts",id);const qualityIssues=this.store.find("catalogQualityIssues",x=>x.entityId===id);const links=this.store.find("productMedia",x=>x.masterProductId===id);const media=links.map(x=>this.store.get("media",x.mediaAssetId)).filter(Boolean);const gate=catalogPublishReadiness({product:p,qualityIssues,media});if(!gate.ready)throw Object.assign(new Error("CATALOG_PUBLISH_BLOCKED"),{blockers:gate.blockers});return this.catalog.transition({id,to:"PUBLISHED",actorId});}
+ archiveProduct({actorId,id}){if(this.impact)this.impact.assertArchiveSafe(id);return this.catalog.transition({id,to:"ARCHIVED",actorId});}
 }
