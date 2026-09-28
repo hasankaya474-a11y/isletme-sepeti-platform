@@ -1,0 +1,12 @@
+{
+  "name": "isletme-sepeti-platform",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Isletme Sepeti B2B platform",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "check": "node scripts/architecture-check.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
