@@ -5,7 +5,9 @@ export const FOUR_EYES_ACTIONS = Object.freeze(new Set([
   "finance.commission.change",
   "bulk.price.change",
   "privacy.mass_export",
-  "production.release"
+  "production.release",
+  "content.publish",
+  "content.rollback"
 ]));
 
 export function requiresFourEyes(actionCode) {
