@@ -1,0 +1,1 @@
+import {Router} from "./router.mjs";import {registerAdminRoutes} from "./admin-routes.mjs";import {registerChangeRoutes} from "./change-routes.mjs";export function createTestApp(deps){const router=new Router();registerAdminRoutes(router,deps);registerChangeRoutes(router,deps);return router;}
