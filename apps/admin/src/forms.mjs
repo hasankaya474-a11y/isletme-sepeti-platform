@@ -1,0 +1,3 @@
+export function validateInvite(x){const e={};if(!x?.userId)e.userId="Kullanıcı zorunlu";if(!["BUSINESS","SUPPLIER","PLATFORM"].includes(x?.organizationType))e.organizationType="Kurum türü geçersiz";if(!x?.organizationId)e.organizationId="Kurum zorunlu";return e;}
+export function validateRoleChange(x){const e={};if(!x?.membershipId)e.membershipId="Üyelik zorunlu";if(!x?.roleCode)e.roleCode="Rol zorunlu";if(!x?.scopeType)e.scopeType="Kapsam türü zorunlu";return e;}
+export function hasErrors(e){return Object.keys(e).length>0;}
