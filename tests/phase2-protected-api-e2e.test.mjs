@@ -6,7 +6,7 @@ import {registerControlPlaneRoutes} from "../apps/api/src/control-plane-routes.m
 import {registerVitrinRoutes} from "../apps/api/src/vitrin-routes.mjs";
 
 const csrf={csrf:"token"};
-function auth(permission){return {session:{mfaLevel:0},grants:[{permission,scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE"}};}
+function auth(permission){return {userId:"admin1",session:{mfaLevel:0},grants:[{permission,scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE"}};}
 function req(path,{permission,body={},token="token",authenticated=true}={}){return {method:"POST",path,body,requestId:"r1",cookies:csrf,headers:{"x-csrf-token":token},auth:authenticated?auth(permission):undefined};}
 
 test("phase2 protected API rejects unauthenticated and bad CSRF",async()=>{
@@ -18,7 +18,7 @@ test("phase2 protected API rejects unauthenticated and bad CSRF",async()=>{
 test("Help Admin route injects authenticated actor",async()=>{
  const router=new Router();let seen;registerHelpRoutes(router,{helpAdmin:{create:x=>(seen=x,x),publish:x=>x,unpublish:x=>x}});
  const out=await router.handle(req("/v1/admin/help",{permission:"admin.content.publish",body:{helpKey:"buyer.cart",title:"Sepet"}}));
- assert.equal(out.ok,true);assert.equal(seen.actorId,undefined);
+ assert.equal(out.ok,true);assert.equal(seen.actorId,"admin1");
 });
 
 test("control-plane protected route enforces permission",async()=>{
