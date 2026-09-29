@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderFinanceCenter({rules=[],transactions=[],reconciliations=[]}={}){
+ return '<section class="workspace" aria-labelledby="finance-admin-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="finance-admin-title">Komisyon & Finansal Ledger</h1><p>Komisyon kurallarını, değişmez ledger kayıtlarını ve mutabakat farklarını yönetin.</p></div><button data-action="new-rule">Yeni Komisyon Kuralı</button></header><div class="control-grid"><article><h2>Komisyon Kuralları</h2><strong>'+e(rules.length)+'</strong></article><article><h2>Ledger İşlemleri</h2><strong>'+e(transactions.length)+'</strong></article><article><h2>Mutabakatlar</h2><strong>'+e(reconciliations.length)+'</strong></article></div></section>';
+}
