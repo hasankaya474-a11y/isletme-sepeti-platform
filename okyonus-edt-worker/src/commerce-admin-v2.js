@@ -76,7 +76,61 @@ async function api(path,opt){const r=await fetch(root+path,{headers:{'content-ty
 async function summary(){const j=await api('summary');stats.innerHTML=Object.entries(j.data).map(([k,v])=>'<article class="stat"><b>'+v+'</b><span>'+esc(k)+'</span></article>').join('')}
 function productUI(rows){return '<div class="table"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Düzenle</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td><button onclick=editProduct(\''+esc(x.id)+'\')>Düzenle</button></td></tr>').join('')+'</tbody></table></div><div id="editor"></div>'}
 async function editProduct(id){const j=await api('products'),x=j.data.find(v=>v.id===id);editor.innerHTML='<div class="grid"><form class="form" id="pf"><h3>Ürün Düzenle</h3><input name="name" value="'+esc(x.name)+'" required><input name="category" value="'+esc(x.category)+'" required><input name="unit" value="'+esc(x.unit)+'" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><select name="stockStatus"><option>'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><button>Kaydet</button></form><div><h3>Önizleme</h3><p>Değişiklik ürün kartı ve katalog API’sine yansır.</p></div></div>';pf.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(pf));b.price=Number(b.price);await api('products/'+id,{method:'POST',body:JSON.stringify(b)});await load()}}
-function genericUI(resource,rows){const fields=resource==='banners'?['title','subtitle','desktopImage','mobileImage','ctaText','ctaUrl','startAt','endAt','sortOrder']:resource==='categories'?['name','slug','icon','imageUrl','description','sortOrder']:resource==='brands'?['name','slug','logoUrl','description','sortOrder']:resource==='campaigns'?['title','description','ctaText','ctaUrl','startAt','endAt','priority','sortOrder']:resource==='delivery'?['region','district','minOrder','fee','freeThreshold','cutoff','deliveryDays','sortOrder']:resource==='media'?['name','url','kind','altText','tags','sortOrder']:resource==='help'?['title','slug','category','body','sortOrder']:['title','kind','source','sortOrder'];return '<div class="grid"><form class="form" id="gf"><h3>Yeni / Güncelle</h3>'+fields.map(f=>(f==='body'||f==='description'||f==='subtitle')?'<textarea name="'+f+'" placeholder="'+f+'"></textarea>':'<input name="'+f+'" placeholder="'+f+'">').join('')+'<button>Kaydet</button></form><div class="table"><table><tbody>'+rows.map(x=>'<tr><td>'+esc(x.title||x.name)+'</td><td>'+esc(x.slug||x.kind||'')+'</td><td>'+esc(x.active)+'</td></tr>').join('')+'</tbody></table></div></div>'}
-async function load(){const j=await api(current);content.innerHTML=current==='products'?productUI(j.data):genericUI(current,j.data);const f=document.getElementById('gf');if(f)f.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(f));b.sortOrder=Number(b.sortOrder||0);await api(current,{method:'POST',body:JSON.stringify(b)});await load()}}
-document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{current=b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('active',x===b));load()});summary();load();
+const fieldSets={
+ banners:['title','subtitle','desktopImage','mobileImage','ctaText','ctaUrl','startAt','endAt','sortOrder'],
+ categories:['name','slug','icon','imageUrl','description','sortOrder'],
+ brands:['name','slug','logoUrl','description','sortOrder'],
+ campaigns:['title','description','ctaText','ctaUrl','startAt','endAt','priority','sortOrder'],
+ delivery:['region','district','minOrder','fee','freeThreshold','cutoff','deliveryDays','sortOrder'],
+ media:['name','url','kind','altText','tags','sortOrder'],
+ help:['title','slug','category','body','sortOrder'],
+ sections:['title','kind','source','sortOrder']
+};
+const dbMap={desktopImage:'desktop_image',mobileImage:'mobile_image',ctaText:'cta_text',ctaUrl:'cta_url',startAt:'start_at',endAt:'end_at',sortOrder:'sort_order',imageUrl:'image_url',logoUrl:'logo_url',minOrder:'min_order',freeThreshold:'free_threshold',deliveryDays:'delivery_days',altText:'alt_text'};
+let editingId='';
+function genericUI(resource,rows){
+ const fields=fieldSets[resource]||fieldSets.sections;
+ return '<div class="grid"><form class="form" id="gf"><h3 id="gfTitle">Yeni Kayıt</h3>'+
+ fields.map(f=>(f==='body'||f==='description'||f==='subtitle')?'<textarea name="'+f+'" placeholder="'+f+'"></textarea>':'<input name="'+f+'" placeholder="'+f+'">').join('')+
+ '<label><input type="checkbox" name="active" checked style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="submit">Kaydet</button><button type="button" id="cancelEdit" style="background:#60778a;display:none">Vazgeç</button></div></form><div class="table"><table><thead><tr><th>Kayıt</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+
+ rows.map(x=>'<tr><td><b>'+esc(x.title||x.name||x.region||x.id)+'</b><br><small>'+esc(x.slug||x.kind||x.district||'')+'</small></td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="startEdit(\''+esc(resource)+'\',\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="removeRow(\''+esc(resource)+'\',\''+esc(x.id)+'\')" style="background:#9d2635">Sil</button></td></tr>').join('')+
+ '</tbody></table></div></div>';
+}
+async function startEdit(resource,id){
+ const j=await api(resource),x=j.data.find(v=>String(v.id)===String(id));if(!x)return;
+ editingId=id;current=resource;
+ const f=document.getElementById('gf');if(!f)return;
+ document.getElementById('gfTitle').textContent='Kaydı Düzenle';
+ document.getElementById('cancelEdit').style.display='inline-block';
+ for(const name of fieldSets[resource]||[]){
+   const el=f.elements[name];if(!el)continue;
+   const key=dbMap[name]||name;el.value=x[key]??'';
+ }
+ if(f.elements.active)f.elements.active.checked=Number(x.active)!==0;
+ f.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function removeRow(resource,id){
+ if(!confirm('Bu kayıt silinsin mi?'))return;
+ await api(resource+'/'+encodeURIComponent(id),{method:'DELETE'});
+ editingId='';await load();await summary();
+}
+async function load(){
+ const j=await api(current);
+ content.innerHTML=current==='products'?productUI(j.data):genericUI(current,j.data);
+ const f=document.getElementById('gf');
+ if(f){
+   const cancel=document.getElementById('cancelEdit');
+   cancel.onclick=()=>{editingId='';load()};
+   f.onsubmit=async e=>{
+     e.preventDefault();
+     const b=Object.fromEntries(new FormData(f));
+     b.active=!!f.elements.active?.checked;
+     for(const k of ['sortOrder','priority','minOrder','fee','freeThreshold']) if(k in b)b[k]=Number(b[k]||0);
+     const target=current+(editingId?'/'+encodeURIComponent(editingId):'');
+     await api(target,{method:'POST',body:JSON.stringify(b)});
+     editingId='';await load();await summary();
+   };
+ }
+}
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{current=b.dataset.r;editingId='';document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('active',x===b));load()});summary();load();
 </script></body></html>`,headers)}
