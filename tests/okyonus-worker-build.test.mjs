@@ -89,7 +89,8 @@ test("sales-first homepage and active public flows are wired",()=>{
 test("legacy tools default hidden while Digital Menu remains active",()=>{
   for(const item of ["COST:false","COST_RADAR:false","ACADEMY:false","CESNI:false","EASY_RECIPE:false"]) assert.ok(deniz.includes(item),item);
   for(const item of ["ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
-  for(const item of ["PRODUCTS:true","QUOTE:true","PHOTO:true","WHATSAPP:true","SEO:true","MEMBERSHIP:true","DIGITAL_MENU:true","ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
+  for(const item of ["PRODUCTS:true","QUOTE:true","PHOTO:true","SEO:true","MEMBERSHIP:true","DIGITAL_MENU:true","ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
+  assert.ok(deniz.includes("WHATSAPP:false"),"WhatsApp must remain hidden until verified");
   assert.match(deniz,/okyFeatureUnavailable/);
   assert.match(admin,/moduleFlagsRoute/);
   assert.match(admin,/Satış Modu & Modül Kontrolü/);
@@ -148,7 +149,8 @@ test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",asy
   assert.match(homeText,/Sepet \/ Teklif/);
   assert.match(homeText,/İletişim/);
   assert.match(homeText,/Site Yardım/);
-  assert.match(homeText,/wa\.me\/905358813264/);
+  assert.doesNotMatch(homeText,/wa\.me\//);
+  assert.match(homeText,/\/site-yardim|\/yardim/);
   const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
   assert.equal(help.status,200);
   const helpText=await help.text();

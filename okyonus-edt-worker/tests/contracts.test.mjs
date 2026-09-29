@@ -47,7 +47,8 @@ test('sales-first public face is wired',()=>{
 
 test('legacy modules hidden and Digital Menu active',()=>{
   for(const x of ['COST:false','COST_RADAR:false','ACADEMY:false','CESNI:false']) assert.ok(deniz.includes(x),x);
-  for(const x of ['PRODUCTS:true','QUOTE:true','PHOTO:true','WHATSAPP:true','SEO:true','MEMBERSHIP:true','DIGITAL_MENU:true']) assert.ok(deniz.includes(x),x);
+  for(const x of ['PRODUCTS:true','QUOTE:true','PHOTO:true','SEO:true','MEMBERSHIP:true','DIGITAL_MENU:true']) assert.ok(deniz.includes(x),x);
+  assert.ok(deniz.includes('WHATSAPP:false'),'WhatsApp remains hidden until verified');
   assert.match(admin,/moduleFlagsRoute/);
   assert.match(admin,/Satış Modu & Modül Kontrolü/);
 });
@@ -109,12 +110,14 @@ test('Commerce V2 storefront is wired without replacing critical engines',()=>{
 });
 
 test('Commerce V2 mobile tablet contact and help locks are present',()=>{
+  assert.match(commerce,/@media\(max-width:1024px\)/);
   assert.match(commerce,/@media\(max-width:900px\)/);
   assert.match(commerce,/@media\(max-width:620px\)/);
   assert.match(commerce,/Mobil alt menü/);
   assert.match(commerce,/Site Yardım/);
   assert.match(commerce,/İletişim/);
-  assert.match(commerce,/WhatsApp Destek/);
+  assert.match(commerce,/\/site-yardim/);
+  assert.doesNotMatch(commerce,/wa\.me\//);
 });
 
 test('Commerce V2 admin can manage product image price banner category and help',()=>{
