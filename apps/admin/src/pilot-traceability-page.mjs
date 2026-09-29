@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderPilotTraceability({enrollments=[],traceEvents=[],locationSamples=[]}={}){
+ return '<section class="workspace" aria-labelledby="pilot-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="pilot-title">Pilot & İzlenebilirlik</h1><p>Pilot katılımlarını, izlenebilirlik olaylarını ve izinli konum örneklerini yönetin.</p></div></header><div class="control-grid"><article><h2>Pilot Katılımları</h2><strong>'+e(enrollments.length)+'</strong></article><article><h2>Trace Events</h2><strong>'+e(traceEvents.length)+'</strong></article><article><h2>Konum Örnekleri</h2><strong>'+e(locationSamples.length)+'</strong></article></div></section>';
+}
