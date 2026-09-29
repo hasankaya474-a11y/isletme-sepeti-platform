@@ -10,6 +10,7 @@
 
 ## D1
 - [ ] Run `migrations/001_sales_mode.sql`
+- [ ] Run additive Commerce V2 migrations `migrations/003_commerce_v2.sql` and `migrations/004_commerce_extended.sql`
 - [ ] Verify `oky_module_flags_v1`
 - [ ] Confirm DIGITAL_MENU = ACTIVE
 - [ ] Confirm COST / COST_RADAR / ACADEMY / CESNI / EASY_RECIPE / ABOUT = HIDDEN
@@ -25,7 +26,7 @@
 - [ ] Contact email still arrives
 - [ ] Photo upload creates request number
 - [ ] Photo notification still works
-- [ ] WhatsApp links contain correct business number/context
+- [ ] WhatsApp public module remains HIDDEN until separately verified and intentionally enabled
 - [ ] Member login works
 - [ ] Digital Menu Studio opens
 - [ ] 30 themes are selectable
