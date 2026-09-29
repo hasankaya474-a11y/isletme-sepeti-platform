@@ -1,0 +1,7 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {Router} from "../apps/api/src/router.mjs";
+import {registerPhase11Routes} from "../apps/api/src/phase11-routes.mjs";
+import {renderFinancialLedgerCenter} from "../apps/admin/src/financial-ledger-center-page.mjs";
+function auth(){return {userId:"admin",session:{mfaLevel:1},grants:[{permission:"admin.configuration.manage",scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE",organizationType:"PLATFORM",organizationId:"platform"}};}
+test("phase11 admin center is semantic and escaped",()=>{const h=renderFinancialLedgerCenter({entries:[{id:"<script>"}]});assert.match(h,/Finansal Defter/);assert.doesNotMatch(h,/<script>/);});
+test("phase11 API propagates actor",async()=>{let seen;const r=new Router();registerPhase11Routes(r,{ledger:{append:x=>(seen=x,x),reverse:x=>x},commissions:{createRule:x=>x},reconciliation:{open:x=>x,resolve:x=>x}});const out=await r.handle({method:"POST",path:"/v1/admin/ledger/append",body:{organizationId:"o",entryType:"RECEIVABLE",direction:"CREDIT",amountMinor:1,currency:"TRY",referenceType:"x",referenceId:"1"},requestId:"r",cookies:{csrf:"t"},headers:{"x-csrf-token":"t"},auth:auth()});assert.equal(out.ok,true);assert.equal(seen.actorId,"admin");});

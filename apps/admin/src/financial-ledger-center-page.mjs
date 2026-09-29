@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderFinancialLedgerCenter({entries=[],rules=[],cases=[]}={}){
+ return '<section class="workspace" aria-labelledby="ledger-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="ledger-title">Finansal Defter & Mutabakat</h1><p>Komisyon kuralları, defter hareketleri ve mutabakat farklarını yönetin.</p></div></header><div class="control-grid"><article><h2>Defter Kayıtları</h2><strong>'+e(entries.length)+'</strong></article><article><h2>Komisyon Kuralları</h2><strong>'+e(rules.length)+'</strong></article><article><h2>Açık Mutabakatlar</h2><strong>'+e(cases.filter(x=>x.status==="OPEN"||x.status==="REVIEW").length)+'</strong></article></div></section>';
+}
