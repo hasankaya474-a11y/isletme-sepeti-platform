@@ -4,6 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {execFileSync} from "node:child_process";
+import {pathToFileURL} from "node:url";
 
 const root=process.cwd();
 const p=(...x)=>path.join(root,...x);
@@ -127,4 +128,41 @@ test("SEO keeps product/photo/contact and removes hidden legacy routes from prim
   assert.match(block,/\/dijital-menu-cozumleri/);
   assert.doesNotMatch(block,/\/cost-radar/);
   assert.doesNotMatch(block,/\/hakkimizda/);
+});
+
+
+test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),"oky-runtime-"));
+  const file=path.join(dir,"deniz.mjs");
+  fs.writeFileSync(file,deniz);
+  const mod=await import(pathToFileURL(file).href+"?v="+Date.now());
+  assert.ok(mod.default&&typeof mod.default.fetch==="function");
+  const home=await mod.default.fetch(new Request("https://www.okyonusedt.com/"),{}, {waitUntil(){}});
+  assert.equal(home.status,200);
+  const homeText=await home.text();
+  assert.match(homeText,/Profesyonel Mutfağınız İçin Güvenilir Gıda Tedariki/);
+  assert.match(homeText,/Ürün Seç • Teklif Al/);
+  const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
+  assert.equal(help.status,200);
+  const helpText=await help.text();
+  assert.match(helpText,/AKTİF MODÜL KILAVUZLARI/);
+  assert.doesNotMatch(helpText,/COST Maliyet/);
+  const dm=await mod.default.fetch(new Request("https://www.okyonusedt.com/dijital-menu-cozumleri"),{}, {waitUntil(){}});
+  assert.equal(dm.status,200);
+  assert.match(await dm.text(),/30\+/);
+  const hidden=await mod.default.fetch(new Request("https://www.okyonusedt.com/cost-radar"),{}, {waitUntil(){}});
+  assert.equal(hidden.status,404);
+  assert.match(await hidden.text(),/Bu modül şu anda aktif değil/);
+});
+
+test("ZAMAN runtime smoke: login surface remains available",async()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),"oky-admin-runtime-"));
+  const file=path.join(dir,"zaman.mjs");
+  fs.writeFileSync(file,admin);
+  const mod=await import(pathToFileURL(file).href+"?v="+Date.now());
+  assert.ok(mod.default&&typeof mod.default.fetch==="function");
+  const res=await mod.default.fetch(new Request("https://admin.example.test/login"),{SESSION_PEPPER:"x".repeat(64)});
+  assert.equal(res.status,200);
+  const body=await res.text();
+  assert.match(body,/Yönetici Paneli/);
 });
