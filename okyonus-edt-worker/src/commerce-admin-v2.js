@@ -35,6 +35,25 @@ export async function commerceAdminApi(request,env,auth,headers){
   if(request.method==="GET"){const rows=(await env.DB.prepare(`SELECT p.*,(SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 ORDER BY valid_from DESC LIMIT 1) current_price FROM b2b_products_v1 p ORDER BY active DESC,name LIMIT 500`).all()).results||[];return j({ok:true,data:rows},200,headers)}
   if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
   const b=await read(request);
+  if(request.method==="DELETE"&&id){
+    const old=await env.DB.prepare("SELECT id FROM b2b_products_v1 WHERE id=?").bind(id).first();
+    if(!old)return j({ok:false,error:"PRODUCT_NOT_FOUND"},404,headers);
+    await env.DB.prepare("UPDATE b2b_products_v1 SET active=0,updated_at=datetime('now') WHERE id=?").bind(id).run();
+    await env.DB.prepare("UPDATE b2b_prices_v1 SET active=0 WHERE product_id=? AND active=1").bind(id).run();
+    return j({ok:true,id,softDeleted:true},200,headers);
+  }
+  if(request.method==="POST"&&!id){
+    const name=clean(b.name,220),category=clean(b.category,120),unit=clean(b.unit,30)||"Adet",image=clean(b.imageUrl,1500),rid=crypto.randomUUID();
+    if(!name||!category)return j({ok:false,error:"NAME_CATEGORY_REQUIRED"},400,headers);
+    if(image&&!/^https:\/\//i.test(image))return j({ok:false,error:"INVALID_IMAGE_URL"},400,headers);
+    await env.DB.prepare("INSERT INTO b2b_products_v1(id,source_product_id,name,category,unit,package_text,image_url,stock_status,active,updated_at) VALUES(?,?,?,?,?,?,?,?,?,datetime('now'))")
+      .bind(rid,null,name,category,unit,clean(b.packageText,140),image||null,clean(b.stockStatus,30)||"ORDER",b.active===false?0:1).run();
+    if(b.price!==undefined&&Number.isFinite(Number(b.price))){
+      await env.DB.prepare("INSERT INTO b2b_prices_v1(id,product_id,price,currency,active) VALUES(?,?,?,?,1)").bind(crypto.randomUUID(),rid,Number(b.price),"TRY").run();
+      await env.DB.prepare("INSERT INTO b2b_price_history_v1(id,product_id,old_price,new_price,actor) VALUES(?,?,?,?,?)").bind(crypto.randomUUID(),rid,null,Number(b.price),auth.user.id).run();
+    }
+    return j({ok:true,id:rid},201,headers);
+  }
   if(request.method==="POST"&&id){
     const old=await env.DB.prepare("SELECT * FROM b2b_products_v1 WHERE id=?").bind(id).first();if(!old)return j({ok:false,error:"PRODUCT_NOT_FOUND"},404,headers);
     const image=clean(b.imageUrl,1500);if(image&&!/^https:\/\//i.test(image))return j({ok:false,error:"INVALID_IMAGE_URL"},400,headers);
@@ -74,8 +93,17 @@ const root='/api/commerce-admin/';let current='products';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(path,opt){const r=await fetch(root+path,{headers:{'content-type':'application/json'},...opt});const j=await r.json();if(!r.ok)throw Error(j.error||'İstek başarısız');return j}
 async function summary(){const j=await api('summary');stats.innerHTML=Object.entries(j.data).map(([k,v])=>'<article class="stat"><b>'+v+'</b><span>'+esc(k)+'</span></article>').join('')}
-function productUI(rows){return '<div class="table"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Düzenle</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td><button onclick=editProduct(\''+esc(x.id)+'\')>Düzenle</button></td></tr>').join('')+'</tbody></table></div><div id="editor"></div>'}
-async function editProduct(id){const j=await api('products'),x=j.data.find(v=>v.id===id);editor.innerHTML='<div class="grid"><form class="form" id="pf"><h3>Ürün Düzenle</h3><input name="name" value="'+esc(x.name)+'" required><input name="category" value="'+esc(x.category)+'" required><input name="unit" value="'+esc(x.unit)+'" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><select name="stockStatus"><option>'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><button>Kaydet</button></form><div><h3>Önizleme</h3><p>Değişiklik ürün kartı ve katalog API’sine yansır.</p></div></div>';pf.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(pf));b.price=Number(b.price);await api('products/'+id,{method:'POST',body:JSON.stringify(b)});await load()}}
+function productForm(x={}){
+ return '<div class="grid"><form class="form" id="pf"><h3>'+(x.id?'Ürün Düzenle':'Yeni Ürün')+'</h3><input name="name" value="'+esc(x.name||'')+'" placeholder="Ürün adı" required><input name="category" value="'+esc(x.category||'')+'" placeholder="Kategori" required><input name="unit" value="'+esc(x.unit||'Adet')+'" placeholder="Birim" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" min="0" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><select name="stockStatus"><option value="'+esc(x.stock_status||'ORDER')+'">'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><label><input type="checkbox" name="active" '+(Number(x.active)!==0?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button>Kaydet</button>'+(x.id?'<button type="button" id="cancelProduct" style="background:#60778a">Vazgeç</button>':'')+'</div></form><div><h3>Ürün Yönetimi</h3><p>Görsel, fiyat, kategori, paket, stok ve görünürlük buradan yönetilir.</p><p>Silme işlemi güvenlik için ürünü pasife alır ve aktif fiyatını kapatır.</p></div></div>';
+}
+function productUI(rows){return productForm()+'<div class="table" style="margin-top:14px"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="editProduct(\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="disableProduct(\''+esc(x.id)+'\')" style="background:#9d2635">Pasife Al</button></td></tr>').join('')+'</tbody></table></div>'}
+async function bindProductForm(id=''){
+ const f=document.getElementById('pf');if(!f)return;
+ const cancel=document.getElementById('cancelProduct');if(cancel)cancel.onclick=()=>load();
+ f.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(f));b.active=!!f.elements.active?.checked;if(b.price!=='')b.price=Number(b.price);else delete b.price;await api('products'+(id?'/'+encodeURIComponent(id):''),{method:'POST',body:JSON.stringify(b)});await load();await summary()}
+}
+async function editProduct(id){const j=await api('products'),x=j.data.find(v=>String(v.id)===String(id));if(!x)return;content.innerHTML=productForm(x)+'<div style="margin-top:12px"><button type="button" onclick="load()">← Ürün listesine dön</button></div>';await bindProductForm(id)}
+async function disableProduct(id){if(!confirm('Bu ürün pasife alınsın mı?'))return;await api('products/'+encodeURIComponent(id),{method:'DELETE'});await load();await summary()}
 const fieldSets={
  banners:['title','subtitle','desktopImage','mobileImage','ctaText','ctaUrl','startAt','endAt','sortOrder'],
  categories:['name','slug','icon','imageUrl','description','sortOrder'],
@@ -117,6 +145,7 @@ async function removeRow(resource,id){
 async function load(){
  const j=await api(current);
  content.innerHTML=current==='products'?productUI(j.data):genericUI(current,j.data);
+ if(current==='products'){await bindProductForm();return}
  const f=document.getElementById('gf');
  if(f){
    const cancel=document.getElementById('cancelEdit');
