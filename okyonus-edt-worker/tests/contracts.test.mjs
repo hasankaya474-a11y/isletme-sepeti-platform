@@ -334,3 +334,17 @@ test('binding consistency audit locks canonical and legacy names',()=>{
   assert.match(matrix,/MEDYA_MAĞAZASI/);
   assert.doesNotMatch(audit,/fetch\(|https?:\/\/|child_process|execSync|spawnSync/);
 });
+
+
+test('managed section kinds render products categories and promo payloads',()=>{
+  assert.match(commerce,/PRODUCT_GRID/);
+  assert.match(commerce,/CATEGORY_STRIP/);
+  assert.match(commerce,/CAMPAIGN/);
+  assert.match(commerce,/managedBlock/);
+  assert.match(commerce,/function renderSection\(/);
+  assert.match(commerceAdmin,/payloadJson/);
+  assert.match(commerceAdmin,/INVALID_SECTION_PAYLOAD_JSON/);
+  assert.match(commerceAdmin,/sectionKinds/);
+  assert.match(commerceAdmin,/PRODUCT_GRID/);
+  assert.match(commerceAdmin,/CATEGORY_STRIP/);
+});
