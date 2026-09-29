@@ -85,8 +85,9 @@ test("sales-first homepage and active public flows are wired",()=>{
 });
 
 test("legacy tools default hidden while Digital Menu remains active",()=>{
-  for(const item of ["COST:false","COST_RADAR:false","ACADEMY:false","CESNI:false","EASY_RECIPE:false","ABOUT:false"]) assert.ok(deniz.includes(item),item);
-  for(const item of ["PRODUCTS:true","QUOTE:true","PHOTO:true","WHATSAPP:true","SEO:true","MEMBERSHIP:true","DIGITAL_MENU:true"]) assert.ok(deniz.includes(item),item);
+  for(const item of ["COST:false","COST_RADAR:false","ACADEMY:false","CESNI:false","EASY_RECIPE:false"]) assert.ok(deniz.includes(item),item);
+  for(const item of ["ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
+  for(const item of ["PRODUCTS:true","QUOTE:true","PHOTO:true","WHATSAPP:true","SEO:true","MEMBERSHIP:true","DIGITAL_MENU:true","ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
   assert.match(deniz,/okyFeatureUnavailable/);
   assert.match(admin,/moduleFlagsRoute/);
   assert.match(admin,/Satış Modu & Modül Kontrolü/);
@@ -127,7 +128,7 @@ test("SEO keeps product/photo/contact and removes hidden legacy routes from prim
   assert.match(block,/\/iletisim/);
   assert.match(block,/\/dijital-menu-cozumleri/);
   assert.doesNotMatch(block,/\/cost-radar/);
-  assert.doesNotMatch(block,/\/hakkimizda/);
+  assert.match(block,/\/hakkimizda/);
 });
 
 
@@ -142,6 +143,9 @@ test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",asy
   const homeText=await home.text();
   assert.match(homeText,/Profesyonel Mutfağınız İçin Güvenilir Gıda Tedariki/);
   assert.match(homeText,/Ürün Seç • Teklif Al/);
+  assert.match(homeText,/İletişim/);
+  assert.match(homeText,/Hakkımızda/);
+  assert.match(homeText,/api\.whatsapp\.com\/send\?phone=905358813264/);
   const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
   assert.equal(help.status,200);
   const helpText=await help.text();
@@ -149,7 +153,10 @@ test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",asy
   assert.doesNotMatch(helpText,/COST Maliyet/);
   const dm=await mod.default.fetch(new Request("https://www.okyonusedt.com/dijital-menu-cozumleri"),{}, {waitUntil(){}});
   assert.equal(dm.status,200);
-  assert.match(await dm.text(),/30\+/);
+  const dmText=await dm.text();
+  assert.match(dmText,/30 tema ve 30 profesyonel şablon/);
+  assert.match(dmText,/Tema Seç/);
+  assert.match(dmText,/Şablon Seç/);
   const hidden=await mod.default.fetch(new Request("https://www.okyonusedt.com/cost-radar"),{}, {waitUntil(){}});
   assert.equal(hidden.status,404);
   assert.match(await hidden.text(),/Bu modül şu anda aktif değil/);
