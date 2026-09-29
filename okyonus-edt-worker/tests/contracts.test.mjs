@@ -137,3 +137,20 @@ test('Commerce V2 migration is additive and avoids protected baseline tables',()
    assert.match(sql,new RegExp(table));
  }
 });
+
+
+test('Commerce extended catalog/cart routes are present',()=>{
+  assert.match(commerce,/commerceCatalogPage/);
+  assert.match(commerce,/commerceCartPage/);
+  assert.match(commerce,/commerceProductPage/);
+  assert.match(commerce,/\/markalar/);
+  assert.match(commerce,/\/kampanyalar/);
+  assert.match(commerce,/\/teslimat/);
+  assert.match(commerce,/oky-commerce-cart-v2/);
+});
+
+test('Commerce extended schema remains additive',()=>{
+  const sql=fs.readFileSync(new URL('../migrations/004_commerce_extended.sql',import.meta.url),'utf8');
+  for(const table of ['oky_brands_v1','oky_campaigns_v1','oky_delivery_rules_v1','oky_media_assets_v1']) assert.match(sql,new RegExp(table));
+  for(const table of ['audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']) assert.doesNotMatch(sql,new RegExp('CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+'+table+'\\b','i'));
+});
