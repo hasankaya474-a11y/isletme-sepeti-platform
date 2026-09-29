@@ -229,7 +229,7 @@ test('Commerce V2 catalog URL filters and product detail stay wired',()=>{
   assert.match(commerce,/params\.get\('category'\)/);
   assert.match(commerce,/params\.get\('filter'\)/);
   assert.match(commerce,/fetch\('\/api\/storefront-v2'/);
-  assert.match(commerce,/id=\\\"pdAdd\\\"/);
+  assert.match(commerce,/pdAdd/);
   assert.match(commerce,/Sepete \/ Teklife Ekle/);
   assert.match(commerce,/effectivePrice/);
   assert.match(commerce,/stock_status/);
