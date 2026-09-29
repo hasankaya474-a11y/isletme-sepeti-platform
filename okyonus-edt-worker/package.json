@@ -9,6 +9,7 @@
     "verify": "npm run check && npm test",
     "release:dry-run": "node scripts/release-dry-run.mjs",
     "staging:preflight": "node scripts/staging-preflight.mjs",
-    "staging:config-check": "node scripts/staging-config-check.mjs"
+    "staging:config-check": "node scripts/staging-config-check.mjs",
+    "staging:binding-check": "node scripts/binding-consistency-check.mjs"
   }
 }
