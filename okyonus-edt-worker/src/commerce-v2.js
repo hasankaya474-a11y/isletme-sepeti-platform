@@ -1,4 +1,4 @@
-const BUILD="commerce-v2-2026-09-30-complete-storefront";
+const BUILD="commerce-v2-2026-09-30-cart-flow-v14";
 const DEFAULT_LOGO_URL="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp";
 const DEFAULT_SETTINGS=Object.freeze({siteTitle:"Okyanus EDT",logoUrl:DEFAULT_LOGO_URL,phone:"+90 535 881 32 64",email:"info@okyonusedt.com",whatsapp:"905358813264",announcement:"İstanbul HORECA tedariki • Profesyonel ürün • Hızlı teklif • Güvenli iletişim",heroTitle:"Profesyonel mutfağın alışverişi burada başlar.",heroSubtitle:"Ürünleri kategori kategori inceleyin, miktarı belirleyin ve sepetten sipariş veya teklif akışına geçin.",address:"İstanbul",footerText:"Restoran, kafe, otel, catering ve profesyonel mutfaklar için ürün, teklif ve tedarik çözümleri."});
 
