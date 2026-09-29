@@ -8,6 +8,7 @@ const required = [
   'migrations/001_sales_mode.sql',
   'migrations/003_commerce_v2.sql',
   'migrations/004_commerce_extended.sql',
+  'migrations/005_product_meta.sql',
   'DEPLOYMENT_CHECKLIST.md',
   'docs/WORKER_COPY_RUNBOOK.md',
   'docs/OKYANUS_EDT_COMMERCE_V2_FINAL_RELEASE_MANIFEST_2026-09-30.md',
@@ -37,6 +38,7 @@ console.log('3) Required staging migration order');
 console.log('   npx wrangler d1 execute <STAGING_DB_NAME> --file=migrations/001_sales_mode.sql');
 console.log('   npx wrangler d1 execute <STAGING_DB_NAME> --file=migrations/003_commerce_v2.sql');
 console.log('   npx wrangler d1 execute <STAGING_DB_NAME> --file=migrations/004_commerce_extended.sql');
+console.log('   npx wrangler d1 execute <STAGING_DB_NAME> --file=migrations/005_product_meta.sql');
 console.log('');
 console.log('4) Staging deploy commands');
 console.log('   npx wrangler deploy --config wrangler.deniz.staging.toml');
