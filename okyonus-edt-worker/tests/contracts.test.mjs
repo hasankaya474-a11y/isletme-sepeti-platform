@@ -614,7 +614,8 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.match(commerceAdmin,/ON CONFLICT\(id\) DO UPDATE SET path=excluded\.path/);
   assert.match(commerceAdmin,/INVALID_SEO_PATH/);
   assert.match(commerceAdmin,/SEO_LABEL_REQUIRED/);
-  assert.match(commerceAdmin,/\^\\\/[a-z0-9-]\+\$/);
+  assert.match(commerceAdmin,/seoPath=clean\(b\.path/);
+  assert.match(commerceAdmin,/\.test\(seoPath\)/);
   const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
   assert.equal(routes.length,200);
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
