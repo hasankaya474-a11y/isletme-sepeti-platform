@@ -221,3 +221,16 @@ test('Commerce V2 managed subpages use admin-backed storefront data',()=>{
   assert.match(commerce,/Array\.isArray\(j\.delivery\)/);
   assert.match(commerce,/Array\.isArray\(j\.help\)/);
 });
+
+
+test('Commerce V2 catalog URL filters and product detail stay wired',()=>{
+  assert.match(commerce,/new URLSearchParams\(location\.search\)/);
+  assert.match(commerce,/params\.get\('q'\)/);
+  assert.match(commerce,/params\.get\('category'\)/);
+  assert.match(commerce,/params\.get\('filter'\)/);
+  assert.match(commerce,/fetch\('\/api\/storefront-v2'/);
+  assert.match(commerce,/pdAdd/);
+  assert.match(commerce,/Sepete \/ Teklife Ekle/);
+  assert.match(commerce,/effectivePrice/);
+  assert.match(commerce,/stock_status/);
+});
