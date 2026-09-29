@@ -274,3 +274,16 @@ test('Commerce V2 final admin and release state are locked',()=>{
   assert.match(checklist,/Product create\/edit\/soft-delete and price history controls wired/);
   assert.match(checklist,/\[ \] Production deployment performed/);
 });
+
+
+test('release dry-run command pack is non-destructive',()=>{
+  const dry=fs.readFileSync(new URL('../scripts/release-dry-run.mjs',import.meta.url),'utf8');
+  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
+  assert.equal(pkg.scripts['release:dry-run'],'node scripts/release-dry-run.mjs');
+  assert.match(dry,/No Cloudflare or D1 changes are performed by this script/);
+  assert.match(dry,/001_sales_mode\.sql/);
+  assert.match(dry,/003_commerce_v2\.sql/);
+  assert.match(dry,/004_commerce_extended\.sql/);
+  assert.match(dry,/Production remains blocked until staging smoke-test evidence/);
+  assert.doesNotMatch(dry,/execSync|spawnSync|child_process/);
+});
