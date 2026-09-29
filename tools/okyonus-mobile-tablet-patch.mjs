@@ -15,7 +15,7 @@ function replaceOnce(from, to, label) {
 const home = s.indexOf('function okySalesFirstHomeV1');
 need(home >= 0, 'sales homepage');
 
-const mobileBarMarker=s.indexOf('.mobileBar{display:none}',home);
+const mobileBarMarker=s.indexOf('mobileBar',home);
 need(mobileBarMarker>=0,'mobile bar marker');
 
 if (!s.includes('@media(max-width:980px){.shell{grid-template-columns:210px')) {
