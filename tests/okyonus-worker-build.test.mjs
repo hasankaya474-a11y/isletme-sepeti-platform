@@ -166,3 +166,29 @@ test("ZAMAN runtime smoke: login surface remains available",async()=>{
   const body=await res.text();
   assert.match(body,/Yönetici Paneli/);
 });
+
+
+test("new Okyanus homepage is mobile/tablet ready and keeps navigation available",()=>{
+  assert.match(deniz,/class="okyTopbar"/);
+  assert.match(deniz,/class="okyMobileNav"/);
+  assert.match(deniz,/@media\(max-width:900px\)/);
+  assert.match(deniz,/@media\(max-width:620px\)/);
+  assert.match(deniz,/@media\(max-width:430px\)/);
+  assert.match(deniz,/@media\(max-width:360px\)/);
+  assert.match(deniz,/\.okyMobileNav\{position:sticky/);
+  assert.match(deniz,/min-height:44px/);
+});
+
+test("sales-first homepage reconnects Vitrin Studio live publication",()=>{
+  assert.match(deniz,/id="okyanus-vitrini"/);
+  assert.match(deniz,/okySalesFirstHomeV1\(\)\.replace\('<\/body>',vitrineLiveHydrationScript\(\)\+'<\/body>'\)/);
+  assert.match(deniz,/function vitrineLiveHydrationScript\(\)/);
+});
+
+test("homepage product cards use catalog media, price and stock data",()=>{
+  const home=extractFunction(deniz,"okySalesFirstHomeV1");
+  assert.match(home,/p\.image/);
+  assert.match(home,/p\.effectivePrice/);
+  assert.match(home,/p\.stockStatus/);
+  assert.doesNotMatch(home,/🍟|🫗|🧀|🐟/);
+});
