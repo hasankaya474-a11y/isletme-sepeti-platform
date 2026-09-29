@@ -1,0 +1,14 @@
+name = "deniz-edt-v2"
+main = "src/deniz-worker.js"
+compatibility_date = "2026-09-29"
+
+# Keep existing production bindings and IDs. Do not copy example IDs into production.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "..."
+# database_id = "..."
+# [[r2_buckets]]
+# binding = "PHOTO_TEMP"
+# bucket_name = "..."
+# EMAIL is the existing send binding.
+# Vars/secrets preserved: MAIL_FROM, MAIL_TO/ADMIN_MAIL_TO and any existing webhook/secrets.
