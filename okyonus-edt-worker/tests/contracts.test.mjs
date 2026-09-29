@@ -471,3 +471,39 @@ test('single-file bundles are byte-current with canonical sources',()=>{
   assert.equal(denizSingle,expectedDeniz);
   assert.equal(zamanSingle,expectedZaman);
 });
+
+
+test('cart flow v14 keeps product selection quote scenario intact',()=>{
+  assert.match(commerce,/commerce-v2-2026-09-30-cart-flow-v14/);
+  assert.match(commerce,/data-cart-count/);
+  assert.match(commerce,/cartRuntimeScript/);
+  assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
+  assert.match(commerce,/Güncel katalog doğrulanamadı/);
+  assert.match(commerce,/data-inc/);
+  assert.match(commerce,/data-dec/);
+  assert.match(commerce,/Sepeti Temizle/);
+  assert.match(commerce,/Katalogda bulunamayan ürünü silip yeniden ekleyin/);
+  assert.match(commerce,/Telefon numarasını kontrol edin/);
+  assert.match(commerce,/2026-09-30-commerce-v2-cart/);
+  assert.match(commerce,/quoteNo\|\|j\.requestNo\|\|j\.inquiryNo/);
+  assert.match(commerce,/Bağlantı hatası\. Sepetiniz korunuyor/);
+  assert.match(commerce,/document\.dispatchEvent\(new Event\('oky-cart-change'\)\)/);
+});
+
+test('cart add paths carry current price and product metadata',()=>{
+  assert.match(commerce,/package_text:pack,category,image/);
+  assert.match(commerce,/effectivePrice\?\?p\.price\?\?null/);
+  assert.match(commerce,/stok yok\|tükendi\|pasif\|inactive\|out of stock/);
+  assert.match(commerce,/Math\.min\(999/);
+  assert.match(commerce,/x\.price=price/);
+  assert.match(commerce,/x\.package_text=pack/);
+  assert.match(commerce,/x\.category=category/);
+  assert.match(commerce,/x\.image=image/);
+});
+
+test('cart quote payload preserves legacy quote contract',()=>{
+  assert.match(commerce,/products:a\.map\(x=>\(\{id:String\(x\.id\),name:String\(x\.name\),quantity:qty\(x\.qty\),unit:String\(x\.unit\|\|'Adet'\)\}\)\)/);
+  assert.match(commerce,/customer:\{name:String\(f\.name/);
+  assert.match(commerce,/consent:\{kvkk:true,textVersion:'2026-09-30-commerce-v2-cart'\}/);
+  assert.match(commerce,/fetch\('\/api\/quote'/);
+});
