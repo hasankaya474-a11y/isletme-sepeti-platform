@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderIntegrationHub({connections=[],webhooks=[],bulkJobs=[]}={}){
+ return '<section class="workspace" aria-labelledby="integration-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="integration-title">Entegrasyon Merkezi</h1><p>Bağlantıları, webhook teslimatlarını ve toplu veri işlerini yönetin.</p></div></header><div class="control-grid"><article><h2>Bağlantılar</h2><strong>'+e(connections.length)+'</strong></article><article><h2>Webhooklar</h2><strong>'+e(webhooks.length)+'</strong></article><article><h2>Toplu İşler</h2><strong>'+e(bulkJobs.length)+'</strong></article></div></section>';
+}
