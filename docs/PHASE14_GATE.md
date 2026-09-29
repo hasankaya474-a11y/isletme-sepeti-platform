@@ -1,16 +1,29 @@
 # Phase 14 Gate
-Status: IN PROGRESS
-Started: 2026-09-29
+Status: PASS FOUNDATION
+Locked: 2026-09-29
 
 Scope: Advertising, campaigns and Market Radar.
 
-Foundation rules:
-- campaigns are explicit, scoped and lifecycle-managed
-- sponsored visibility is distinguishable from organic visibility
-- Market Radar is observational/analytical only
-- Radar must not silently change price, supplier choice, stock, order or payment
-- targeting inputs are limited to permitted commercial context
-- normal operations are codeless, audited and permission protected
-- production remains locked
+Closed foundation:
+- explicit campaign lifecycle
+- sponsored placement records with visible sponsored label
+- observational Market Radar signals with evidence
+- strict separation between radar observation and commercial execution
+- codeless Admin campaign/radar center
+- protected Admin API with authentication, CSRF, permission and MFA enforcement
+- audit coverage for campaign and radar mutations
+- SQLite persistence E2E
+- Help/Site Guide and privacy/targeting touchpoints
+- loading/empty/error UI states and responsive/accessibility contracts
+- no silent price, supplier, stock, cart, order or payment change
 
-PASS requires the full module PASS rule in docs/ARCHITECTURE_LOCK.md.
+Final CI evidence:
+- GitHub Actions quality run 36530877502: SUCCESS
+- Head commit: a6f4696adb96e9491d74a762a4e78e84558eaebf
+- Architecture check: PASS
+- Test suite: PASS
+
+Gate decision:
+Phase 14 is PASS FOUNDATION and is locked as the campaign/sponsored-visibility/Market-Radar baseline. Later automation must preserve sponsored labeling and keep Radar observational unless an explicit human-controlled workflow is added.
+
+Production remains locked.
