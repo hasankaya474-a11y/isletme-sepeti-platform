@@ -44,7 +44,44 @@ export async function commerceAdminApi(request,env,auth,headers){
  if(resource==="summary"){
   const out={};for(const [k,t] of Object.entries(tables))out[k]=Number((await env.DB.prepare("SELECT COUNT(*) n FROM "+t).first())?.n||0);
   out.products=Number((await env.DB.prepare("SELECT COUNT(*) n FROM b2b_products_v1").first())?.n||0);
+  out.settings=Number((await env.DB.prepare("SELECT COUNT(*) n FROM oky_storefront_settings_v1").first())?.n||0);
   return j({ok:true,data:out},200,headers);
+ }
+ if(resource==="settings"){
+  if(request.method==="GET"){const rows=(await env.DB.prepare("SELECT key,value,updated_at FROM oky_storefront_settings_v1 ORDER BY key").all()).results||[];return j({ok:true,data:Object.fromEntries(rows.map(x=>[x.key,x.value])),rows},200,headers)}
+  if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
+  if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
+  const b=await read(request),allowed=["siteTitle","logoUrl","phone","email","whatsapp","announcement","heroTitle","heroSubtitle","address","footerText"];
+  for(const key of allowed)if(Object.prototype.hasOwnProperty.call(b,key))await env.DB.prepare("INSERT INTO oky_storefront_settings_v1(key,value,updated_by,updated_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=datetime('now')").bind(key,clean(b[key],key==="heroSubtitle"||key==="footerText"?1000:500),auth.user.id).run();
+  return j({ok:true},200,headers);
+ }
+ if(resource==="legacy-catalog-sync"){
+  if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
+  if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
+  const origin=clean(env.PUBLIC_SITE_URL||"https://www.okyonusedt.com",500).replace(/\/$/,"");
+  let payload;try{const rr=await fetch(origin+"/api/products",{headers:{accept:"application/json"}});if(!rr.ok)return j({ok:false,error:"LEGACY_CATALOG_FETCH_FAILED",status:rr.status},502,headers);payload=await rr.json()}catch{return j({ok:false,error:"LEGACY_CATALOG_FETCH_FAILED"},502,headers)}
+  const items=Array.isArray(payload?.products)?payload.products.slice(0,1000):[];
+  let created=0,updated=0,failed=0;
+  for(const x of items){
+    const sourceId=clean(x.id,120),name=clean(x.name,220);if(!sourceId||!name){failed++;continue}
+    const txt=[x.category,x.masterCategory,x.subCategory,x.name].filter(Boolean).join(" ").toLocaleLowerCase("tr-TR");
+    let category=clean(x.category,120)||"Diğer Ürünler";
+    if(/deniz|balık|karides|kalamar|ahtapot|su ürün/.test(txt))category="Deniz Ürünleri";
+    else if(/donuk|patates|dondur/.test(txt))category="Donuk Ürünler";
+    else if(/et|kanat|tavuk|piliç|köfte|şarküteri|sucuk|sosis/.test(txt))category="Et & Şarküteri";
+    else if(/süt|peynir|krema|tereyağ|yoğurt/.test(txt))category="Süt & Şarküteri";
+    else if(/yağ/.test(txt))category="Yağlar";
+    else if(/sos|ketçap|mayonez|hardal|sirke/.test(txt))category="Soslar";
+    else if(/baharat|çeşni/.test(txt))category="Baharat";
+    else if(/bakliyat|pirinç|bulgur|makarna|un|şeker|tuz|kuru/.test(txt))category="Kuru Gıda";
+    const pack=[clean(x.amount,100),clean(x.package,100)].filter(Boolean).join(" • "),unit=/kg/i.test(pack)?"Kg":/litre|\bL\b/i.test(pack)?"Litre":"Adet";
+    try{
+      const row=await env.DB.prepare("SELECT id FROM b2b_products_v1 WHERE source_product_id=? LIMIT 1").bind(sourceId).first();
+      if(row){await env.DB.prepare("UPDATE b2b_products_v1 SET name=?,category=?,unit=?,package_text=?,active=1,updated_at=datetime('now') WHERE id=?").bind(name,category,unit,pack,row.id).run();updated++}
+      else{await env.DB.prepare("INSERT INTO b2b_products_v1(id,source_product_id,name,category,unit,package_text,image_url,stock_status,active,updated_at) VALUES(?,?,?,?,?,?,NULL,'ORDER',1,datetime('now'))").bind(crypto.randomUUID(),sourceId,name,category,unit,pack).run();created++}
+    }catch{failed++}
+  }
+  return j({ok:true,source:origin,count:items.length,created,updated,failed},200,headers);
  }
  if(resource==="product-history"&&id&&request.method==="GET"){
   const rows=(await env.DB.prepare("SELECT old_price,new_price,actor,created_at FROM b2b_price_history_v1 WHERE product_id=? ORDER BY created_at DESC LIMIT 50").bind(id).all()).results||[];
