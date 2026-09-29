@@ -422,6 +422,14 @@ Each integration exposes status, last sync, errors, retry controls, credential r
 
 Help is a first-class contextual system in Public, İşletmeci, Tedarikçi and Admin surfaces. It explains the active task and links users to appropriate support without exposing unrelated privileged surfaces.
 
+Visibility rule:
+- Only guides for modules/features that are currently active and visible on the relevant web surface may be shown to end users.
+- Guides belonging to inactive, hidden, unpublished or feature-flagged-off modules remain stored in Admin but are not visible, searchable or suggested to end users.
+- When a module is reactivated, its guide may be reactivated together with it after validation.
+- Help visibility follows the same role/scope and feature-flag rules as the feature it documents.
+- Admin may preview inactive guides without publishing them.
+- Deactivating a module must never delete its guide content or history.
+
 ## 25. Technical architecture
 
 Initial architecture is a modular monolith, API-first and event-aware.
