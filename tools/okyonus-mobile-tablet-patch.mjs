@@ -14,6 +14,7 @@ function replaceOnce(from, to, label) {
 
 const home = s.indexOf('function okySalesFirstHomeV1');
 need(home >= 0, 'sales homepage');
+console.log('DIAG_HOME',JSON.stringify({home,globalMobile:s.indexOf('mobileBar'),afterHomeMobile:s.indexOf('mobileBar',home),afterHomeMedia:s.indexOf('@media',home),snippet:s.slice(home,home+1800)}));
 
 const mobileBarMarker=s.indexOf('mobileBar',home);
 need(mobileBarMarker>=0,'mobile bar marker');
