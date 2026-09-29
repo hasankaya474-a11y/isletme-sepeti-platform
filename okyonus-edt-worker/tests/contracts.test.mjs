@@ -606,3 +606,17 @@ test('single bundles carry architecture v15 control plane',()=>{
   for(const token of ['commerce-v2-2026-09-30-architecture-v15','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
+
+
+test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
+  assert.match(commerceAdmin,/resource==="seo"/);
+  assert.match(commerceAdmin,/INSERT INTO oky_seo_links_v1/);
+  assert.match(commerceAdmin,/ON CONFLICT\(id\) DO UPDATE SET path=excluded\.path/);
+  assert.match(commerceAdmin,/INVALID_SEO_PATH/);
+  assert.match(commerceAdmin,/SEO_LABEL_REQUIRED/);
+  assert.match(commerceAdmin,/seoPath=clean\(b\.path/);
+  assert.match(commerceAdmin,/\.test\(seoPath\)/);
+  const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
+  assert.equal(routes.length,200);
+  assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
+});
