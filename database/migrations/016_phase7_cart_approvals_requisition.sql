@@ -23,6 +23,8 @@ CREATE TABLE procurement_approval_rules(
  updated_at TEXT NOT NULL
 );
 
+CREATE UNIQUE INDEX idx_proc_rule_active ON procurement_approval_rules(business_id,currency) WHERE status='ACTIVE';
+
 CREATE TABLE carts(
  id TEXT PRIMARY KEY,
  business_id TEXT NOT NULL REFERENCES businesses(id),
