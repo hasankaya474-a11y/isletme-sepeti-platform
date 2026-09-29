@@ -9,6 +9,7 @@ export class DeliveryOperationService{
   const now=new Date().toISOString(),row={id:newId("delivery"),orderId,businessId:order.businessId,supplierId,deliveryZoneId,deliverySlaId,capacitySlotId,status:"SCHEDULED",scheduledStart,scheduledEnd,etaAt:null,createdBy:actorId,createdAt:now,updatedAt:now};
   this.store.insert("deliveries",row);
   for(const line of this.store.find("orderLines",x=>x.orderId===orderId))this.store.insert("deliveryItems",{id:newId("delitem"),deliveryId:row.id,orderLineId:line.id,plannedQtyMilli:line.quantityMilli,deliveredQtyMilli:0});
+  this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"delivery",aggregateId:row.id,eventType:"delivery.scheduled",payload:{deliveryId:row.id,orderId},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"delivery.create",resourceType:"delivery",resourceId:row.id,occurredAt:now});
   return row;
  }
@@ -19,13 +20,16 @@ export class DeliveryOperationService{
   this.orderTransitions.transition({orderId:order.id,to:"SHIPPED",organizationType:"SUPPLIER",organizationId:supplierId,actorId});
   const now=new Date().toISOString();
   const row=this.store.update("deliveries",deliveryId,x=>({...x,status:"IN_TRANSIT",etaAt,updatedAt:now}));
+  this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"delivery",aggregateId:deliveryId,eventType:"delivery.dispatched",payload:{deliveryId,orderId:delivery.orderId},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"delivery.dispatch",resourceType:"delivery",resourceId:deliveryId,occurredAt:now});
   return row;
  }
  setEta({deliveryId,supplierId,etaAt,actorId}){
   const d=this.store.get("deliveries",deliveryId);if(!d||d.supplierId!==supplierId)throw new Error("DELIVERY_FORBIDDEN");
   if(!etaAt||Number.isNaN(new Date(etaAt).getTime()))throw new TypeError("ETA_INVALID");
-  const row=this.store.update("deliveries",deliveryId,x=>({...x,etaAt,updatedAt:new Date().toISOString()}));
+  const now=new Date().toISOString();
+  const row=this.store.update("deliveries",deliveryId,x=>({...x,etaAt,updatedAt:now}));
+  this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"delivery",aggregateId:deliveryId,eventType:"delivery.eta_updated",payload:{deliveryId,etaAt},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"delivery.eta.set",resourceType:"delivery",resourceId:deliveryId,occurredAt:new Date().toISOString()});return row;
  }
 }
