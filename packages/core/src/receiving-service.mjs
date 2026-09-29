@@ -28,6 +28,7 @@ export class ReceivingService{
   this.store.update("deliveries",delivery.id,x=>({...x,status:to,updatedAt:now}));
   this.orderTransitions.transition({orderId:delivery.orderId,to,organizationType:"BUSINESS",organizationId:businessId,actorId});
   const row=this.store.update("receivings",receivingId,x=>({...x,status:rejected?"DISPUTED":"COMPLETED",updatedAt:now}));
+  this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"receiving",aggregateId:receivingId,eventType:"receiving.completed",payload:{receivingId,deliveryId:delivery.id,status:row.status},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"receiving.complete",resourceType:"receiving",resourceId:receivingId,occurredAt:now});return row;
  }
 }
