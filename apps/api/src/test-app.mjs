@@ -6,6 +6,7 @@ import {registerHelpRoutes} from "./help-routes.mjs";
 import {registerVitrinRoutes} from "./vitrin-routes.mjs";
 import {registerPhase4Routes} from "./phase4-routes.mjs";
 import {registerPhase5Routes} from "./phase5-routes.mjs";
+import {registerPhase6Routes} from "./phase6-routes.mjs";
 
 export function createTestApp(deps){
   const router=new Router();
@@ -16,5 +17,6 @@ export function createTestApp(deps){
   if(deps.pages&&deps.versions&&deps.workflow&&deps.redirects) registerVitrinRoutes(router,deps);
   if(deps.pricing&&deps.stock&&deps.reservations&&deps.delivery) registerPhase4Routes(router,deps);
   if(deps.search&&deps.productCards&&deps.buyerLists&&deps.matching&&deps.searchAdmin) registerPhase5Routes(router,deps);
+  if(deps.rfqs&&deps.quotes&&deps.comparison&&deps.messages&&deps.rfqAdmin) registerPhase6Routes(router,deps);
   return router;
 }
