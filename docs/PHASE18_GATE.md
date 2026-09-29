@@ -1,18 +1,24 @@
 # Phase 18 Gate
-Status: ENGINEERING READY - EXTERNAL GATES REQUIRED
-Started: 2026-09-29
+Status: ENGINEERING COMPLETE - EXTERNAL GATES REQUIRED
+Locked: 2026-09-29
 
 Scope: Private pilot, defect closure, legal/accounting gate and production decision.
 
-Engineering completion rules:
-- release gates are explicit evidence records
-- no code path may auto-authorize production
-- production decision requires all mandatory gates PASS
-- private pilot, defect closure, security/restore/load, legal, accounting and privacy evidence are individually reviewable
-- production release requires explicit human approval after gate completion
-- failed or missing evidence keeps production locked
+Engineering completion:
+- explicit release-gate evidence records
+- mandatory gate evaluation
+- production approval blocked unless every mandatory gate is PASS
+- pilot defect tracking and verified-closure workflow
+- explicit human production release decision
+- immutable gate snapshot recorded with release decision
+- codeless Admin Production Release Gate
+- protected Admin API with authentication, CSRF, permission and MFA enforcement
+- SQLite persistence E2E
+- Help/Site Guide and release-governance touchpoints
+- loading/blocked/eligible/error UI states and responsive/accessibility contracts
+- no deployment is executed by the release-decision service
 
-Mandatory gates:
+Mandatory external/operational gates:
 - PRIVATE_PILOT
 - DEFECT_CLOSURE
 - SECURITY_REVIEW
@@ -22,6 +28,15 @@ Mandatory gates:
 - ACCOUNTING_REVIEW
 - PRIVACY_REVIEW
 
-Repository engineering can prepare and enforce these gates. It cannot manufacture real pilot, legal, accounting or external-security evidence.
+Final engineering CI evidence:
+- GitHub Actions quality run 36531985205: SUCCESS
+- Head commit: 17499bdabbcfc1b7ade1866b82604d1c49426412
+- Architecture check: PASS
+- Test suite: PASS
 
-Production remains locked until all mandatory evidence is PASS and an explicit release decision is recorded.
+Gate decision:
+Phase 18 engineering is complete. Production is NOT authorized. Real pilot, legal, accounting, privacy, security, restore/load and defect-closure evidence must be entered and reviewed before the release service can accept an APPROVE decision.
+
+Repository code must not fabricate these external evidence records.
+
+Production remains locked.
