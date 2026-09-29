@@ -1,7 +1,7 @@
-# İşletme Sepeti Architecture Lock v3
+# İşletme Sepeti Architecture Lock v4
 
 Status: LOCKED
-Date: 2026-09-28
+Date: 2026-09-29
 
 ## Constitutional rules
 1. İşletme Sepeti is an independent B2B procurement marketplace.
@@ -17,6 +17,11 @@ Date: 2026-09-28
 11. The platform exposes a single public homepage. Business-operator, supplier and admin workspaces are not presented as parallel public tabs or public navigation choices.
 12. After authentication, session role and scope determine the workspace: BUSINESS -> İşletmeci Paneli, SUPPLIER -> Tedarikçi Paneli, PLATFORM_ADMIN -> Admin Command Center.
 13. The former product/demo label "Buyer/Alıcı Paneli" is renamed to "İşletmeci Paneli" in the product UI and documentation.
+14. Communication is a first-class platform domain. WhatsApp, email, web messages, RFQ messages, order messages, support cases, photo/list submissions and call-center interactions are correlated to customer and commerce entities through Communication Center.
+15. WhatsApp deep links may prefill contextual messages but must not be treated as proof that a message was sent, delivered or read. Delivery/read states require an authorized WhatsApp Business provider/webhook integration.
+16. Public homepage content, catalog surfaces, help, campaigns and other manageable content must support lifecycle control from Admin: draft, preview, schedule, publish, unpublish, archive, version and rollback where applicable.
+17. Reporting is required across Business, Supplier and Platform Admin workspaces; reports must distinguish observed platform facts from recommendations or automated actions.
+18. Security controls are enforced at API and data scope layers, not only by hiding UI. Authentication, RBAC/scope, MFA for privileged access, audit, rate limits, upload validation, secret storage, privacy/retention, backup and restore verification are mandatory platform concerns.
 
 ## Surfaces
 - `/`: the single public homepage and public discovery surface.
@@ -29,6 +34,13 @@ Date: 2026-09-28
 Public navigation must not expose BUSINESS, SUPPLIER or ADMIN workspaces as sibling tabs. Direct workspace routes remain protected by authentication, role and scope guards.
 
 These are contracts, not proof of live deployment.
+
+## Locked consolidated reference
+The complete functional and operational architecture is frozen in:
+`docs/ISLETME_SEPETI_CONSOLIDATED_ARCHITECTURE_v4_2026-09-29.md`
+
+ADR 0007 locks the single public entry and role-routed workspaces.
+ADR 0008 locks Communication Center and contextual WhatsApp behavior.
 
 ## Management lifecycle
 DRAFT -> REVIEW -> SCHEDULED -> PUBLISHED -> UNPUBLISHED -> ARCHIVED
