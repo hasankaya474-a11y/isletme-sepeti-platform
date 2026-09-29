@@ -1,0 +1,2 @@
+export const PHASE17_UI_STATES=Object.freeze({loading:{title:"Pilot verileri yükleniyor"},empty:{title:"Henüz pilot katılımı yok"},error:{title:"Pilot verileri yüklenemedi"},consentRequired:{title:"Konum izni gerekli"}});
+export const PHASE17_RESPONSIVE=Object.freeze({mobile:{enrollments:"cards",trace:"timeline",location:"cards",actions:"sticky"},tablet:{enrollments:"adaptive-table",trace:"two-column",location:"adaptive-table",actions:"visible"},desktop:{enrollments:"dense-table",trace:"timeline-panel",location:"dense-table",actions:"toolbar"}});
