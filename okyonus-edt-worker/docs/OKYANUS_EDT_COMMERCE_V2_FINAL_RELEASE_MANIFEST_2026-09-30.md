@@ -2,7 +2,7 @@
 
 Status: CODE COMPLETE / PRE-PRODUCTION
 Date: 2026-09-30
-Canonical code source commit: `96406528a399b66f986d155af4a8544f93bc46a0`
+Canonical code source commit: `a0a33335755d626e68043bd2779eb78e036c4932`
 Architecture build: `commerce-v2-2026-09-30-architecture-v15`
 
 ## Canonical Worker sources
@@ -120,7 +120,7 @@ Bonservis or other third-party product imagery is not copied into this release. 
 
 ## Quality evidence
 
-Canonical code source commit `96406528a399b66f986d155af4a8544f93bc46a0`:
+Canonical code source commit `a0a33335755d626e68043bd2779eb78e036c4932`:
 - Okyonus Worker Quality: PASS
 - quality: PASS
 - single-file bundle byte-current contract: PASS
