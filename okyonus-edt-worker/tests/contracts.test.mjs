@@ -320,3 +320,17 @@ test('staging Wrangler templates keep isolated binding placeholders',()=>{
   assert.match(zaman,/binding = "MEDIA_STORE"/);
   assert.match(zaman,/REQUIRE_CF_ACCESS = "true"/);
 });
+
+
+test('binding consistency audit locks canonical and legacy names',()=>{
+  const audit=fs.readFileSync(new URL('../scripts/binding-consistency-check.mjs',import.meta.url),'utf8');
+  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
+  const matrix=fs.readFileSync(new URL('../docs/BINDINGS_MATRIX.md',import.meta.url),'utf8');
+  assert.equal(pkg.scripts['staging:binding-check'],'node scripts/binding-consistency-check.mjs');
+  assert.match(audit,/BINDING CONSISTENCY PASS/);
+  assert.match(matrix,/Legacy compatibility aliases/);
+  assert.match(matrix,/Veritabanı/);
+  assert.match(matrix,/FOTOĞRAF_TEMP/);
+  assert.match(matrix,/MEDYA_MAĞAZASI/);
+  assert.doesNotMatch(audit,/fetch\(|https?:\/\/|child_process|execSync|spawnSync/);
+});

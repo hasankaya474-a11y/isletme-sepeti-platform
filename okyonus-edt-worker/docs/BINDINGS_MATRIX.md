@@ -45,3 +45,15 @@ Expected runtime bindings / variables:
 
 Staging must use staging D1/R2/secret values.
 Production bindings are never copied into GitHub or exposed in test fixtures.
+
+
+## Legacy compatibility aliases
+
+The canonical deployment names above remain the preferred names. The preserved Workers also accept legacy aliases so an existing environment is not broken during controlled migration.
+
+ZAMAN compatibility aliases currently present in source:
+- `DB` may fall back to `Veritabanı` or `Veritabani`
+- `PHOTO_TEMP` may fall back to `FOTOĞRAF_TEMP`
+- `MEDIA_STORE` may fall back to `MEDYA_MAĞAZASI` or `MEDYA_DEPO`
+
+Do not remove these aliases during the Commerce V2 release unless the production bindings have first been audited and intentionally migrated.
