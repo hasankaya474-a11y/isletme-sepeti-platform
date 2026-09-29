@@ -1,0 +1,2 @@
+import test from "node:test";import assert from "node:assert/strict";import {PHASE13_UI_STATES,PHASE13_RESPONSIVE} from "../apps/admin/src/phase13-ui-contract.mjs";import {ADMIN_A11Y} from "../apps/admin/src/accessibility-contract.mjs";
+test("phase13 UI state and responsive contracts",()=>{assert.match(PHASE13_UI_STATES.loading.title,/yükleniyor/i);assert.equal(PHASE13_RESPONSIVE.mobile.actions,"sticky");assert.equal(ADMIN_A11Y.keyboardNavigation,true);});
