@@ -49,7 +49,44 @@ async function commerceAdminApi(request,env,auth,headers){
  if(resource==="summary"){
   const out={};for(const [k,t] of Object.entries(tables))out[k]=Number((await env.DB.prepare("SELECT COUNT(*) n FROM "+t).first())?.n||0);
   out.products=Number((await env.DB.prepare("SELECT COUNT(*) n FROM b2b_products_v1").first())?.n||0);
+  out.settings=Number((await env.DB.prepare("SELECT COUNT(*) n FROM oky_storefront_settings_v1").first())?.n||0);
   return j({ok:true,data:out},200,headers);
+ }
+ if(resource==="settings"){
+  if(request.method==="GET"){const rows=(await env.DB.prepare("SELECT key,value,updated_at FROM oky_storefront_settings_v1 ORDER BY key").all()).results||[];return j({ok:true,data:Object.fromEntries(rows.map(x=>[x.key,x.value])),rows},200,headers)}
+  if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
+  if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
+  const b=await read(request),allowed=["siteTitle","logoUrl","phone","email","whatsapp","announcement","heroTitle","heroSubtitle","address","footerText"];
+  for(const key of allowed)if(Object.prototype.hasOwnProperty.call(b,key))await env.DB.prepare("INSERT INTO oky_storefront_settings_v1(key,value,updated_by,updated_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=datetime('now')").bind(key,clean(b[key],key==="heroSubtitle"||key==="footerText"?1000:500),auth.user.id).run();
+  return j({ok:true},200,headers);
+ }
+ if(resource==="legacy-catalog-sync"){
+  if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
+  if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
+  const origin=clean(env.PUBLIC_SITE_URL||"https://www.okyonusedt.com",500).replace(/\/$/,"");
+  let payload;try{const rr=await fetch(origin+"/api/products",{headers:{accept:"application/json"}});if(!rr.ok)return j({ok:false,error:"LEGACY_CATALOG_FETCH_FAILED",status:rr.status},502,headers);payload=await rr.json()}catch{return j({ok:false,error:"LEGACY_CATALOG_FETCH_FAILED"},502,headers)}
+  const items=Array.isArray(payload?.products)?payload.products.slice(0,1000):[];
+  let created=0,updated=0,failed=0;
+  for(const x of items){
+    const sourceId=clean(x.id,120),name=clean(x.name,220);if(!sourceId||!name){failed++;continue}
+    const txt=[x.category,x.masterCategory,x.subCategory,x.name].filter(Boolean).join(" ").toLocaleLowerCase("tr-TR");
+    let category=clean(x.category,120)||"Diğer Ürünler";
+    if(/deniz|balık|karides|kalamar|ahtapot|su ürün/.test(txt))category="Deniz Ürünleri";
+    else if(/donuk|patates|dondur/.test(txt))category="Donuk Ürünler";
+    else if(/et|kanat|tavuk|piliç|köfte|şarküteri|sucuk|sosis/.test(txt))category="Et & Şarküteri";
+    else if(/süt|peynir|krema|tereyağ|yoğurt/.test(txt))category="Süt & Şarküteri";
+    else if(/yağ/.test(txt))category="Yağlar";
+    else if(/sos|ketçap|mayonez|hardal|sirke/.test(txt))category="Soslar";
+    else if(/baharat|çeşni/.test(txt))category="Baharat";
+    else if(/bakliyat|pirinç|bulgur|makarna|un|şeker|tuz|kuru/.test(txt))category="Kuru Gıda";
+    const pack=[clean(x.amount,100),clean(x.package,100)].filter(Boolean).join(" • "),unit=/kg/i.test(pack)?"Kg":/litre|\bL\b/i.test(pack)?"Litre":"Adet";
+    try{
+      const row=await env.DB.prepare("SELECT id FROM b2b_products_v1 WHERE source_product_id=? LIMIT 1").bind(sourceId).first();
+      if(row){await env.DB.prepare("UPDATE b2b_products_v1 SET name=?,category=?,unit=?,package_text=?,active=1,updated_at=datetime('now') WHERE id=?").bind(name,category,unit,pack,row.id).run();updated++}
+      else{await env.DB.prepare("INSERT INTO b2b_products_v1(id,source_product_id,name,category,unit,package_text,image_url,stock_status,active,updated_at) VALUES(?,?,?,?,?,?,NULL,'ORDER',1,datetime('now'))").bind(crypto.randomUUID(),sourceId,name,category,unit,pack).run();created++}
+    }catch{failed++}
+  }
+  return j({ok:true,source:origin,count:items.length,created,updated,failed},200,headers);
  }
  if(resource==="product-history"&&id&&request.method==="GET"){
   const rows=(await env.DB.prepare("SELECT old_price,new_price,actor,created_at FROM b2b_price_history_v1 WHERE product_id=? ORDER BY created_at DESC LIMIT 50").bind(id).all()).results||[];
@@ -156,7 +193,7 @@ async function commerceAdminApi(request,env,auth,headers){
 }
 
 function commerceAdminPage(headers={}){
-return page(`<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ticaret Yönetimi | Okyanus EDT</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f3f7fa;color:#0b3150}.top{padding:18px 22px;background:#fff;border-bottom:1px solid #dce8f0;display:flex;justify-content:space-between;align-items:center}.top h1{margin:0}.tabs{display:flex;gap:8px;overflow:auto;padding:12px 22px;background:#fff}.tabs button{border:1px solid #cfe0ea;background:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}.tabs button.active{background:#0768b2;color:#fff}.wrap{padding:22px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.stat,.panel{background:#fff;border:1px solid #dce8f0;border-radius:15px;padding:16px}.stat b{font-size:28px;display:block}.panel{margin-top:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form{display:grid;gap:8px}.form input,.form textarea,.form select{width:100%;padding:10px;border:1px solid #bfd2df;border-radius:9px}.form button{padding:11px;border:0;border-radius:9px;background:#0768b2;color:#fff;font-weight:800}.table{overflow:auto}.table table{border-collapse:collapse;width:100%;font-size:12px}.table th,.table td{padding:9px;border-bottom:1px solid #edf3f7;text-align:left}.table img{width:60px;height:45px;object-fit:cover;border-radius:6px}.tabs button,.form button,.table button{min-height:44px}.table button{margin:2px;padding:8px 10px;border:0;border-radius:8px;background:#0768b2;color:#fff;font-weight:800}.table{max-width:100%;-webkit-overflow-scrolling:touch}@media(max-width:800px){.top{padding:12px;gap:10px;align-items:flex-start;flex-direction:column}.tabs{padding:8px 12px}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.wrap{padding:12px}.panel{padding:10px}.table table{min-width:760px}.form input,.form textarea,.form select{min-height:44px}}</style></head><body><header class="top"><h1>Ticaret Yönetimi</h1><a href="/">← Yönetici Ana Sayfa</a></header><nav class="tabs"><button data-r="products" class="active">Ürün & Fiyat</button><button data-r="categories">Kategoriler</button><button data-r="banners">Banner</button><button data-r="sections">Vitrin</button><button data-r="brands">Markalar</button><button data-r="campaigns">Kampanyalar</button><button data-r="delivery">Teslimat</button><button data-r="media">Medya</button><button data-r="help">Site Yardım</button></nav><main class="wrap"><div id="stats" class="stats"></div><section class="panel"><div id="content">Yükleniyor…</div></section></main><script>
+return page(`<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ticaret Yönetimi | Okyanus EDT</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f3f7fa;color:#0b3150}.top{padding:18px 22px;background:#fff;border-bottom:1px solid #dce8f0;display:flex;justify-content:space-between;align-items:center}.top h1{margin:0}.tabs{display:flex;gap:8px;overflow:auto;padding:12px 22px;background:#fff}.tabs button{border:1px solid #cfe0ea;background:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}.tabs button.active{background:#0768b2;color:#fff}.wrap{padding:22px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.stat,.panel{background:#fff;border:1px solid #dce8f0;border-radius:15px;padding:16px}.stat b{font-size:28px;display:block}.panel{margin-top:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form{display:grid;gap:8px}.form input,.form textarea,.form select{width:100%;padding:10px;border:1px solid #bfd2df;border-radius:9px}.form button{padding:11px;border:0;border-radius:9px;background:#0768b2;color:#fff;font-weight:800}.table{overflow:auto}.table table{border-collapse:collapse;width:100%;font-size:12px}.table th,.table td{padding:9px;border-bottom:1px solid #edf3f7;text-align:left}.table img{width:60px;height:45px;object-fit:cover;border-radius:6px}.tabs button,.form button,.table button{min-height:44px}.table button{margin:2px;padding:8px 10px;border:0;border-radius:8px;background:#0768b2;color:#fff;font-weight:800}.table{max-width:100%;-webkit-overflow-scrolling:touch}@media(max-width:800px){.top{padding:12px;gap:10px;align-items:flex-start;flex-direction:column}.tabs{padding:8px 12px}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.wrap{padding:12px}.panel{padding:10px}.table table{min-width:760px}.form input,.form textarea,.form select{min-height:44px}}</style></head><body><header class="top"><h1>Ticaret Yönetimi</h1><a href="/">← Yönetici Ana Sayfa</a></header><nav class="tabs"><button data-r="products" class="active">Ürün & Fiyat</button><button data-r="settings">Site Ayarları</button><button data-r="categories">Kategoriler</button><button data-r="banners">Banner</button><button data-r="sections">Vitrin</button><button data-r="brands">Markalar</button><button data-r="campaigns">Kampanyalar</button><button data-r="delivery">Teslimat</button><button data-r="media">Medya</button><button data-r="help">Site Yardım</button></nav><main class="wrap"><div id="stats" class="stats"></div><section class="panel"><div id="content">Yükleniyor…</div></section></main><script>
 const root='/api/commerce-admin/';let current='products';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(path,opt){const r=await fetch(root+path,{headers:{'content-type':'application/json'},...opt});const j=await r.json();if(!r.ok)throw Error(j.error||'İstek başarısız');return j}
@@ -164,8 +201,21 @@ async function summary(){const j=await api('summary');stats.innerHTML=Object.ent
 function productForm(x={}){
  return '<div class="grid"><form class="form" id="pf"><h3>'+(x.id?'Ürün Düzenle':'Yeni Ürün')+'</h3><input name="name" value="'+esc(x.name||'')+'" placeholder="Ürün adı" required><input name="category" value="'+esc(x.category||'')+'" placeholder="Kategori" required><input name="unit" value="'+esc(x.unit||'Adet')+'" placeholder="Birim" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" min="0" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><input name="brandId" list="brandIds" value="'+esc(x.brand_id||'')+'" placeholder="Marka seç / ID"><datalist id="brandIds"></datalist><textarea name="description" placeholder="Ürün açıklaması">'+esc(x.description||'')+'</textarea><input name="seoTitle" value="'+esc(x.seo_title||'')+'" placeholder="SEO başlık"><textarea name="seoDescription" placeholder="SEO açıklama">'+esc(x.seo_description||'')+'</textarea><input name="sortOrder" type="number" value="'+esc(x.sort_order??0)+'" placeholder="Sıra"><label><input type="checkbox" name="featured" '+(Number(x.featured)===1?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Öne çıkar</label><select name="stockStatus"><option value="'+esc(x.stock_status||'ORDER')+'">'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><label><input type="checkbox" name="active" '+(Number(x.active)!==0?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button>Kaydet</button>'+(x.id?'<button type="button" id="cancelProduct" style="background:#60778a">Vazgeç</button>':'')+'</div></form><div><h3>Ürün Yönetimi</h3><p>Görsel, fiyat, kategori, paket, stok ve görünürlük buradan yönetilir.</p><p>Silme işlemi güvenlik için ürünü pasife alır ve aktif fiyatını kapatır.</p></div></div>';
 }
-function catalogImportUI(){return '<div class="panel" style="margin:0 0 14px"><h3>Toplu Katalog İçe Aktar</h3><p>En fazla 500 ürün. JSON dizi formatı: name, category, unit, packageText, imageUrl, stockStatus, price, sourceProductId, brandId, description, seoTitle, seoDescription, featured, sortOrder.</p><textarea id="catalogImportJson" style="width:100%;min-height:150px" placeholder=\'[{"name":"Donuk Patates","category":"Donuk Ürünler","unit":"Koli","packageText":"4x2,5 kg","imageUrl":"https://...","stockStatus":"AVAILABLE","price":0}]\'></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" onclick="runCatalogImport()">İçe Aktar</button><span id="catalogImportResult"></span></div></div>'}
+function catalogImportUI(){return '<div class="panel" style="margin:0 0 14px"><h3>Katalog Yönetimi</h3><p>Eski Okyanus ürün havuzunu tek tıkla yönetilebilir D1 ürünlerine aktarabilir veya en fazla 500 ürünü JSON ile içe alabilirsiniz. Fiyat ve görsel uydurulmaz; yönetim panelinden siz belirlersiniz.</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" onclick="runLegacyCatalogSync()">Eski Okyanus Kataloğunu D1’e Aktar</button><span id="legacySyncResult"></span></div><textarea id="catalogImportJson" style="width:100%;min-height:150px" placeholder=\'[{"name":"Donuk Patates","category":"Donuk Ürünler","unit":"Koli","packageText":"4x2,5 kg","imageUrl":"https://...","stockStatus":"AVAILABLE","price":0}]\'></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" onclick="runCatalogImport()">JSON İçe Aktar</button><span id="catalogImportResult"></span></div></div>'}
 function productUI(rows){return catalogImportUI()+productForm()+'<div class="table" style="margin-top:14px"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="editProduct(\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="showPriceHistory(\''+esc(x.id)+'\')">Fiyat Geçmişi</button><button type="button" onclick="disableProduct(\''+esc(x.id)+'\')" style="background:#9d2635">Pasife Al</button></td></tr>').join('')+'</tbody></table></div>'}
+async function runLegacyCatalogSync(){
+ const out=document.getElementById('legacySyncResult');if(!out)return;
+ out.textContent='Eski katalog taranıyor...';
+ try{const j=await api('legacy-catalog-sync',{method:'POST',body:'{}'});out.textContent='Toplam: '+(j.count||0)+' • Yeni: '+(j.created||0)+' • Güncel: '+(j.updated||0)+' • Hatalı: '+(j.failed||0);await load();await summary()}catch(e){out.textContent='Aktarım hatası: '+e.message}
+}
+function settingsUI(x={}){
+ const d={siteTitle:'Okyanus EDT',logoUrl:'https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp',phone:'+90 535 881 32 64',email:'info@okyonusedt.com',whatsapp:'905358813264',announcement:'İstanbul HORECA tedariki • Profesyonel ürün • Hızlı teklif • Güvenli iletişim',heroTitle:'Profesyonel mutfağın alışverişi burada başlar.',heroSubtitle:'Ürünleri kategori kategori inceleyin, miktarı belirleyin ve sepetten sipariş veya teklif akışına geçin.',address:'İstanbul',footerText:'Restoran, kafe, otel, catering ve profesyonel mutfaklar için ürün, teklif ve tedarik çözümleri.',...x};
+ return '<div class="grid"><form class="form" id="settingsForm"><h3>Site Ayarları</h3><input name="siteTitle" value="'+esc(d.siteTitle)+'" placeholder="Site adı"><input name="logoUrl" value="'+esc(d.logoUrl)+'" placeholder="Logo URL"><input name="phone" value="'+esc(d.phone)+'" placeholder="Telefon"><input name="email" value="'+esc(d.email)+'" placeholder="E-posta"><input name="whatsapp" value="'+esc(d.whatsapp)+'" placeholder="WhatsApp numarası"><textarea name="announcement" placeholder="Üst duyuru">'+esc(d.announcement)+'</textarea><input name="heroTitle" value="'+esc(d.heroTitle)+'" placeholder="Ana banner başlığı"><textarea name="heroSubtitle" placeholder="Ana banner açıklaması">'+esc(d.heroSubtitle)+'</textarea><input name="address" value="'+esc(d.address)+'" placeholder="Adres / bölge"><textarea name="footerText" placeholder="Footer açıklaması">'+esc(d.footerText)+'</textarea><button>Site Ayarlarını Kaydet</button><div id="settingsResult" role="status"></div></form><div><h3>Merkezi Yönetim</h3><p>Logo, iletişim, duyuru, ana banner metni ve alt bilgi bu ekrandan değişir.</p><p>Ürün görseli/fiyatı Ürün & Fiyat; kategori, banner, vitrin, kampanya, marka, teslimat, medya ve yardım içerikleri üst sekmelerden yönetilir.</p><p><b>Not:</b> Logo için GitHub’daki resmî Okyanus EDT görseli varsayılan olarak bağlıdır.</p></div></div>';
+}
+async function bindSettings(){
+ const f=document.getElementById('settingsForm');if(!f)return;
+ f.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(f)),out=document.getElementById('settingsResult');if(out)out.textContent='Kaydediliyor...';try{await api('settings',{method:'POST',body:JSON.stringify(b)});if(out)out.textContent='Site ayarları kaydedildi ✓';await summary()}catch(err){if(out)out.textContent=err.message}}
+}
 async function runCatalogImport(){
  const out=document.getElementById('catalogImportResult'),ta=document.getElementById('catalogImportJson');if(!out||!ta)return;
  let items;try{items=JSON.parse(ta.value)}catch(_){out.textContent='Geçersiz JSON';return}
@@ -227,8 +277,9 @@ async function removeRow(resource,id){
 }
 async function load(){
  const j=await api(current);
- content.innerHTML=current==='products'?productUI(j.data):genericUI(current,j.data);
- if(current==='products'){await bindProductForm();return}
+ if(current==='products'){content.innerHTML=productUI(j.data);await bindProductForm();return}
+ if(current==='settings'){content.innerHTML=settingsUI(j.data||{});await bindSettings();return}
+ content.innerHTML=genericUI(current,j.data);
  const f=document.getElementById('gf');
  if(f){
    const cancel=document.getElementById('cancelEdit');
@@ -249,8 +300,6 @@ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{current=b.datase
 
 return { commerceAdminApi, commerceAdminPage };
 })();
-
-
 /*
 OKYANUS EDT — ZAMAN/ADMIN B2B YONETIM WORKER
 v1.40 PRODUCT-CARD + CONTACT-FLOW PASS — 2026-09-23
