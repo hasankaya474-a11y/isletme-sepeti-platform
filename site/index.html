@@ -31,7 +31,7 @@ main{padding:30px}.view{display:none}.view.active{display:block}.hero{display:gr
 </style>
 </head>
 <body>
-<header class="top"><div class="topin"><div class="brand">İşletme <b>Sepeti</b></div><div class="switch" id="surfaceSwitch"></div></div></header>
+<header class="top"><div class="topin"><div class="brand">İşletme <b>Sepeti</b></div><span class="badge" aria-label="Birleşik canlı görünüm, demo veriler">Canlı görünüm · demo veri</span><div class="switch" id="surfaceSwitch"></div></div></header>
 <div class="shell">
 <aside><div class="nav-title" id="navTitle">Menü</div><div class="nav" id="sideNav"></div></aside>
 <main>
@@ -93,9 +93,9 @@ main{padding:30px}.view{display:none}.view.active{display:block}.hero{display:gr
 <script>
 const surfaces={
  public:["Ana Sayfa","Kategoriler","Tedarikçiler","Nasıl Çalışır","Yardım"],
- buyer:["Ana Sayfa","Ürün Ara / Katalog","Kategoriler","Toptancılar","Liste Yükle","Teklifler","Sepetim","Siparişlerim","Teslimatlarım","Faturalarım","Raporlarım","Yardım"],
+ buyer:["Ana Sayfa","Ürün Ara / Katalog","Kategoriler","Toptancılar","Liste Yükle","Teklifler","Sepetim","Siparişlerim","Teslimatlarım","Tekrar Sipariş","Satın Alma Listelerim","Tedarikçilerim","Favorilerim","Faturalarım","Raporlarım","Şubelerim","Kullanıcı & Yetki","Bildirimler","İşletme Ayarları","Yardım"],
  supplier:["Genel Bakış","RFQ'lar","Tekliflerim","Ürünlerim","Fiyat & Stok","Siparişler","Teslimatlar","Faturalar","Raporlar","Yardım"],
- admin:["Genel Bakış","Ticaret","Katalog","Fiyat & Stok","Teslimat","İşletmeciler","Toptancılar","Üyelik & Yetki","Vitrin Studio","Kampanya & Reklam","Raporlama","Pazar Radarı","Destek / Çağrı Merkezi","Entegrasyonlar","Güvenlik & KVKK","Audit / Hareketler","Engine Room"]
+ admin:["Genel Bakış","Ticaret","Katalog","Fiyat & Stok","Teslimat","İşletmeciler","Toptancılar","Üyelik & Yetki","Vitrin Studio","Kampanya & Reklam","Raporlama","Pazar Radarı","Destek / Çağrı Merkezi","Yardım & Site Kılavuzu","Sözleşmeler","Entegrasyonlar","Güvenlik & KVKK","Audit / Hareketler","Engine Room"]
 };
 const titles={public:"Public",buyer:"Alıcı",supplier:"Tedarikçi",admin:"Admin"};
 const products=[
