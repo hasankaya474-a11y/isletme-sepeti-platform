@@ -1,16 +1,28 @@
 # Phase 16 Gate
-Status: IN PROGRESS
-Started: 2026-09-29
+Status: PASS FOUNDATION
+Locked: 2026-09-29
 
 Scope: Privacy, retention, security hardening, load and restore tests.
 
-Foundation rules:
-- retention rules are explicit, scoped and auditable
-- privacy-sensitive exports/actions are permission controlled
-- restore verification is evidence-based
-- load budgets are measured against declared thresholds
-- security hardening is additive and must not weaken prior auth/MFA/CSRF/tenant/audit controls
-- no production authorization is implied by repository tests
-- production remains locked
+Closed foundation:
+- explicit retention policies and lifecycle
+- restore verification evidence records
+- declared load budgets with throughput, p95 latency and error-rate evaluation
+- additive security hardening contract preserving auth/MFA/CSRF/tenant/audit controls
+- codeless Admin security-readiness center
+- protected Admin API with authentication, CSRF, permission and MFA enforcement
+- SQLite persistence E2E
+- Help/Site Guide plus privacy/security touchpoints
+- loading/empty/error UI states and responsive/accessibility contracts
+- explicit statement that repository tests are not penetration-test certification
 
-PASS requires the full module PASS rule in docs/ARCHITECTURE_LOCK.md.
+Final CI evidence:
+- GitHub Actions quality run 36531348825: SUCCESS
+- Head commit: a1f3d69f3eb84617e3ee06bff74aabe6925147b3
+- Architecture check: PASS
+- Test suite: PASS
+
+Gate decision:
+Phase 16 is PASS FOUNDATION and is locked as the retention/security-readiness/load/restore baseline. Production still requires later pilot, external/operational evidence and explicit release gates.
+
+Production remains locked.
