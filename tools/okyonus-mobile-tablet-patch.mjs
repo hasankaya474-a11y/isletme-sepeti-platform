@@ -3,58 +3,79 @@ import fs from 'node:fs';
 const file='okyonus-edt-worker/src/deniz-worker.js';
 let s=fs.readFileSync(file,'utf8');
 
-function replaceOnce(from,to,label){
-  const i=s.indexOf(from);
-  if(i<0) throw new Error('PATCH_TARGET_NOT_FOUND: '+label);
-  if(s.indexOf(from,i+1)>=0) throw new Error('PATCH_TARGET_NOT_UNIQUE: '+label);
-  s=s.slice(0,i)+to+s.slice(i+from.length);
+const homeStart=s.indexOf('function okySalesFirstHomeV1');
+if(homeStart<0) throw new Error('HOME_FUNCTION_NOT_FOUND');
+const helpStart=s.indexOf('function okySalesHelpPage',homeStart);
+if(helpStart<0) throw new Error('HOME_FUNCTION_END_NOT_FOUND');
+let home=s.slice(homeStart,helpStart);
+
+function need(ok,label){if(!ok)throw new Error('PATCH_TARGET_NOT_FOUND: '+label)}
+
+if(!home.includes('@media(max-width:980px)')){
+  const i=home.indexOf('@media(max-width:860px)');
+  need(i>=0,'homepage mobile breakpoint');
+  const tablet='@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+  home=home.slice(0,i)+tablet+home.slice(i);
 }
 
-replaceOnce(
-  '@media(max-width:860px){.top{',
-  '@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px){.top{',
-  'tablet breakpoint'
-);
+if(!home.includes('safe-area-inset-top')){
+  const from='.top{height:auto;min-height:66px;flex-wrap:wrap;padding:10px 12px}';
+  need(home.includes(from),'mobile safe area');
+  home=home.replace(from,'.top{height:auto;min-height:66px;flex-wrap:wrap;padding:max(10px,env(safe-area-inset-top)) 12px 10px}');
+}
 
-replaceOnce(
-  '.top{height:auto;min-height:66px;flex-wrap:wrap;padding:10px 12px}',
-  '.top{height:auto;min-height:66px;flex-wrap:wrap;padding:max(10px,env(safe-area-inset-top)) 12px 10px}',
-  'mobile safe area'
-);
+if(!home.includes('min-height:52px;touch-action:manipulation')){
+  const marker='.mobileBar a,.mobileBar button{';
+  const i=home.indexOf(marker),e=home.indexOf('}',i);
+  need(i>=0&&e>i,'mobile touch targets');
+  const block=home.slice(i,e+1);
+  home=home.slice(0,i)+block.slice(0,-1)+';min-height:52px;touch-action:manipulation}'+home.slice(e+1);
+}
 
-replaceOnce(
-  '.mobileBar a,.mobileBar button{border:0;background:#fff;color:#34586f;text-decoration:none;text-align:center;font-size:10px;font-weight:850;padding:6px 2px}',
-  '.mobileBar a,.mobileBar button{border:0;background:#fff;color:#34586f;text-decoration:none;text-align:center;font-size:10px;font-weight:850;padding:6px 2px;min-height:52px;touch-action:manipulation}',
-  'mobile touch targets'
-);
+if(!home.includes('.topActions button{display:none}')){
+  const marker='@media(max-width:480px){';
+  const i=home.indexOf(marker);
+  need(i>=0,'phone breakpoint');
+  const extra='.topActions button{display:none}.heroButtons a{flex:1 1 100%;text-align:center}';
+  home=home.slice(0,i+marker.length)+extra+home.slice(i+marker.length);
+}
 
-replaceOnce(
-  '@media(max-width:480px){.products{grid-template-columns:1fr 1fr;gap:8px}',
-  '@media(max-width:480px){.topActions button{display:none}.heroButtons a{flex:1 1 100%;text-align:center}.products{grid-template-columns:1fr 1fr;gap:8px}',
-  'phone header and CTA'
-);
+if(!home.includes('.categoryStrip{')){
+  const marker='.section{margin-top:12px';
+  const i=home.indexOf(marker);
+  need(i>=0,'section css');
+  const css='.categoryStrip{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding:2px 0 10px;margin:2px 0 0;scroll-snap-type:x proximity}.categoryStrip a{flex:0 0 auto;scroll-snap-align:start;min-height:40px;display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #d6e5ed;border-radius:999px;background:#fff;color:#1a506d;text-decoration:none;font-size:12px;font-weight:850;white-space:nowrap}.categoryStrip a:first-child{background:#e9f7fb;color:#087fc1;border-color:#bfe4ef}';
+  home=home.slice(0,i)+css+home.slice(i);
+}
 
-replaceOnce(
-  '.quick span{font-size:12px;color:#6d8594}.section{',
-  '.quick span{font-size:12px;color:#6d8594}.categoryStrip{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;padding:2px 0 10px;margin:2px 0 0;scroll-snap-type:x proximity}.categoryStrip a{flex:0 0 auto;scroll-snap-align:start;min-height:40px;display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #d6e5ed;border-radius:999px;background:#fff;color:#1a506d;text-decoration:none;font-size:12px;font-weight:850;white-space:nowrap}.categoryStrip a:first-child{background:#e9f7fb;color:#087fc1;border-color:#bfe4ef}.section{',
-  'category strip css'
-);
+if(!home.includes('aria-label=\\"Ürün kategorileri\\"')){
+  const quick=home.indexOf('<section class=\\"quick\\">');
+  const marker='</section><section class=\\"section\\">';
+  const i=home.indexOf(marker,quick);
+  need(quick>=0&&i>=0,'quick section end');
+  const categories='<nav class=\\"categoryStrip\\" aria-label=\\"Ürün kategorileri\\"><a href=\\"/urunler\\">Tüm Ürünler</a><a href=\\"/urunler?category=deniz-urunleri\\">Deniz Ürünleri</a><a href=\\"/urunler?category=donuk\\">Donuk</a><a href=\\"/urunler?category=et\\">Et</a><a href=\\"/urunler?category=tavuk\\">Tavuk</a><a href=\\"/urunler?category=sut\\">Süt & Şarküteri</a><a href=\\"/urunler?category=yag\\">Yağlar</a><a href=\\"/urunler?category=bakliyat\\">Bakliyat</a><a href=\\"/urunler?category=baharat\\">Baharat</a><a href=\\"/urunler?category=sos\\">Sos & Konserve</a><a href=\\"/urunler?category=ithal\\">İthal</a></nav>';
+  home=home.slice(0,i+10)+categories+home.slice(i+10);
+}
 
-const quickEnd='<a href=\\"https://wa.me/905358813264?text=Merhaba%20Okyanus%20EDT%2C%20%C3%BCr%C3%BCn%20ve%20teklif%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum.\\" target=\\"_blank\\" rel=\\"noopener\\"><b>WhatsApp Satış</b><span>Satış ekibine ürün veya teklif bağlamında ulaşın.</span></a></section>';
-const categories='<nav class=\\"categoryStrip\\" aria-label=\\"Ürün kategorileri\\"><a href=\\"/urunler\\">Tüm Ürünler</a><a href=\\"/urunler?category=deniz-urunleri\\">Deniz Ürünleri</a><a href=\\"/urunler?category=donuk\\">Donuk</a><a href=\\"/urunler?category=et\\">Et</a><a href=\\"/urunler?category=tavuk\\">Tavuk</a><a href=\\"/urunler?category=sut\\">Süt & Şarküteri</a><a href=\\"/urunler?category=yag\\">Yağlar</a><a href=\\"/urunler?category=bakliyat\\">Bakliyat</a><a href=\\"/urunler?category=baharat\\">Baharat</a><a href=\\"/urunler?category=sos\\">Sos & Konserve</a><a href=\\"/urunler?category=ithal\\">İthal</a></nav>';
-replaceOnce(quickEnd,quickEnd+categories,'mobile/tablet category vitrine');
+if(!home.includes('Gizlilik</a> · <a href=\\"/yardim\\">Yardım</a>')){
+  const from='Gizlilik</a></footer>';
+  need(home.includes(from),'footer help');
+  home=home.replace(from,'Gizlilik</a> · <a href=\\"/yardim\\">Yardım</a></footer>');
+}
 
-replaceOnce(
-  '· <a href=\\"/gizlilik\\">Gizlilik</a></footer>',
-  '· <a href=\\"/gizlilik\\">Gizlilik</a> · <a href=\\"/yardim\\">Yardım</a></footer>',
-  'mobile help access'
-);
+s=s.slice(0,homeStart)+home+s.slice(helpStart);
 
-replaceOnce(
-  '@media(max-width:860px){.dm2-mobile-tabs{display:none!important}.dm2-workspace{display:flex!important;flex-direction:column}.dm2-workspace .dm2-editor{display:grid!important;order:1}.dm2-workspace .dm2-stage{display:block!important;order:2;margin-top:14px}.dm2-workspace .dm2-result{display:grid!important;order:3;margin-top:12px}}',
-  '@media(max-width:860px){.dm2-mobile-tabs{display:grid!important}.dm2-workspace{display:block!important}.dm2-workspace .dm2-editor{display:grid!important}.dm2-workspace .dm2-stage,.dm2-workspace .dm2-result{display:none!important}.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-editor{display:none!important}.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-stage,.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-result{display:block!important}.dm2-stage{margin-top:8px}.dm2-result{margin-top:12px}}',
-  'digital menu mobile tabs'
-);
+const dmStart=s.indexOf('function digitalMenuStudioV2');
+need(dmStart>=0,'digital menu studio');
+const bad='@media(max-width:860px){.dm2-mobile-tabs{display:none!important}';
+const badStart=s.indexOf(bad,dmStart);
+if(badStart>=0){
+  const lineEnd=s.indexOf('\n',badStart);
+  need(lineEnd>badStart,'digital menu override line');
+  const fixed='@media(max-width:860px){.dm2-mobile-tabs{display:grid!important}.dm2-workspace{display:block!important}.dm2-workspace .dm2-editor{display:grid!important}.dm2-workspace .dm2-stage,.dm2-workspace .dm2-result{display:none!important}.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-editor{display:none!important}.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-stage,.dm2-workspace[data-mobile-view=\\"preview\\"] .dm2-result{display:block!important}.dm2-stage{margin-top:8px}.dm2-result{margin-top:12px}}';
+  s=s.slice(0,badStart)+fixed+s.slice(lineEnd);
+}
+need(!s.includes('@media(max-width:860px){.dm2-mobile-tabs{display:none!important}'),'digital menu mobile tabs still hidden');
 
 fs.writeFileSync(file,s);
 console.log('patched',file,s.length);
