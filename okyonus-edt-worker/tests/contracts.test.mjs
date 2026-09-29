@@ -245,3 +245,16 @@ test('Commerce V2 cart quote flow keeps product integrity',()=>{
   assert.match(commerce,/grid-template-columns:minmax\(0,1fr\) 68px 44px/);
   assert.match(commerce,/min-width:44px;min-height:44px/);
 });
+
+
+test('Commerce V2 product admin supports create edit and safe soft-delete',()=>{
+  assert.match(commerceAdmin,/request\.method==="POST"&&!id/);
+  assert.match(commerceAdmin,/INSERT INTO b2b_products_v1/);
+  assert.match(commerceAdmin,/request\.method==="DELETE"&&id/);
+  assert.match(commerceAdmin,/UPDATE b2b_products_v1 SET active=0/);
+  assert.match(commerceAdmin,/UPDATE b2b_prices_v1 SET active=0/);
+  assert.match(commerceAdmin,/function productForm\(/);
+  assert.match(commerceAdmin,/function disableProduct\(/);
+  assert.match(commerceAdmin,/Pasife Al/);
+  assert.match(commerceAdmin,/NAME_CATEGORY_REQUIRED/);
+});
