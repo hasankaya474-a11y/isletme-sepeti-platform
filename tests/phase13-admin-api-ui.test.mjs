@@ -1,0 +1,5 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {Router} from "../apps/api/src/router.mjs";import {registerPhase13Routes} from "../apps/api/src/phase13-routes.mjs";import {renderSupportCenter} from "../apps/admin/src/support-center-page.mjs";
+function auth(){return {userId:"admin",session:{mfaLevel:1},grants:[{permission:"admin.configuration.manage",scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE",organizationType:"PLATFORM",organizationId:"platform"}};}
+test("support center is semantic and escaped",()=>{const h=renderSupportCenter({cases:[{status:"OPEN",caseType:"DISPUTE",subject:"<script>"}]});assert.match(h,/Destek \/ Çağrı Merkezi/);assert.doesNotMatch(h,/<script>/);});
+test("support API propagates actor",async()=>{let seen;const r=new Router();registerPhase13Routes(r,{supportCases:{create:x=>(seen=x,x),transition:x=>x,assign:x=>x,addEvent:x=>x},disputes:{open:x=>x}});const out=await r.handle({method:"POST",path:"/v1/admin/support/cases",body:{subject:"X"},requestId:"r",cookies:{csrf:"t"},headers:{"x-csrf-token":"t"},auth:auth()});assert.equal(out.ok,true);assert.equal(seen.actorId,"admin");});
