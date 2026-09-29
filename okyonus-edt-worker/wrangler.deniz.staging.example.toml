@@ -1,0 +1,24 @@
+name = "deniz-edt-v2-staging"
+main = "src/deniz-worker.js"
+compatibility_date = "2026-09-29"
+
+# STAGING ONLY. Replace placeholder values before deploy.
+# Never copy production IDs/secrets into this file.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "REPLACE_WITH_STAGING_D1_NAME"
+database_id = "REPLACE_WITH_STAGING_D1_ID"
+
+[[r2_buckets]]
+binding = "PHOTO_TEMP"
+bucket_name = "REPLACE_WITH_STAGING_PHOTO_BUCKET"
+
+[vars]
+ENVIRONMENT = "staging"
+MAIL_FROM = "REPLACE_WITH_STAGING_MAIL_FROM"
+MAIL_TO = "REPLACE_WITH_STAGING_MAIL_TO"
+ADMIN_MAIL_TO = "REPLACE_WITH_STAGING_ADMIN_MAIL_TO"
+
+# Preserve any additional existing DENIZ vars/secrets through Wrangler secret management.
+# Do not commit secret values.
