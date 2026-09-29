@@ -1,22 +1,33 @@
 # Phase 4 Gate
-Status: IN PROGRESS
-Started: 2026-09-29
+Status: PASS FOUNDATION
+Locked: 2026-09-29
 
 Scope: Pricing, Money/Tax, Stock, Reservation, Delivery Zones, Calendar and SLA.
 
-Foundation sequence:
-1. Pricing + Money/Tax deterministic domain rules
-2. Stock + reservation consistency
-3. Delivery zone/calendar/SLA contracts
-4. Admin/control counterparts for normal operations
-5. Protected APIs, persistence E2E, audit/events/help/privacy touchpoints
-6. responsive/accessibility/error-empty-loading states and regression coverage
+Closed foundation:
+- deterministic money using integer minor units and explicit currency
+- tax profiles and deterministic tax calculation
+- price books and supplier-offer price attachment
+- stock locations, balances and movement ledger
+- reservation lifecycle with available-stock protection and single commit semantics
+- delivery zones, calendars, cutoff/lead-time SLA foundations
+- codeless Admin management surfaces
+- protected Admin API with authentication, CSRF, permission and MFA enforcement
+- audit coverage for pricing, tax, stock, reservation and delivery mutations
+- SQLite persistence E2E
+- explicit Phase 4 event contracts
+- Help/Site Guide and privacy/legal/accounting engineering touchpoints
+- loading, empty, error and forbidden UI states
+- responsive and accessibility regression contracts
+- additive integration preserving Phase 2 and Phase 3 locks
 
-Safety rules:
-- no silent AI price changes
-- money stored as integer minor units with explicit currency
-- tax computation is deterministic and explainable
-- production remains locked
-- Phase 2 and Phase 3 contracts remain additive and unchanged
+Final CI evidence:
+- GitHub Actions quality run 36525464321: SUCCESS
+- Head commit: ce7069f1565cefd06f4b08ebd07612fb8d8a34df
+- Architecture check: PASS
+- Test suite: PASS
 
-PASS requires the full module PASS rule in docs/ARCHITECTURE_LOCK.md.
+Gate decision:
+Phase 4 is PASS FOUNDATION and is locked as the pricing, stock and delivery-policy baseline. Future work must be additive and must not weaken money integrity, stock/reservation separation, auditability, codeless Admin control, tenant authorization or delivery-policy contracts.
+
+This is not production authorization. Production remains locked behind later security, restore, legal/accounting, private-pilot and explicit release gates.
