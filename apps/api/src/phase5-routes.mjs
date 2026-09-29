@@ -19,4 +19,5 @@ export function registerPhase5Routes(router,{search,productCards,buyerLists,matc
 
  router.register("POST","/v1/admin/search/synonyms",admin(async req=>ok(searchAdmin.createSynonym({...req.body,actorId:req.auth.userId}),{requestId:req.requestId})));
  router.register("POST","/v1/admin/search/synonyms/transition",admin(async req=>ok(searchAdmin.transition({...req.body,actorId:req.auth.userId}),{requestId:req.requestId})));
+ router.register("POST","/v1/admin/matching/suggest-text",admin(async req=>ok(matching.suggestTextCandidates({...req.body,actorId:req.auth.userId}),{requestId:req.requestId})));
 }
