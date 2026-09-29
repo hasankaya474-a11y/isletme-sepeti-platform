@@ -3,6 +3,20 @@ function page(body,headers={}){const h=new Headers(headers);h.set("content-type"
 function clean(v,n=500){return String(v==null?"":v).trim().slice(0,n)}
 function canWrite(auth){return ["owner","admin","editor"].includes(auth?.user?.role)}
 async function read(request){try{return await request.json()}catch{return {}}}
+async function upsertProductMeta(env,productId,b){
+ const old=await env.DB.prepare("SELECT * FROM oky_product_meta_v1 WHERE product_id=?").bind(productId).first();
+ const pick=(k,alt,def="")=>Object.prototype.hasOwnProperty.call(b,k)?b[k]:(alt&&Object.prototype.hasOwnProperty.call(b,alt)?b[alt]:(old?.[def||k]??""));
+ const brandId=clean(pick("brandId","brand_id","brand_id"),120)||null;
+ const description=clean(pick("description",null,"description"),5000);
+ const seoTitle=clean(pick("seoTitle","seo_title","seo_title"),220);
+ const seoDescription=clean(pick("seoDescription","seo_description","seo_description"),500);
+ const sortOrder=Object.prototype.hasOwnProperty.call(b,"sortOrder")?Number(b.sortOrder||0):Number(old?.sort_order||0);
+ const featured=Object.prototype.hasOwnProperty.call(b,"featured")?(b.featured?1:0):Number(old?.featured||0);
+ await env.DB.prepare(`INSERT INTO oky_product_meta_v1(product_id,brand_id,description,seo_title,seo_description,sort_order,featured,updated_at)
+ VALUES(?,?,?,?,?,?,?,datetime('now'))
+ ON CONFLICT(product_id) DO UPDATE SET brand_id=excluded.brand_id,description=excluded.description,seo_title=excluded.seo_title,seo_description=excluded.seo_description,sort_order=excluded.sort_order,featured=excluded.featured,updated_at=datetime('now')`)
+ .bind(productId,brandId,description,seoTitle,seoDescription,sortOrder,featured).run();
+}
 
 async function ensure(env){
  const q=[
@@ -17,7 +31,8 @@ async function ensure(env){
 ,
  `CREATE TABLE IF NOT EXISTS oky_delivery_rules_v1(id TEXT PRIMARY KEY,region TEXT NOT NULL DEFAULT 'İstanbul',district TEXT,min_order REAL,fee REAL,free_threshold REAL,cutoff TEXT,delivery_days TEXT,cold_chain INTEGER NOT NULL DEFAULT 1,sort_order INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL DEFAULT (datetime('now')))`
 ,
- `CREATE TABLE IF NOT EXISTS oky_media_assets_v1(id TEXT PRIMARY KEY,name TEXT NOT NULL,url TEXT NOT NULL,kind TEXT NOT NULL DEFAULT 'product',alt_text TEXT,tags TEXT,sort_order INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL DEFAULT (datetime('now')),updated_at TEXT NOT NULL DEFAULT (datetime('now')))`
+ `CREATE TABLE IF NOT EXISTS oky_media_assets_v1(id TEXT PRIMARY KEY,name TEXT NOT NULL,url TEXT NOT NULL,kind TEXT NOT NULL DEFAULT 'product',alt_text TEXT,tags TEXT,sort_order INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL DEFAULT (datetime('now')),updated_at TEXT NOT NULL DEFAULT (datetime('now')))`,
+ `CREATE TABLE IF NOT EXISTS oky_product_meta_v1(product_id TEXT PRIMARY KEY,brand_id TEXT,description TEXT,seo_title TEXT,seo_description TEXT,sort_order INTEGER NOT NULL DEFAULT 0,featured INTEGER NOT NULL DEFAULT 0,updated_at TEXT NOT NULL DEFAULT (datetime('now')))`
  ];for(const s of q)await env.DB.prepare(s).run();
  const cats=[["deniz-urunleri","Deniz Ürünleri","🐟"],["donuk-urunler","Donuk Ürünler","❄"],["et-kanatli","Et & Kanatlı","🥩"],["sut-sarkuteri","Süt & Şarküteri","🧀"],["yaglar","Yağlar","🫗"],["soslar","Soslar","🥫"],["kuru-gida","Kuru Gıda","🌾"],["baharat","Baharat","✦"]];
  for(let i=0;i<cats.length;i++)await env.DB.prepare("INSERT OR IGNORE INTO oky_storefront_categories_v1(id,name,slug,icon,sort_order,active) VALUES(?,?,?,?,?,1)").bind(crypto.randomUUID(),cats[i][1],cats[i][0],cats[i][2],i).run();
@@ -59,6 +74,7 @@ export async function commerceAdminApi(request,env,auth,headers){
           .bind(id,sourceId||null,name,category,unit,clean(x.packageText||x.package_text,140),image||null,clean(x.stockStatus||x.stock_status,30)||"ORDER",x.active===false?0:1).run();
         created++;
       }
+      await upsertProductMeta(env,id,x);
       if(x.price!==undefined&&Number.isFinite(Number(x.price))){
         const current=await env.DB.prepare("SELECT price FROM b2b_prices_v1 WHERE product_id=? AND active=1 ORDER BY valid_from DESC LIMIT 1").bind(id).first();
         if(Number(current?.price)!==Number(x.price)){
@@ -72,7 +88,12 @@ export async function commerceAdminApi(request,env,auth,headers){
   return j({ok:failed.length===0,created,updated,failed},failed.length?207:200,headers);
  }
  if(resource==="products"){
-  if(request.method==="GET"){const rows=(await env.DB.prepare(`SELECT p.*,(SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 ORDER BY valid_from DESC LIMIT 1) current_price FROM b2b_products_v1 p ORDER BY active DESC,name LIMIT 500`).all()).results||[];return j({ok:true,data:rows},200,headers)}
+  if(request.method==="GET"){const rows=(await env.DB.prepare(`SELECT p.*,
+ (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 ORDER BY valid_from DESC LIMIT 1) current_price,
+ m.brand_id,m.description,m.seo_title,m.seo_description,m.sort_order,m.featured,
+ (SELECT name FROM oky_brands_v1 b WHERE b.id=m.brand_id LIMIT 1) brand_name
+ FROM b2b_products_v1 p LEFT JOIN oky_product_meta_v1 m ON m.product_id=p.id
+ ORDER BY p.active DESC,m.featured DESC,m.sort_order,p.name LIMIT 500`).all()).results||[];return j({ok:true,data:rows},200,headers)}
   if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
   const b=await read(request);
   if(request.method==="DELETE"&&id){
@@ -88,6 +109,7 @@ export async function commerceAdminApi(request,env,auth,headers){
     if(image&&!/^https:\/\//i.test(image))return j({ok:false,error:"INVALID_IMAGE_URL"},400,headers);
     await env.DB.prepare("INSERT INTO b2b_products_v1(id,source_product_id,name,category,unit,package_text,image_url,stock_status,active,updated_at) VALUES(?,?,?,?,?,?,?,?,?,datetime('now'))")
       .bind(rid,null,name,category,unit,clean(b.packageText,140),image||null,clean(b.stockStatus,30)||"ORDER",b.active===false?0:1).run();
+    await upsertProductMeta(env,rid,b);
     if(b.price!==undefined&&Number.isFinite(Number(b.price))){
       await env.DB.prepare("INSERT INTO b2b_prices_v1(id,product_id,price,currency,active) VALUES(?,?,?,?,1)").bind(crypto.randomUUID(),rid,Number(b.price),"TRY").run();
       await env.DB.prepare("INSERT INTO b2b_price_history_v1(id,product_id,old_price,new_price,actor) VALUES(?,?,?,?,?)").bind(crypto.randomUUID(),rid,null,Number(b.price),auth.user.id).run();
@@ -98,6 +120,7 @@ export async function commerceAdminApi(request,env,auth,headers){
     const old=await env.DB.prepare("SELECT * FROM b2b_products_v1 WHERE id=?").bind(id).first();if(!old)return j({ok:false,error:"PRODUCT_NOT_FOUND"},404,headers);
     const image=clean(b.imageUrl,1500);if(image&&!/^https:\/\//i.test(image))return j({ok:false,error:"INVALID_IMAGE_URL"},400,headers);
     await env.DB.prepare("UPDATE b2b_products_v1 SET name=?,category=?,unit=?,package_text=?,image_url=?,stock_status=?,active=?,updated_at=datetime('now') WHERE id=?").bind(clean(b.name,220)||old.name,clean(b.category,120)||old.category,clean(b.unit,30)||old.unit,clean(b.packageText,140),image||null,clean(b.stockStatus,30)||old.stock_status,b.active===false?0:1,id).run();
+    await upsertProductMeta(env,id,b);
     if(b.price!==undefined&&Number.isFinite(Number(b.price))){
       const oldPrice=await env.DB.prepare("SELECT price FROM b2b_prices_v1 WHERE product_id=? AND active=1 ORDER BY valid_from DESC LIMIT 1").bind(id).first();
       await env.DB.prepare("UPDATE b2b_prices_v1 SET active=0 WHERE product_id=? AND active=1").bind(id).run();
@@ -134,9 +157,9 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 async function api(path,opt){const r=await fetch(root+path,{headers:{'content-type':'application/json'},...opt});const j=await r.json();if(!r.ok)throw Error(j.error||'İstek başarısız');return j}
 async function summary(){const j=await api('summary');stats.innerHTML=Object.entries(j.data).map(([k,v])=>'<article class="stat"><b>'+v+'</b><span>'+esc(k)+'</span></article>').join('')}
 function productForm(x={}){
- return '<div class="grid"><form class="form" id="pf"><h3>'+(x.id?'Ürün Düzenle':'Yeni Ürün')+'</h3><input name="name" value="'+esc(x.name||'')+'" placeholder="Ürün adı" required><input name="category" value="'+esc(x.category||'')+'" placeholder="Kategori" required><input name="unit" value="'+esc(x.unit||'Adet')+'" placeholder="Birim" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" min="0" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><select name="stockStatus"><option value="'+esc(x.stock_status||'ORDER')+'">'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><label><input type="checkbox" name="active" '+(Number(x.active)!==0?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button>Kaydet</button>'+(x.id?'<button type="button" id="cancelProduct" style="background:#60778a">Vazgeç</button>':'')+'</div></form><div><h3>Ürün Yönetimi</h3><p>Görsel, fiyat, kategori, paket, stok ve görünürlük buradan yönetilir.</p><p>Silme işlemi güvenlik için ürünü pasife alır ve aktif fiyatını kapatır.</p></div></div>';
+ return '<div class="grid"><form class="form" id="pf"><h3>'+(x.id?'Ürün Düzenle':'Yeni Ürün')+'</h3><input name="name" value="'+esc(x.name||'')+'" placeholder="Ürün adı" required><input name="category" value="'+esc(x.category||'')+'" placeholder="Kategori" required><input name="unit" value="'+esc(x.unit||'Adet')+'" placeholder="Birim" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" min="0" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><input name="brandId" value="'+esc(x.brand_id||'')+'" placeholder="Marka ID"><textarea name="description" placeholder="Ürün açıklaması">'+esc(x.description||'')+'</textarea><input name="seoTitle" value="'+esc(x.seo_title||'')+'" placeholder="SEO başlık"><textarea name="seoDescription" placeholder="SEO açıklama">'+esc(x.seo_description||'')+'</textarea><input name="sortOrder" type="number" value="'+esc(x.sort_order??0)+'" placeholder="Sıra"><label><input type="checkbox" name="featured" '+(Number(x.featured)===1?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Öne çıkar</label><select name="stockStatus"><option value="'+esc(x.stock_status||'ORDER')+'">'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><label><input type="checkbox" name="active" '+(Number(x.active)!==0?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button>Kaydet</button>'+(x.id?'<button type="button" id="cancelProduct" style="background:#60778a">Vazgeç</button>':'')+'</div></form><div><h3>Ürün Yönetimi</h3><p>Görsel, fiyat, kategori, paket, stok ve görünürlük buradan yönetilir.</p><p>Silme işlemi güvenlik için ürünü pasife alır ve aktif fiyatını kapatır.</p></div></div>';
 }
-function catalogImportUI(){return '<div class="panel" style="margin:0 0 14px"><h3>Toplu Katalog İçe Aktar</h3><p>En fazla 500 ürün. JSON dizi formatı: name, category, unit, packageText, imageUrl, stockStatus, price, sourceProductId.</p><textarea id="catalogImportJson" style="width:100%;min-height:150px" placeholder=\'[{"name":"Donuk Patates","category":"Donuk Ürünler","unit":"Koli","packageText":"4x2,5 kg","imageUrl":"https://...","stockStatus":"AVAILABLE","price":0}]\'></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" onclick="runCatalogImport()">İçe Aktar</button><span id="catalogImportResult"></span></div></div>'}
+function catalogImportUI(){return '<div class="panel" style="margin:0 0 14px"><h3>Toplu Katalog İçe Aktar</h3><p>En fazla 500 ürün. JSON dizi formatı: name, category, unit, packageText, imageUrl, stockStatus, price, sourceProductId, brandId, description, seoTitle, seoDescription, featured, sortOrder.</p><textarea id="catalogImportJson" style="width:100%;min-height:150px" placeholder=\'[{"name":"Donuk Patates","category":"Donuk Ürünler","unit":"Koli","packageText":"4x2,5 kg","imageUrl":"https://...","stockStatus":"AVAILABLE","price":0}]\'></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" onclick="runCatalogImport()">İçe Aktar</button><span id="catalogImportResult"></span></div></div>'}
 function productUI(rows){return catalogImportUI()+productForm()+'<div class="table" style="margin-top:14px"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="editProduct(\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="showPriceHistory(\''+esc(x.id)+'\')">Fiyat Geçmişi</button><button type="button" onclick="disableProduct(\''+esc(x.id)+'\')" style="background:#9d2635">Pasife Al</button></td></tr>').join('')+'</tbody></table></div>'}
 async function runCatalogImport(){
  const out=document.getElementById('catalogImportResult'),ta=document.getElementById('catalogImportJson');if(!out||!ta)return;
@@ -148,7 +171,7 @@ async function runCatalogImport(){
 async function bindProductForm(id=''){
  const f=document.getElementById('pf');if(!f)return;
  const cancel=document.getElementById('cancelProduct');if(cancel)cancel.onclick=()=>load();
- f.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(f));b.active=!!f.elements.active?.checked;if(b.price!=='')b.price=Number(b.price);else delete b.price;await api('products'+(id?'/'+encodeURIComponent(id):''),{method:'POST',body:JSON.stringify(b)});await load();await summary()}
+ f.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(f));b.active=!!f.elements.active?.checked;b.featured=!!f.elements.featured?.checked;b.sortOrder=Number(b.sortOrder||0);if(b.price!=='')b.price=Number(b.price);else delete b.price;await api('products'+(id?'/'+encodeURIComponent(id):''),{method:'POST',body:JSON.stringify(b)});await load();await summary()}
 }
 async function editProduct(id){const j=await api('products'),x=j.data.find(v=>String(v.id)===String(id));if(!x)return;content.innerHTML=productForm(x)+'<div style="margin-top:12px"><button type="button" onclick="load()">← Ürün listesine dön</button></div>';await bindProductForm(id)}
 async function disableProduct(id){if(!confirm('Bu ürün pasife alınsın mı?'))return;await api('products/'+encodeURIComponent(id),{method:'DELETE'});await load();await summary()}
