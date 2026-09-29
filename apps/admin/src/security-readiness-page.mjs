@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderSecurityReadiness({retentionPolicies=[],restoreVerifications=[],loadResults=[]}={}){
+ return '<section class="workspace" aria-labelledby="security-readiness-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="security-readiness-title">Güvenlik & Restore Hazırlığı</h1><p>Retention politikalarını, restore doğrulamalarını ve yük testi kanıtlarını yönetin.</p></div></header><div class="control-grid"><article><h2>Retention</h2><strong>'+e(retentionPolicies.length)+'</strong></article><article><h2>Restore Doğrulama</h2><strong>'+e(restoreVerifications.length)+'</strong></article><article><h2>Load Sonuçları</h2><strong>'+e(loadResults.length)+'</strong></article></div></section>';
+}

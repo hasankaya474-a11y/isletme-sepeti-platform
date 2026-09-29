@@ -1,0 +1,2 @@
+export const PHASE16_UI_STATES=Object.freeze({loading:{title:"Güvenlik kanıtları yükleniyor"},empty:{title:"Henüz doğrulama kanıtı yok"},error:{title:"Güvenlik kanıtları yüklenemedi"},restoreFail:{title:"Restore doğrulaması başarısız"}});
+export const PHASE16_RESPONSIVE=Object.freeze({mobile:{retention:"cards",restore:"cards",load:"cards",actions:"sticky"},tablet:{retention:"adaptive-table",restore:"adaptive-table",load:"two-column",actions:"visible"},desktop:{retention:"dense-table",restore:"dense-table",load:"dashboard-grid",actions:"toolbar"}});
