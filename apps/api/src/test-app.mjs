@@ -18,6 +18,7 @@ import {registerPhase14Routes} from "./phase14-routes.mjs";
 import {registerPhase15Routes} from "./phase15-routes.mjs";
 import {registerPhase16Routes} from "./phase16-routes.mjs";
 import {registerPhase17Routes} from "./phase17-routes.mjs";
+import {registerPhase18Routes} from "./phase18-routes.mjs";
 
 export function createTestApp(deps){
   const router=new Router();
@@ -40,5 +41,6 @@ export function createTestApp(deps){
   if(deps.integrations&&deps.webhooks&&deps.bulkJobs) registerPhase15Routes(router,{integrations:deps.integrations,webhooks:deps.webhooks,bulkJobs:deps.bulkJobs});
   if(deps.retention&&deps.restoreVerification&&deps.loadBudget) registerPhase16Routes(router,{retention:deps.retention,restoreVerification:deps.restoreVerification,loadBudget:deps.loadBudget});
   if(deps.pilots&&deps.traceability&&deps.locationPilot) registerPhase17Routes(router,{pilots:deps.pilots,traceability:deps.traceability,locationPilot:deps.locationPilot});
+  if(deps.releaseReadiness&&deps.pilotDefects) registerPhase18Routes(router,{releaseReadiness:deps.releaseReadiness,pilotDefects:deps.pilotDefects});
   return router;
 }
