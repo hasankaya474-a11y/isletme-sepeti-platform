@@ -194,3 +194,16 @@ test('release docs match Commerce V2 production contract',()=>{
   assert.match(runbook,/hidden flags: WHATSAPP/);
   assert.doesNotMatch(runbook,/active flags: PRODUCTS, QUOTE, PHOTO, WHATSAPP/);
 });
+
+
+test('Commerce V2 managed storefront content reaches homepage',()=>{
+  assert.match(commerce,/id="commerce-categories"/);
+  assert.match(commerce,/id="commerce-campaign"/);
+  assert.match(commerce,/id="commerce-managed-sections"/);
+  assert.match(commerce,/oky_storefront_sections_v1/);
+  assert.match(commerce,/oky_campaigns_v1/);
+  assert.match(commerce,/categories,sections,campaigns/);
+  assert.match(commerce,/Array\.isArray\(j\.categories\)/);
+  assert.match(commerce,/Array\.isArray\(j\.campaigns\)/);
+  assert.match(commerce,/Array\.isArray\(j\.sections\)/);
+});
