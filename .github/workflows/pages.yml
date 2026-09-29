@@ -28,34 +28,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Check Pages availability
-        id: pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          code=$(curl -sS -o /tmp/pages.json -w "%{http_code}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages")
-          if [ "$code" = "200" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::GitHub Pages is not enabled for this repository. Deployment skipped cleanly."
-          fi
-
-      - name: Configure Pages
-        if: steps.pages.outputs.enabled == 'true'
+      - name: Configure or enable Pages
         uses: actions/configure-pages@v5
+        with:
+          token: ${{ github.token }}
+          enablement: true
 
       - name: Upload site
-        if: steps.pages.outputs.enabled == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
           path: site
 
       - name: Deploy
-        if: steps.pages.outputs.enabled == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
