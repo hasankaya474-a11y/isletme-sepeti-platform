@@ -348,3 +348,15 @@ test('managed section kinds render products categories and promo payloads',()=>{
   assert.match(commerceAdmin,/PRODUCT_GRID/);
   assert.match(commerceAdmin,/CATEGORY_STRIP/);
 });
+
+
+test('catalog bulk import preserves product identity and price history',()=>{
+  assert.match(commerceAdmin,/resource==="catalog-import"/);
+  assert.match(commerceAdmin,/INVALID_IMPORT_SIZE/);
+  assert.match(commerceAdmin,/source_product_id=\?/);
+  assert.match(commerceAdmin,/SELECT \* FROM b2b_products_v1 WHERE name=\? AND category=\?/);
+  assert.match(commerceAdmin,/b2b_price_history_v1/);
+  assert.match(commerceAdmin,/Toplu Katalog İçe Aktar/);
+  assert.match(commerceAdmin,/runCatalogImport/);
+  assert.match(commerceAdmin,/En fazla 500 ürün/);
+});
