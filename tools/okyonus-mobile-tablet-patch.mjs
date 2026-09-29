@@ -14,7 +14,7 @@ function replaceOnce(from, to, label) {
 
 const home = s.indexOf('function okySalesFirstHomeV1');
 need(home >= 0, 'sales homepage');
-console.log('DIAG_HOME',JSON.stringify({home,globalMobile:s.indexOf('mobileBar'),afterHomeMobile:s.indexOf('mobileBar',home),afterHomeMedia:s.indexOf('@media',home),snippet:s.slice(home,home+1800)}));
+console.log('DIAG_HOME',JSON.stringify({home,globalMobile:s.indexOf('mobileBar'),afterHomeMobile:s.indexOf('mobileBar',home),afterHomeMedia:s.indexOf('@media',home),snippet:s.slice(home,home+7000)}));
 const cssDiag=s.indexOf('function okySalesCss'); const navDiag=s.indexOf('function okySalesNav'); console.log('DIAG_CSS',JSON.stringify({cssDiag,navDiag,css:s.slice(cssDiag,cssDiag+6000),nav:s.slice(navDiag,navDiag+3500)}));
 
 const mobileBarMarker=s.indexOf('mobileBar',home);
