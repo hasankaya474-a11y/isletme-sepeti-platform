@@ -207,3 +207,17 @@ test('Commerce V2 managed storefront content reaches homepage',()=>{
   assert.match(commerce,/Array\.isArray\(j\.campaigns\)/);
   assert.match(commerce,/Array\.isArray\(j\.sections\)/);
 });
+
+
+test('Commerce V2 managed subpages use admin-backed storefront data',()=>{
+  for(const key of ['brands','delivery','help:helpArticles']) assert.match(commerce,new RegExp(key.replace(':','\\s*:\\s*')));
+  assert.match(commerce,/oky_brands_v1/);
+  assert.match(commerce,/oky_delivery_rules_v1/);
+  assert.match(commerce,/oky_help_articles_v1/);
+  assert.match(commerce,/id="campaignList"/);
+  assert.match(commerce,/id="deliveryList"/);
+  assert.match(commerce,/id="managed-help"/);
+  assert.match(commerce,/Array\.isArray\(j\.brands\)/);
+  assert.match(commerce,/Array\.isArray\(j\.delivery\)/);
+  assert.match(commerce,/Array\.isArray\(j\.help\)/);
+});
