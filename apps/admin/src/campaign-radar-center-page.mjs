@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderCampaignRadarCenter({campaigns=[],observations=[]}={}){
+ return '<section class="workspace" aria-labelledby="campaign-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="campaign-title">Kampanya & Market Radar</h1><p>Sponsorlu görünürlükleri ve pazar sinyallerini ayrı kontrollarda yönetin.</p></div></header><div class="control-grid"><article><h2>Kampanyalar</h2><strong>'+e(campaigns.length)+'</strong></article><article><h2>Radar Gözlemleri</h2><strong>'+e(observations.length)+'</strong></article></div></section>';
+}
