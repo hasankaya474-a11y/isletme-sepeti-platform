@@ -1,0 +1,43 @@
+name: Apply Okyonus mobile tablet patch
+
+on:
+  push:
+    branches:
+      - okyonus-mobile-tablet-hardening-v1
+    paths:
+      - tools/okyonus-mobile-tablet-patch.mjs
+      - .github/workflows/okyonus-mobile-tablet-patch.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: okyonus-mobile-tablet-hardening-v1
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply deterministic mobile/tablet patch
+        run: node tools/okyonus-mobile-tablet-patch.mjs
+      - name: Verify Worker syntax and tests
+        run: |
+          node --check okyonus-edt-worker/src/deniz-worker.js
+          npm test
+      - name: Commit patched Worker
+        run: |
+          if git diff --quiet; then
+            echo "No patch changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add okyonus-edt-worker/src/deniz-worker.js
+          git commit -m "fix: harden Okyonus mobile tablet storefront"
+          git push origin HEAD:okyonus-mobile-tablet-hardening-v1
