@@ -388,3 +388,15 @@ test('release dry-run includes product metadata migration',()=>{
   const dry=fs.readFileSync(new URL('../scripts/release-dry-run.mjs',import.meta.url),'utf8');
   assert.match(dry,/005_product_meta\.sql/);
 });
+
+
+test('product metadata admin UX and SEO detail wiring are present',()=>{
+  assert.match(commerceAdmin,/list="brandIds"/);
+  assert.match(commerceAdmin,/api\('brands'\)/);
+  assert.match(commerceAdmin,/SEO başlık/);
+  assert.match(commerceAdmin,/SEO açıklama/);
+  assert.match(commerceAdmin,/Öne çıkar/);
+  assert.match(commerce,/document\.title=esc\(p\.seo_title/);
+  assert.match(commerce,/meta\[name="description"\]/);
+  assert.match(commerce,/p\.seo_description/);
+});
