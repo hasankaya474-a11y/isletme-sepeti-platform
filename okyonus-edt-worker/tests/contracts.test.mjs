@@ -189,6 +189,7 @@ test('release docs match Commerce V2 production contract',()=>{
   for(const doc of [checklist,runbook]){
     assert.match(doc,/003_commerce_v2\.sql/);
     assert.match(doc,/004_commerce_extended\.sql/);
+    assert.match(doc,/005_product_meta\.sql/);
   }
   assert.match(checklist,/WhatsApp public module remains HIDDEN/);
   assert.match(runbook,/hidden flags: WHATSAPP/);
@@ -359,4 +360,31 @@ test('catalog bulk import preserves product identity and price history',()=>{
   assert.match(commerceAdmin,/Toplu Katalog İçe Aktar/);
   assert.match(commerceAdmin,/runCatalogImport/);
   assert.match(commerceAdmin,/En fazla 500 ürün/);
+});
+
+
+test('product metadata extension is additive and storefront-wired',()=>{
+  const sql=fs.readFileSync(new URL('../migrations/005_product_meta.sql',import.meta.url),'utf8');
+  assert.match(sql,/oky_product_meta_v1/);
+  assert.match(sql,/brand_id/);
+  assert.match(sql,/seo_title/);
+  assert.match(sql,/featured/);
+  for(const table of ['b2b_products_v1','audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
+    assert.doesNotMatch(sql,new RegExp('ALTER\\s+TABLE\\s+'+table+'\\b','i'),table);
+  }
+  assert.match(commerceAdmin,/async function upsertProductMeta/);
+  assert.match(commerceAdmin,/LEFT JOIN oky_product_meta_v1/);
+  assert.match(commerceAdmin,/brandId/);
+  assert.match(commerceAdmin,/seoTitle/);
+  assert.match(commerceAdmin,/featured/);
+  assert.match(commerce,/oky_product_meta_v1/);
+  assert.match(commerce,/m\.description/);
+  assert.match(commerce,/m\.brand_id/);
+  assert.match(commerce,/m\.featured/);
+  assert.match(commerce,/p\.description/);
+});
+
+test('release dry-run includes product metadata migration',()=>{
+  const dry=fs.readFileSync(new URL('../scripts/release-dry-run.mjs',import.meta.url),'utf8');
+  assert.match(dry,/005_product_meta\.sql/);
 });
