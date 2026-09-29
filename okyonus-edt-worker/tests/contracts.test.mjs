@@ -190,6 +190,7 @@ test('release docs match Commerce V2 production contract',()=>{
     assert.match(doc,/003_commerce_v2\.sql/);
     assert.match(doc,/004_commerce_extended\.sql/);
     assert.match(doc,/005_product_meta\.sql/);
+    assert.match(doc,/006_commerce_control_plane\.sql/);
   }
   assert.match(checklist,/WhatsApp public module remains HIDDEN/);
   assert.match(runbook,/hidden flags: WHATSAPP/);
@@ -286,6 +287,8 @@ test('release dry-run command pack is non-destructive',()=>{
   assert.match(dry,/001_sales_mode\.sql/);
   assert.match(dry,/003_commerce_v2\.sql/);
   assert.match(dry,/004_commerce_extended\.sql/);
+  assert.match(dry,/005_product_meta\.sql/);
+  assert.match(dry,/006_commerce_control_plane\.sql/);
   assert.match(dry,/Production remains blocked until staging smoke-test evidence/);
   assert.doesNotMatch(dry,/execSync|spawnSync|child_process/);
 });
@@ -475,7 +478,7 @@ test('single-file bundles are byte-current with canonical sources',()=>{
 
 
 test('cart flow v14 keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-cart-flow-v14/);
+  assert.match(commerce,/commerce-v2-2026-09-30-architecture-v15/);
   assert.match(commerce,/data-cart-count/);
   assert.match(commerce,/cartRuntimeScript/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
@@ -493,7 +496,7 @@ test('cart flow v14 keeps product selection quote scenario intact',()=>{
 
 test('cart add paths carry current price and product metadata',()=>{
   assert.match(commerce,/package_text:pack,category,image/);
-  assert.match(commerce,/effectivePrice\?\?p\.price\?\?null/);
+  assert.match(commerce,/sale_price\?\?p\.effectivePrice\?\?p\.price\?\?p\.list_price\?\?null/);
   assert.match(commerce,/stok yok\|tükendi\|pasif\|inactive\|out of stock/);
   assert.match(commerce,/Math\.min\(999/);
   assert.match(commerce,/x\.price=price/);
@@ -503,8 +506,91 @@ test('cart add paths carry current price and product metadata',()=>{
 });
 
 test('cart quote payload preserves legacy quote contract',()=>{
-  assert.match(commerce,/products:a\.map\(x=>\(\{id:String\(x\.id\),name:String\(x\.name\),quantity:qty\(x\.qty\),unit:String\(x\.unit\|\|'Adet'\)\}\)\)/);
+  assert.match(commerce,/products:a\.map\(x=>\(\{id:String\(x\.id\),name:String\(x\.name\),quantity:qty\(x\.qty,x\),unit:String\(x\.unit\|\|'Adet'\)\}\)\)/);
   assert.match(commerce,/customer:\{name:String\(f\.name/);
   assert.match(commerce,/consent:\{kvkk:true,textVersion:'2026-09-30-commerce-v2-cart'\}/);
   assert.match(commerce,/fetch\('\/api\/quote'/);
+});
+
+
+test('architecture v15 commerce control plane is additive',()=>{
+  const sql=fs.readFileSync(new URL('../migrations/006_commerce_control_plane.sql',import.meta.url),'utf8');
+  for(const table of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1']) assert.match(sql,new RegExp(table));
+  for(const table of ['b2b_products_v1','audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
+    assert.doesNotMatch(sql,new RegExp('ALTER\\s+TABLE\\s+'+table+'\\b','i'),table);
+  }
+  assert.match(sql,/min_order_qty/);
+  assert.match(sql,/qty_step/);
+  assert.match(sql,/list_price/);
+  assert.match(sql,/sale_price/);
+});
+
+test('architecture v15 public storefront matches locked sales architecture',()=>{
+  assert.match(commerce,/commerce-v2-2026-09-30-architecture-v15/);
+  assert.match(commerce,/contactName:"Hasan Kaya"/);
+  assert.match(commerce,/\+90 532 346 99 25/);
+  assert.match(commerce,/905323469925/);
+  assert.match(commerce,/oky-cookie-consent-v1/);
+  assert.match(commerce,/Yalnız Zorunlu/);
+  assert.match(commerce,/Tümünü Kabul Et/);
+  assert.match(commerce,/function sideNav\(/);
+  assert.match(commerce,/commerceLayout/);
+  assert.match(commerce,/oky-favorites-v1/);
+  assert.match(commerce,/helpSearch/);
+  assert.match(commerce,/runtimeSettingsScript\(\)/);
+});
+
+test('managed banner category and SEO presentation is functional',()=>{
+  assert.match(commerce,/function managedHero\(/);
+  assert.match(commerce,/desktop_image/);
+  assert.match(commerce,/mobile_image/);
+  assert.match(commerce,/data-prev/);
+  assert.match(commerce,/data-next/);
+  assert.match(commerce,/touchstart/);
+  assert.match(commerce,/ArrowLeft/);
+  assert.match(commerce,/c\.image_url/);
+  assert.match(commerce,/const SEO_ROUTES=/);
+  const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
+  assert.equal(routes.length,200);
+  for(const label of ['HORECA & İşletme','Ürün & Kategori','İstanbul & Tedarik','EDT Rehberi']) assert.match(commerce,new RegExp(label));
+  assert.match(commerceAdmin,/oky_seo_links_v1/);
+  assert.match(commerceAdmin,/SEO 200 Link/);
+});
+
+test('full product commerce fields are admin managed and storefront visible',()=>{
+  for(const field of ['sku','barcode','subcategory','origin','storage_conditions','cold_chain','min_order_qty','qty_step','list_price','sale_price','new_until','best_seller']) {
+    assert.match(commerceAdmin,new RegExp(field));
+    assert.match(commerce,new RegExp(field));
+  }
+  for(const ui of ['SKU','Barkod','Alt kategori','Minimum sipariş','Miktar adımı','Liste fiyatı / eski fiyat','İndirimli fiyat','Soğuk zincir','Çok satan']) assert.match(commerceAdmin,new RegExp(ui));
+  assert.match(commerce,/Minimum:/);
+  assert.match(commerce,/Adım:/);
+});
+
+test('campaign rules and newsletter have real control flows',()=>{
+  assert.match(commerceAdmin,/oky_campaign_rules_v1/);
+  assert.match(commerceAdmin,/Kampanya Kuralları/);
+  assert.match(commerceAdmin,/PERCENT/);
+  assert.match(commerceAdmin,/FIXED/);
+  assert.match(commerce,/campaignRules/);
+  assert.match(commerce,/discount_value/);
+  assert.match(commerce,/target_type/);
+  assert.match(commerce,/async function newsletterApi/);
+  assert.match(commerce,/\/api\/newsletter/);
+  assert.match(commerce,/E-bülten/);
+  assert.match(commerceAdmin,/oky_newsletter_subscribers_v1/);
+  assert.match(commerceAdmin,/E-bülten/);
+  assert.match(commerce,/CONSENT_REQUIRED/);
+});
+
+test('admin exposes locked architecture control fields',()=>{
+  for(const x of ['parentId','seoTitle','seoDescription','audience','deviceTarget','coldChain','campaignId','targetType','discountType','discountValue']) assert.match(commerceAdmin,new RegExp(x));
+  assert.match(commerceAdmin,/contactName/);
+  assert.match(commerceAdmin,/Hasan Kaya/);
+  assert.match(commerceAdmin,/0532|532 346 99 25/);
+});
+
+test('staging matrix includes architecture v15 checks',()=>{
+  const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
+  for(const id of ['DENIZ_BANNER','DENIZ_CATEGORY_MEDIA','DENIZ_CAMPAIGN_PRICE','DENIZ_QTY_RULES','DENIZ_CONTACT_OWNER','DENIZ_COOKIE','DENIZ_SEO_200','DENIZ_NEWSLETTER']) assert.match(pre,new RegExp(id));
 });
