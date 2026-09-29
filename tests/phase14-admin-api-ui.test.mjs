@@ -1,0 +1,5 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {Router} from "../apps/api/src/router.mjs";import {registerPhase14Routes} from "../apps/api/src/phase14-routes.mjs";import {renderCampaignRadarCenter} from "../apps/admin/src/campaign-radar-center-page.mjs";
+function auth(){return {userId:"admin",session:{mfaLevel:1},grants:[{permission:"admin.configuration.manage",scope:"GLOBAL"}],requiredScope:"GLOBAL",membership:{status:"ACTIVE",organizationType:"PLATFORM",organizationId:"platform"}};}
+test("campaign radar center is semantic",()=>{const h=renderCampaignRadarCenter({campaigns:[{}],observations:[{}]});assert.match(h,/Kampanya & Market Radar/);assert.match(h,/aria-labelledby/);});
+test("campaign API propagates actor",async()=>{let seen;const r=new Router();registerPhase14Routes(r,{campaigns:{create:x=>(seen=x,x),transition:x=>x,addPlacement:x=>x},radar:{record:x=>x}});const out=await r.handle({method:"POST",path:"/v1/admin/campaigns",body:{name:"X",campaignType:"BANNER"},requestId:"r",cookies:{csrf:"t"},headers:{"x-csrf-token":"t"},auth:auth()});assert.equal(out.ok,true);assert.equal(seen.actorId,"admin");});

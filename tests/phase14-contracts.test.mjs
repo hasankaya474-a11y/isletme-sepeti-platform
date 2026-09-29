@@ -1,0 +1,2 @@
+import test from "node:test";import assert from "node:assert/strict";import {PHASE14_UI_STATES,PHASE14_RESPONSIVE} from "../apps/admin/src/phase14-ui-contract.mjs";import {ADMIN_A11Y} from "../apps/admin/src/accessibility-contract.mjs";
+test("phase14 UI and accessibility contracts",()=>{assert.match(PHASE14_UI_STATES.loading.title,/yükleniyor/i);assert.equal(PHASE14_RESPONSIVE.mobile.actions,"sticky");assert.equal(ADMIN_A11Y.visibleFocus,true);});
