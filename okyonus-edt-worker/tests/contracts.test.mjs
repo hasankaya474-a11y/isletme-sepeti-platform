@@ -300,3 +300,23 @@ test('staging preflight is offline and production-gated',()=>{
   assert.match(pre,/every row above requires real staging evidence before production/);
   assert.doesNotMatch(pre,/fetch\(|https?:\/\/|child_process|execSync|spawnSync/);
 });
+
+
+test('staging Wrangler templates keep isolated binding placeholders',()=>{
+  const deniz=fs.readFileSync(new URL('../wrangler.deniz.staging.example.toml',import.meta.url),'utf8');
+  const zaman=fs.readFileSync(new URL('../wrangler.zaman.staging.example.toml',import.meta.url),'utf8');
+  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
+  assert.equal(pkg.scripts['staging:config-check'],'node scripts/staging-config-check.mjs');
+  assert.match(deniz,/name = "deniz-edt-v2-staging"/);
+  assert.match(zaman,/name = "okyanus-edt-admin-staging"/);
+  for(const x of [deniz,zaman]){
+    assert.match(x,/binding = "DB"/);
+    assert.match(x,/REPLACE_WITH_STAGING_D1_NAME/);
+    assert.match(x,/REPLACE_WITH_STAGING_D1_ID/);
+    assert.match(x,/ENVIRONMENT = "staging"/);
+  }
+  assert.match(deniz,/binding = "PHOTO_TEMP"/);
+  assert.match(zaman,/binding = "PHOTO_TEMP"/);
+  assert.match(zaman,/binding = "MEDIA_STORE"/);
+  assert.match(zaman,/REQUIRE_CF_ACCESS = "true"/);
+});
