@@ -27,6 +27,7 @@ export class ThreeWayMatchService{
   const row={id:previous?.id??newId("match3"),invoiceId,status,issues,orderSnapshotSha256:snapshot?.snapshotSha256??null,matchedAt:now,matchedBy:actorId};
   if(previous)this.store.update("threeWayMatches",previous.id,()=>row);else this.store.insert("threeWayMatches",row);
   this.store.update("supplierInvoices",invoiceId,x=>({...x,status,updatedAt:now}));
+  this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"invoice",aggregateId:invoiceId,eventType:"invoice.match_completed",payload:{invoiceId,status,issueCount:issues.length},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"invoice.three_way_match."+status.toLowerCase(),resourceType:"invoice",resourceId:invoiceId,occurredAt:now});
   return row;
  }
