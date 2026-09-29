@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js",
+    "check": "node --check src/commerce-v2.js && node --check src/commerce-admin-v2.js && node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js",
     "test": "node --test tests/*.test.mjs",
     "verify": "npm run check && npm test"
   }

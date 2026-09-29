@@ -6,6 +6,8 @@ const deniz=fs.readFileSync(new URL('../src/deniz-worker.js',import.meta.url),'u
 const denizBase=fs.readFileSync(new URL('../baseline/deniz-worker.js',import.meta.url),'utf8');
 const admin=fs.readFileSync(new URL('../src/zaman-admin-worker.js',import.meta.url),'utf8');
 const adminBase=fs.readFileSync(new URL('../baseline/zaman-admin-worker.js',import.meta.url),'utf8');
+const commerce=fs.readFileSync(new URL('../src/commerce-v2.js',import.meta.url),'utf8');
+const commerceAdmin=fs.readFileSync(new URL('../src/commerce-admin-v2.js',import.meta.url),'utf8');
 
 function extractFunction(source,name){
   const patterns=['async function '+name+'(','function '+name+'('];
@@ -94,4 +96,44 @@ test('optional migration never redefines baseline communication/security tables'
   for(const table of ['audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
     assert.doesNotMatch(sql,new RegExp('CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+'+table+'\\b','i'),table);
   }
+});
+
+
+test('Commerce V2 storefront is wired without replacing critical engines',()=>{
+  assert.match(deniz,/from "\.\/commerce-v2\.js"/);
+  assert.match(deniz,/commerceRoute\(request,env\)/);
+  assert.match(commerce,/Profesyonel mutfağın alışverişi burada başlar/);
+  assert.match(commerce,/Kategoriler/);
+  assert.match(commerce,/Sepet \/ Teklif/);
+  assert.match(commerce,/İçerik Stüdyo/);
+});
+
+test('Commerce V2 mobile tablet contact and help locks are present',()=>{
+  assert.match(commerce,/@media\(max-width:900px\)/);
+  assert.match(commerce,/@media\(max-width:620px\)/);
+  assert.match(commerce,/Mobil alt menü/);
+  assert.match(commerce,/Site Yardım/);
+  assert.match(commerce,/İletişim/);
+  assert.match(commerce,/WhatsApp Destek/);
+});
+
+test('Commerce V2 admin can manage product image price banner category and help',()=>{
+  assert.match(admin,/from "\.\/commerce-admin-v2\.js"/);
+  assert.match(admin,/commerceAdminApi/);
+  assert.match(commerceAdmin,/Ürün & Fiyat/);
+  assert.match(commerceAdmin,/Kategoriler/);
+  assert.match(commerceAdmin,/Banner/);
+  assert.match(commerceAdmin,/Site Yardım/);
+  assert.match(commerceAdmin,/imageUrl/);
+  assert.match(commerceAdmin,/price/);
+});
+
+test('Commerce V2 migration is additive and avoids protected baseline tables',()=>{
+ const sql=fs.readFileSync(new URL('../migrations/003_commerce_v2.sql',import.meta.url),'utf8');
+ for(const table of ['audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
+   assert.doesNotMatch(sql,new RegExp('CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+'+table+'\\b','i'),table);
+ }
+ for(const table of ['oky_storefront_categories_v1','oky_storefront_banners_v1','oky_storefront_sections_v1','oky_help_articles_v1']){
+   assert.match(sql,new RegExp(table));
+ }
 });

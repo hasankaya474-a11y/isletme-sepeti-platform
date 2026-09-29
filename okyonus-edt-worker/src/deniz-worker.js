@@ -1,3 +1,4 @@
+import { commerceRoute } from "./commerce-v2.js";
 /* OKYANUS DENIZ FINAL-7 SON FINAL 2026-09-12 | YONETICI+YARDIM SADECE SOL MENU */
     /**
      * OKYANUS EDT V2
@@ -7716,6 +7717,10 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
             path =
               path.slice(0, -1);
           }
+
+          // OKYANUS COMMERCE V2: isolated public commerce shell. Critical legacy APIs remain below unchanged.
+          const commerceV2Response=await commerceRoute(request,env);
+          if(commerceV2Response)return commerceV2Response;
 
           // OKYANUS NEW FACE V1: public sales shell; critical APIs below remain unchanged.
           if((request.method==="GET"||request.method==="HEAD")&&path==="/")return responseHTML(okySalesFirstHomeV1().replace('</body>',vitrineLiveHydrationScript()+'</body>'),200,path);
