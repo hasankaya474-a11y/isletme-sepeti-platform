@@ -594,3 +594,11 @@ test('staging matrix includes architecture v15 checks',()=>{
   const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
   for(const id of ['DENIZ_BANNER','DENIZ_CATEGORY_MEDIA','DENIZ_CAMPAIGN_PRICE','DENIZ_QTY_RULES','DENIZ_CONTACT_OWNER','DENIZ_COOKIE','DENIZ_SEO_200','DENIZ_NEWSLETTER']) assert.match(pre,new RegExp(id));
 });
+
+
+test('single bundles carry architecture v15 control plane',()=>{
+  const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
+  for(const token of ['commerce-v2-2026-09-30-architecture-v15','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
+});
