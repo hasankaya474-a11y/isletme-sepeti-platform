@@ -13,6 +13,7 @@ export class QuoteService{
     if(this.store.find("quotes",x=>x.rfqId===rfqId&&x.supplierId===supplierId).length) throw new Error("QUOTE_ALREADY_EXISTS");
     const now=new Date().toISOString();
     const row={id:newId("quote"),rfqId,supplierId,status:"DRAFT",currency:normalizeCurrency(currency),note,validUntil,createdBy:actorId,createdAt:now,updatedAt:now};
+    this.store.insert("audit",{id:newId("audit"),actorId,action:"quote.create",resourceType:"quote",resourceId:row.id,occurredAt:now});
     return this.store.insert("quotes",row);
   }
 
@@ -30,7 +31,10 @@ export class QuoteService{
     assertMinorUnits(unitPriceMinor);
     if(!Number.isInteger(taxRateBps)||taxRateBps<0||taxRateBps>10000) throw new TypeError("INVALID_TAX_RATE");
     if(this.store.find("quoteLines",x=>x.quoteId===quoteId&&x.rfqLineId===rfqLineId).length) throw new Error("QUOTE_LINE_DUPLICATE");
-    return this.store.insert("quoteLines",{id:newId("quoteline"),quoteId,rfqLineId,unitPriceMinor,taxRateBps,note,createdAt:new Date().toISOString()});
+    const now=new Date().toISOString();
+    const row={id:newId("quoteline"),quoteId,rfqLineId,unitPriceMinor,taxRateBps,note,createdAt:now};
+    this.store.insert("audit",{id:newId("audit"),actorId,action:"quote.line.add",resourceType:"quote",resourceId:quoteId,occurredAt:now});
+    return this.store.insert("quoteLines",row);
   }
 
   submit({quoteId,supplierId,actorId}){
