@@ -15,6 +15,7 @@ export class ProcurementPolicyService{
   const current=this.store.get("procurementApprovalRules",id);
   if(!current||current.businessId!==businessId)throw new Error("PROCUREMENT_POLICY_FORBIDDEN");
   const now=new Date().toISOString();
+  for(const x of this.store.find("procurementApprovalRules",r=>r.businessId===businessId&&r.currency===current.currency&&r.status==="ACTIVE"&&r.id!==id))this.store.update("procurementApprovalRules",x.id,r=>({...r,status:"INACTIVE",updatedAt:now}));
   const row=this.store.update("procurementApprovalRules",id,x=>({...x,status:"ACTIVE",updatedAt:now}));
   this.store.insert("audit",{id:newId("audit"),actorId,action:"procurement.policy.activate",resourceType:"procurement_policy",resourceId:id,occurredAt:now});
   return row;
