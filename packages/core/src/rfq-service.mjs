@@ -22,7 +22,9 @@ export class RfqService{
     if(rfq.status!=="DRAFT") throw new Error("RFQ_NOT_EDITABLE");
     if(!this.store.get("masterProducts",masterProductId)) throw new Error("MASTER_PRODUCT_NOT_FOUND");
     if(!Number.isSafeInteger(quantityMilli)||quantityMilli<=0||!unit) throw new TypeError("RFQ_LINE_INVALID");
-    const row={id:newId("rfqline"),rfqId,masterProductId,variantId,quantityMilli,unit,note,createdAt:new Date().toISOString()};
+    const now=new Date().toISOString();
+    const row={id:newId("rfqline"),rfqId,masterProductId,variantId,quantityMilli,unit,note,createdAt:now};
+    this.store.insert("audit",{id:newId("audit"),actorId,action:"rfq.line.add",resourceType:"rfq",resourceId:rfqId,occurredAt:now});
     return this.store.insert("rfqLines",row);
   }
 
