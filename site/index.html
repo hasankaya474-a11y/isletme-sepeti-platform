@@ -1,121 +1,71 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>İşletme Sepeti</title>
-<meta name="description" content="İşletme Sepeti B2B tedarik platformu canlı birleşik site önizlemesi">
-<style>
-:root{
- --bg:#f5f7fb;--panel:#fff;--ink:#132238;--muted:#6f7b8e;--line:#e3e8ef;
- --brand:#0f766e;--brand2:#115e59;--accent:#f59e0b;--danger:#b91c1c;
- --shadow:0 12px 30px rgba(18,38,63,.08);--r:18px
-}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
-button,input{font:inherit}.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.topin{max-width:1480px;margin:auto;height:72px;display:flex;align-items:center;gap:18px;padding:0 22px}.brand{font-weight:900;font-size:21px;letter-spacing:-.4px}.brand b{color:var(--brand)}
-.switch{display:flex;gap:6px;margin-left:auto;background:#eef2f6;border-radius:12px;padding:4px}.switch button{border:0;background:transparent;padding:9px 12px;border-radius:9px;cursor:pointer}.switch button.active{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);font-weight:800}
-.shell{max-width:1480px;margin:auto;display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 72px)}aside{border-right:1px solid var(--line);padding:24px 14px;background:#fbfcfe}
-.nav-title{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;padding:0 10px 10px}.nav button{width:100%;text-align:left;border:0;background:transparent;padding:11px 12px;border-radius:10px;color:#334155;cursor:pointer;margin:2px 0}.nav button.active,.nav button:hover{background:#e8f4f2;color:var(--brand2);font-weight:800}
-main{padding:30px}.view{display:none}.view.active{display:block}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;margin-bottom:24px}.hero .big,.hero .side{background:linear-gradient(145deg,#0f766e,#0b4f4a);color:#fff;border-radius:26px;padding:32px;box-shadow:var(--shadow)}
-.hero .side{background:linear-gradient(145deg,#172554,#1e3a8a)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;opacity:.8}.hero h1{font-size:40px;line-height:1.05;margin:10px 0 14px;letter-spacing:-1.1px}.hero p{font-size:17px;line-height:1.55;max-width:760px;opacity:.92}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer}.btn.light{background:#fff;color:var(--brand2)}.btn.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.stat{padding:18px}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:27px;margin-top:6px}.section{margin:26px 0 12px;display:flex;align-items:end;justify-content:space-between;gap:14px}.section h2{margin:0;font-size:22px}.section p{margin:4px 0 0;color:var(--muted)}
-.products{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.product{overflow:hidden}.ph{height:145px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);display:grid;place-items:center;font-size:46px}.pb{padding:16px}.badge{display:inline-block;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:800;background:#e6fffa;color:#115e59}.pb h3{margin:10px 0 6px}.price{font-size:18px;font-weight:900;margin:8px 0}.meta{font-size:12px;color:var(--muted)}.product .btn{width:100%;margin-top:12px;background:#0f766e;color:#fff}
-.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:18px}.search{flex:1;background:#fff;border:1px solid var(--line);padding:12px 14px;border-radius:12px}.panel-grid{display:grid;grid-template-columns:1.5fr .75fr;gap:18px}.card{padding:20px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}.table th{color:var(--muted);font-size:12px;text-transform:uppercase}.status{font-weight:800}.ok{color:#047857}.warn{color:#b45309}.bad{color:#b91c1c}
-.timeline{display:grid;gap:10px}.event{display:flex;gap:11px;align-items:flex-start}.dot{width:10px;height:10px;border-radius:50%;background:var(--brand);margin-top:6px}.event small{color:var(--muted)}
-.notice{padding:14px 16px;border-radius:12px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;margin-bottom:18px}
-.footer{padding:30px;color:var(--muted);text-align:center;font-size:12px}
-.mobiletabs{display:none}
-@media(max-width:1100px){.products,.grid4{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr}.shell{grid-template-columns:210px 1fr}}
-@media(max-width:760px){.topin{height:auto;padding:12px;flex-wrap:wrap}.switch{width:100%;overflow:auto;margin-left:0}.switch button{white-space:nowrap}.shell{display:block}.shell aside{display:none}main{padding:16px}.hero h1{font-size:31px}.grid4,.products,.panel-grid{grid-template-columns:1fr}.toolbar{align-items:stretch;flex-direction:column}.mobiletabs{display:flex;overflow:auto;gap:6px;padding:8px 0 12px}.mobiletabs button{white-space:nowrap;border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px}.hero .big,.hero .side{padding:24px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="İşletme Sepeti B2B satın alma platformu birleşik canlı demo: Public, Alıcı, Tedarikçi ve Admin.">
+  <title>İşletme Sepeti · B2B Tedarik Platformu</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<header class="top"><div class="topin"><div class="brand">İşletme <b>Sepeti</b></div><span class="badge" aria-label="Birleşik canlı görünüm, demo veriler">Canlı görünüm · demo veri</span><div class="switch" id="surfaceSwitch"></div></div></header>
-<div class="shell">
-<aside><div class="nav-title" id="navTitle">Menü</div><div class="nav" id="sideNav"></div></aside>
-<main>
-<div class="mobiletabs" id="mobileNav"></div>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <button class="icon-btn mobile-only" id="menuBtn" aria-label="Menüyü aç">☰</button>
+        <a class="brand" href="#public/home" aria-label="İşletme Sepeti ana sayfa">İşletme <strong>Sepeti</strong></a>
+        <span class="env-badge">Canlı demo · sandbox veri</span>
+      </div>
+      <div class="top-actions">
+        <label class="global-search">
+          <span>⌕</span>
+          <input id="globalSearch" type="search" placeholder="Ürün, sipariş, modül ara…" aria-label="Global arama">
+        </label>
+        <button class="icon-btn" id="notificationBtn" aria-label="Bildirimler">🔔<span class="notify-dot"></span></button>
+        <button class="profile-btn" id="profileBtn"><span class="avatar">HK</span><span class="desktop-only">Demo Kullanıcı</span></button>
+      </div>
+    </header>
 
-<section class="view active" data-surface="public">
- <div class="hero">
-  <div class="big"><div class="eyebrow">B2B Tedarik Platformu</div><h1>İşletmen için satın almayı tek yerde yönet.</h1><p>Ürün keşfi, teklif toplama, tedarikçi karşılaştırma, sipariş, teslimat ve fatura akışlarını tek platformda takip et.</p><div class="actions"><button class="btn light" onclick="showSurface('buyer')">Ürünleri Keşfet</button><button class="btn ghost" onclick="showSurface('buyer')">Teklif Topla</button></div></div>
-  <div class="side"><div class="eyebrow">Kontrollü Mimari</div><h2>Şeffaf karar, kayıtlı süreç</h2><p>Tedarikçi seçimi, fiyat değişikliği ve sipariş kararları açık kullanıcı aksiyonlarıyla ilerler.</p></div>
- </div>
- <div class="grid4"><div class="stat"><span>Aktif kategori</span><strong>48</strong></div><div class="stat"><span>Tedarikçi havuzu</span><strong>126</strong></div><div class="stat"><span>Açık teklif akışı</span><strong>24</strong></div><div class="stat"><span>Kontrol merkezi</span><strong>18 modül</strong></div></div>
- <div class="section"><div><h2>Öne çıkan ürünler</h2><p>Alıcı tarafındaki ürün kartı yapısının birleşik görünümü</p></div></div>
- <div class="products" id="publicProducts"></div>
-</section>
+    <div class="surface-tabs" role="tablist" aria-label="Uygulama yüzleri">
+      <button data-surface-tab="public">Public</button>
+      <button data-surface-tab="buyer">Alıcı</button>
+      <button data-surface-tab="supplier">Tedarikçi</button>
+      <button data-surface-tab="admin">Admin</button>
+    </div>
 
-<section class="view" data-surface="buyer">
- <div class="section"><div><h2>Alıcı Çalışma Alanı</h2><p>Arama, liste, RFQ, sepet, sipariş ve teslimat tek akışta.</p></div></div>
- <div class="toolbar"><input class="search" id="searchInput" placeholder="Ürün, kategori veya tedarikçi ara"><button class="btn" style="background:#0f766e;color:#fff" onclick="filterProducts()">Ara</button></div>
- <div class="grid4"><div class="stat"><span>Açık RFQ</span><strong>8</strong></div><div class="stat"><span>Sepet</span><strong id="cartCount">3</strong></div><div class="stat"><span>Sipariş</span><strong>12</strong></div><div class="stat"><span>Teslimat</span><strong>4</strong></div></div>
- <div class="products" id="buyerProducts"></div>
-</section>
+    <aside class="sidebar" id="sidebar" aria-label="Ana navigasyon">
+      <div class="sidebar-head">
+        <div>
+          <small id="surfaceEyebrow">PUBLIC</small>
+          <h2 id="surfaceTitle">Keşif</h2>
+        </div>
+        <button class="icon-btn mobile-only" id="closeMenuBtn" aria-label="Menüyü kapat">✕</button>
+      </div>
+      <nav id="sideNav" class="side-nav"></nav>
+      <div class="sidebar-foot">
+        <div class="guard-card">
+          <span class="guard-dot"></span>
+          <div><strong>Production kilitli</strong><small>Gerçek release kanıtı olmadan açılamaz.</small></div>
+        </div>
+      </div>
+    </aside>
 
-<section class="view" data-surface="supplier">
- <div class="section"><div><h2>Tedarikçi Paneli</h2><p>Teklif, stok, sipariş ve teslimat operasyonları.</p></div></div>
- <div class="grid4"><div class="stat"><span>Bekleyen RFQ</span><strong>14</strong></div><div class="stat"><span>Aktif teklif</span><strong>38</strong></div><div class="stat"><span>Hazırlanan sipariş</span><strong>7</strong></div><div class="stat"><span>SLA riski</span><strong>2</strong></div></div>
- <div class="panel-grid">
-  <div class="card"><h3>Gelen RFQ'lar</h3><table class="table"><thead><tr><th>İşletme</th><th>Ürün</th><th>Miktar</th><th>Durum</th></tr></thead><tbody>
-   <tr><td>Mavi Masa Restoran</td><td>Donuk Patates</td><td>20 koli</td><td class="status warn">Yanıt bekliyor</td></tr>
-   <tr><td>Kıyı Balık</td><td>Levrek Fileto</td><td>45 kg</td><td class="status ok">Teklif verildi</td></tr>
-   <tr><td>Şehir Bistro</td><td>Ayçiçek Yağı</td><td>12 teneke</td><td class="status warn">Yanıt bekliyor</td></tr>
-  </tbody></table></div>
-  <div class="card"><h3>Operasyon Akışı</h3><div class="timeline"><div class="event"><span class="dot"></span><div><b>Sipariş #1048</b><br><small>Hazırlanıyor · 09:42</small></div></div><div class="event"><span class="dot"></span><div><b>Stok güncellendi</b><br><small>Donuk Patates · 09:25</small></div></div><div class="event"><span class="dot"></span><div><b>Teklif #RFQ-812</b><br><small>Gönderildi · 09:04</small></div></div></div></div>
- </div>
-</section>
+    <main class="workspace" id="workspace" tabindex="-1">
+      <div id="page"></div>
+    </main>
+  </div>
 
-<section class="view" data-surface="admin">
- <div class="notice">Production kilitli. Bu canlı birleşik görünüm, son <b>main</b> mimarisinin deploy edilebilir preview yüzüdür.</div>
- <div class="section"><div><h2>Komutan Admin</h2><p>Ticaret, katalog, finans, güvenlik ve release kontrolü.</p></div></div>
- <div class="grid4"><div class="stat"><span>Quality Gate</span><strong class="ok">PASS</strong></div><div class="stat"><span>Phase</span><strong>0–18</strong></div><div class="stat"><span>Açık PR</span><strong>0</strong></div><div class="stat"><span>Production</span><strong class="bad">LOCKED</strong></div></div>
- <div class="panel-grid">
-  <div class="card"><h3>Modül Sağlığı</h3><table class="table"><thead><tr><th>Modül</th><th>Durum</th><th>Kontrol</th></tr></thead><tbody>
-   <tr><td>Katalog / PIM</td><td class="ok status">PASS</td><td>Admin + API + Audit</td></tr>
-   <tr><td>Fiyat / Stok / Rezervasyon</td><td class="ok status">PASS</td><td>Money/Tax + SLA</td></tr>
-   <tr><td>RFQ / Sepet / Sipariş</td><td class="ok status">PASS</td><td>State machine + snapshot</td></tr>
-   <tr><td>Finans / Ledger</td><td class="ok status">PASS</td><td>Append-only + DB trigger</td></tr>
-   <tr><td>Release Readiness</td><td class="warn status">External gates</td><td>Production locked</td></tr>
-  </tbody></table></div>
-  <div class="card"><h3>Release Gate</h3><div class="timeline">
-   <div class="event"><span class="dot"></span><div><b>Engineering</b><br><small>Complete</small></div></div>
-   <div class="event"><span class="dot" style="background:#f59e0b"></span><div><b>Private Pilot</b><br><small>Gerçek kanıt bekliyor</small></div></div>
-   <div class="event"><span class="dot" style="background:#f59e0b"></span><div><b>Legal / Accounting / Privacy</b><br><small>Dış review bekliyor</small></div></div>
-   <div class="event"><span class="dot" style="background:#b91c1c"></span><div><b>Production</b><br><small>Kilitli</small></div></div>
-  </div></div>
- </div>
-</section>
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div><small>Hızlı İşlem</small><h3 id="drawerTitle">İşlem</h3></div>
+      <button class="icon-btn" id="drawerClose">✕</button>
+    </div>
+    <div id="drawerBody" class="drawer-body"></div>
+  </aside>
 
-<div class="footer">İşletme Sepeti · Birleşik canlı preview · Public + Buyer + Supplier + Admin</div>
-</main></div>
-<script>
-const surfaces={
- public:["Ana Sayfa","Kategoriler","Tedarikçiler","Nasıl Çalışır","Yardım"],
- buyer:["Ana Sayfa","Ürün Ara / Katalog","Kategoriler","Toptancılar","Liste Yükle","Teklifler","Sepetim","Siparişlerim","Teslimatlarım","Tekrar Sipariş","Satın Alma Listelerim","Tedarikçilerim","Favorilerim","Faturalarım","Raporlarım","Şubelerim","Kullanıcı & Yetki","Bildirimler","İşletme Ayarları","Yardım"],
- supplier:["Genel Bakış","Siparişler","Teklif Talepleri","Ürünlerim","Fiyat Merkezi","Stok Merkezi","Toplu İşlemler","Teslimat","Müşterilerim","Özel Fiyatlar","Kampanyalar","Faturalar","Cari Bilgileri","Komisyon","Raporlar","Personel & Yetki","Hareket Geçmişi","Firma Ayarları","Yardım"],
- admin:["Genel Bakış","Ticaret","Katalog","Fiyat & Stok","Teslimat","İşletmeciler","Toptancılar","Üyelik & Yetki","Vitrin Studio","Kampanya & Reklam","Raporlama","Pazar Radarı","Destek / Çağrı Merkezi","Yardım & Site Kılavuzu","Sözleşmeler","Entegrasyonlar","Güvenlik & KVKK","Audit / Hareketler","Engine Room"]
-};
-const titles={public:"Public",buyer:"Alıcı",supplier:"Tedarikçi",admin:"Admin"};
-const products=[
- {n:"Donuk Patates 2.5 kg",u:"Koli",p:"₺1.280 – ₺1.460",s:"8 aktif teklif",e:"🍟"},
- {n:"Ayçiçek Yağı 18 L",u:"Teneke",p:"₺1.890 – ₺2.050",s:"11 aktif teklif",e:"🫗"},
- {n:"Dilim Cheddar",u:"Koli",p:"₺2.240 – ₺2.480",s:"6 aktif teklif",e:"🧀"},
- {n:"Levrek Fileto",u:"Kg",p:"Teklif iste",s:"5 aktif teklif",e:"🐟"},
- {n:"Un 25 kg",u:"Çuval",p:"₺780 – ₺860",s:"14 aktif teklif",e:"🌾"},
- {n:"Domates Salçası",u:"Koli",p:"₺1.140 – ₺1.300",s:"9 aktif teklif",e:"🥫"},
- {n:"Süt 1 L",u:"Koli",p:"₺620 – ₺710",s:"12 aktif teklif",e:"🥛"},
- {n:"Nohut",u:"25 kg",p:"₺1.980 – ₺2.140",s:"7 aktif teklif",e:"🫘"}
-];
-function productHtml(p){return `<article class="card product" data-name="${p.n.toLowerCase()}"><div class="ph">${p.e}</div><div class="pb"><span class="badge">${p.u}</span><h3>${p.n}</h3><div class="price">${p.p}</div><div class="meta">${p.s} · Stok sinyali mevcut</div><button class="btn" onclick="addCart(this)">Teklifleri İncele</button></div></article>`}
-function renderProducts(){document.getElementById("publicProducts").innerHTML=products.slice(0,4).map(productHtml).join("");document.getElementById("buyerProducts").innerHTML=products.map(productHtml).join("")}
-function nav(surface){const buttons=surfaces[surface].map((x,i)=>`<button class="${i===0?'active':''}" onclick="activateNav(this)">${x}</button>`).join("");document.getElementById("sideNav").innerHTML=buttons;document.getElementById("mobileNav").innerHTML=buttons;document.getElementById("navTitle").textContent=titles[surface]+" Menü"}
-function showSurface(surface){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.dataset.surface===surface));document.querySelectorAll("#surfaceSwitch button").forEach(x=>x.classList.toggle("active",x.dataset.surface===surface));nav(surface)}
-function activateNav(btn){btn.parentElement.querySelectorAll("button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
-function addCart(btn){btn.textContent="İnceleniyor ✓";btn.style.background="#115e59";const c=document.getElementById("cartCount");if(c)c.textContent=Number(c.textContent)+1}
-function filterProducts(){const q=document.getElementById("searchInput").value.toLowerCase().trim();document.querySelectorAll("#buyerProducts .product").forEach(x=>x.style.display=!q||x.dataset.name.includes(q)?"":"none")}
-document.getElementById("surfaceSwitch").innerHTML=Object.entries(titles).map(([k,v])=>`<button data-surface="${k}" class="${k==='public'?'active':''}" onclick="showSurface('${k}')">${v}</button>`).join("");
-renderProducts();nav("public");
-</script>
-</body></html>
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
