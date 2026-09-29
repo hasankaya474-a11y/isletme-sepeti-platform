@@ -95,7 +95,7 @@
       "/profesyonel-mutfak-tedarikcisi","/restoran-gida-tedariki","/kafe-tedarikcisi","/otel-gida-tedarikcisi",
       "/donuk-gida-tedarikcisi","/isletmelere-toplu-gida-tedariki","/istanbul-horeca-tedarikcisi",
       "/restoran-tedarik-urunleri","/horeca-kuru-gida-tedarikcisi","/horeca-yag-tedarikcisi","/horeca-sos-tedarikcisi","/horeca-patates-tedarikcisi",
-      "/fotografla-teklif","/urunler","/iletisim",
+      "/fotografla-teklif","/urunler","/iletisim","/hakkimizda",
       "/dijital-menu-cozumleri"
     ]);
 
