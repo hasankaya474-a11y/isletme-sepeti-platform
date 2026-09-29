@@ -120,6 +120,20 @@ test('Commerce V2 mobile tablet contact and help locks are present',()=>{
   assert.doesNotMatch(commerce,/wa\.me\//);
 });
 
+test('Commerce V2 mobile navigation routes and touch targets are correct',()=>{
+  assert.match(commerce,/href="\/sepet">▣<br>Sepet\/Teklif/);
+  assert.match(commerce,/href="\/yardim" title="Site Yardım"/);
+  assert.match(commerce,/\.mobile a\{[^}]*min-height:44px/);
+  assert.match(commerce,/\.qty button,\.add\{[^}]*height:44px/);
+});
+
+test('Commerce V2 admin supports storefront record edit and delete',()=>{
+  assert.match(commerceAdmin,/function startEdit\(/);
+  assert.match(commerceAdmin,/function removeRow\(/);
+  assert.match(commerceAdmin,/method:'DELETE'/);
+  assert.match(commerceAdmin,/editingId/);
+});
+
 test('Commerce V2 admin can manage product image price banner category and help',()=>{
   assert.match(admin,/from "\.\/commerce-admin-v2\.js"/);
   assert.match(admin,/commerceAdminApi/);
