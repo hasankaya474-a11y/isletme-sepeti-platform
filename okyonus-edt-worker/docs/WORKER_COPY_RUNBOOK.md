@@ -15,6 +15,7 @@ Required migrations for this Commerce V2 release:
 `okyonus-edt-worker/migrations/001_sales_mode.sql`
 `okyonus-edt-worker/migrations/003_commerce_v2.sql`
 `okyonus-edt-worker/migrations/004_commerce_extended.sql`
+`okyonus-edt-worker/migrations/005_product_meta.sql`
 
 Do not treat `migrations/002_sales_data.sql` as a mandatory production migration. It remains an optional extension layer.
 
@@ -33,7 +34,7 @@ Do not treat `migrations/002_sales_data.sql` as a mandatory production migration
 2. Copy ZAMAN source to a staging Admin Worker.
 3. Bind staging D1 and staging R2 buckets.
 4. Configure staging email/notification bindings.
-5. Run `001_sales_mode.sql`, `003_commerce_v2.sql` and `004_commerce_extended.sql` on staging.
+5. Run `001_sales_mode.sql`, `003_commerce_v2.sql`, `004_commerce_extended.sql` and `005_product_meta.sql` on staging.
 6. Confirm active flags: PRODUCTS, QUOTE, PHOTO, SEO, MEMBERSHIP, DIGITAL_MENU.
 7. Confirm hidden flags: WHATSAPP, COST, COST_RADAR, ACADEMY, CESNI and other intentionally hidden legacy modules.
 
@@ -83,7 +84,7 @@ Only after staging PASS:
 3. preserve all existing DENİZ bindings/secrets
 4. copy canonical ZAMAN source
 5. preserve all existing ZAMAN bindings/secrets
-6. run required migrations `001_sales_mode.sql`, `003_commerce_v2.sql` and `004_commerce_extended.sql`
+6. run required migrations `001_sales_mode.sql`, `003_commerce_v2.sql`, `004_commerce_extended.sql` and `005_product_meta.sql`
 7. deploy DENİZ
 8. deploy ZAMAN
 9. run the same smoke tests against production

@@ -46,6 +46,7 @@ Git blob SHA:
 2. `okyonus-edt-worker/migrations/003_commerce_v2.sql`
    Blob: `aa527935ddf52c6ca08a741c167505a87b4b9316`
 3. `okyonus-edt-worker/migrations/004_commerce_extended.sql`
+4. `okyonus-edt-worker/migrations/005_product_meta.sql`
    Blob: `c2e02f7076e4ef77d0c3dbc33795f6b88e053945`
 
 Do not insert migration 002 into the required production sequence.
@@ -90,7 +91,7 @@ Production remains blocked until:
 1. current Workers are exported
 2. D1 backup exists
 3. staging uses isolated bindings
-4. migrations 001, 003, 004 pass in staging
+4. migrations 001, 003, 004, 005 pass in staging
 5. quote, email, contact and photo evidence passes
 6. member login and Digital Menu pass
 7. rollback source/version is confirmed

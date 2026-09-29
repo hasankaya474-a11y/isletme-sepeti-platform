@@ -25,6 +25,7 @@ Run only after backup and controlled staging PASS:
 1. `okyonus-edt-worker/migrations/001_sales_mode.sql`
 2. `okyonus-edt-worker/migrations/003_commerce_v2.sql`
 3. `okyonus-edt-worker/migrations/004_commerce_extended.sql`
+4. `okyonus-edt-worker/migrations/005_product_meta.sql`
 
 `002_sales_data.sql` remains optional and is not part of the required production release set.
 
@@ -61,6 +62,9 @@ These are protected by contract tests against the supplied baseline files.
 - product create/edit/active-passive control
 - safe product soft-delete
 - product price history
+- product description / brand / SEO metadata
+- featured and product sort-order metadata
+- safe bulk catalog import
 - media management
 - responsive admin controls
 - mobile/tablet navigation and touch target locks
@@ -92,7 +96,7 @@ The final code-completion branch also passed both gates before merge.
 4. back up shared production D1
 5. stage canonical DENİZ and ZAMAN sources
 6. bind staging D1/R2/email/secrets
-7. run migrations 001, 003 and 004 on staging
+7. run migrations 001, 003, 004 and 005 on staging
 8. execute DENİZ smoke tests
 9. execute ZAMAN smoke tests
 10. verify quote email, contact email and photo lifecycle with real evidence
@@ -100,7 +104,7 @@ The final code-completion branch also passed both gates before merge.
 12. take fresh production backup
 13. copy canonical DENİZ source preserving existing bindings/secrets
 14. copy canonical ZAMAN source preserving existing bindings/secrets
-15. run required production migrations
+15. run required production migrations 001, 003, 004 and 005
 16. deploy DENİZ
 17. deploy ZAMAN
 18. repeat smoke tests in production
