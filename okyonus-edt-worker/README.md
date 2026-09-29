@@ -1,30 +1,36 @@
 # Okyanus EDT Worker New Face v1
 
-Gerçek Cloudflare Worker kaynak paketi. Demo HTML değildir.
+Bu klasör, Worker'a doğrudan kopyalanacak gerçek kaynak kodu içerir.
 
-## Hedefler
-- `src/deniz-worker.js` -> DENİZ public/sales Worker
-- `src/zaman-worker.js` -> ZAMAN/ADMIN yönetim Worker
-- ortak D1 veri omurgası
-- mevcut çalışan e-posta gönderim binding sözleşmesini koruma
-- `/api/quote`, `/api/contact`, `/api/photo-inquiries` sözleşmelerini koruma
-- satış odaklı yeni Okyanus yüzü
-- COST, COST Radar, Akademi, ÇEŞNİ public tarafta pasif
-- Dijital Menü aktif, minimum 30 tema + 30 şablon
-- Yardım yalnız aktif modülleri gösterir
+## Dağıtım hedefleri
+- `src/deniz-worker.js` → DENİZ public/satış Worker
+- `src/zaman-admin-worker.js` → ZAMAN / ADMIN Worker
+- `baseline/` → kullanıcı tarafından sağlanan çalışan kaynakların değişmeden saklanan regresyon referansı
+- `migrations/` → ortak D1 görünürlük ve satış katmanı
+- `docs/seo-routes.json` → mevcut 200 EDT SEO route envanteri
 
-## Kritik koruma kuralları
-1. Teklif, mesaj ve fotoğraf önce D1'e kaydedilir; e-posta bildirimi başarısız olsa bile kayıt kaybolmaz.
-2. `EMAIL.send({to,from,replyTo,subject,text})` mevcut binding sözleşmesi korunur.
-3. Fotoğraf JPEG/PNG/WebP imzası doğrulanmadan medya deposuna kabul edilmez.
-4. Public feature görünürlüğü D1 `app_features` üzerinden Admin'den açılıp kapatılabilir.
-5. SEO değerli URL'leri ve `/edt-*` landing yolları public ürün deneyimine düşmeye devam eder.
-6. Production ID/secret bu repoya yazılmaz.
+## Korunan kritik akışlar
+- `POST /api/quote`
+- `POST /api/contact`
+- `POST /api/photo-inquiries`
+- mevcut e-posta binding sözleşmesi
+- ZAMAN mesaj merkezi
+- ZAMAN fotoğraf mesaj akışı
+
+Kritik DENİZ fonksiyonları baseline ile byte-byte korunur. Yeni satış yüzü ve modül görünürlüğü bu motorların dışına eklenmiştir.
+
+## Public varsayılan durum
+Aktif: Products, Quote, Photo, WhatsApp, SEO, Membership, Digital Menu.
+
+Pasif/gizli: COST, COST Radar, Akademi, ÇEŞNİ ve diğer legacy araçlar.
+
+## Dijital Menü
+Minimum 30 tema + 30 şablon. Public landing `/dijital-menu-cozumleri`, mevcut gerçek builder `/dijital-menu`.
 
 ## Kontrol
 ```bash
 npm run verify
 ```
 
-## Geçiş
-Önce staging Worker + staging D1/R2. Production'a kopyalanırken mevcut binding adları/ID'leri korunur. Eski Worker rollback için tutulur.
+## Canlı geçiş
+Önce mevcut Worker/D1/R2/binding yedeği alınır. DENİZ ve ZAMAN kodları kendi Worker'larına kopyalanır. Secret ve binding değerleri GitHub'a yazılmaz. Dağıtım sonrası teklif, e-posta, mesaj, fotoğraf, SEO ve Dijital Menü smoke testleri yapılır. Eski Worker rollback için tutulur.
