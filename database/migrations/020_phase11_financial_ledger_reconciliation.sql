@@ -103,3 +103,28 @@ CREATE INDEX idx_commission_rule_scope ON commission_rules(scope_type,business_i
 CREATE INDEX idx_ledger_transaction_source ON ledger_transactions(source_type,source_id);
 CREATE INDEX idx_ledger_entry_org ON ledger_entries(organization_type,organization_id,currency);
 CREATE INDEX idx_reconciliation_scope ON reconciliation_batches(business_id,supplier_id,status);
+
+
+CREATE TRIGGER ledger_entries_no_update
+BEFORE UPDATE ON ledger_entries
+BEGIN
+ SELECT RAISE(ABORT,'LEDGER_ENTRY_IMMUTABLE');
+END;
+
+CREATE TRIGGER ledger_entries_no_delete
+BEFORE DELETE ON ledger_entries
+BEGIN
+ SELECT RAISE(ABORT,'LEDGER_ENTRY_IMMUTABLE');
+END;
+
+CREATE TRIGGER commission_accruals_no_update
+BEFORE UPDATE ON commission_accruals
+BEGIN
+ SELECT RAISE(ABORT,'COMMISSION_ACCRUAL_IMMUTABLE');
+END;
+
+CREATE TRIGGER commission_accruals_no_delete
+BEFORE DELETE ON commission_accruals
+BEGIN
+ SELECT RAISE(ABORT,'COMMISSION_ACCRUAL_IMMUTABLE');
+END;
