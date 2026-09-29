@@ -22,6 +22,7 @@ Date: 2026-09-29
 16. Public homepage content, catalog surfaces, help, campaigns and other manageable content must support lifecycle control from Admin: draft, preview, schedule, publish, unpublish, archive, version and rollback where applicable.
 17. Reporting is required across Business, Supplier and Platform Admin workspaces; reports must distinguish observed platform facts from recommendations or automated actions.
 18. Security controls are enforced at API and data scope layers, not only by hiding UI. Authentication, RBAC/scope, MFA for privileged access, audit, rate limits, upload validation, secret storage, privacy/retention, backup and restore verification are mandatory platform concerns.
+19. Help & Site Guide visibility mirrors active product visibility: end users see only guides for modules/features currently active on their authorized web surface. Inactive guides are retained in Admin, hidden from end users, and can be reactivated with the corresponding module.
 
 ## Surfaces
 - `/`: the single public homepage and public discovery surface.
@@ -41,6 +42,7 @@ The complete functional and operational architecture is frozen in:
 
 ADR 0007 locks the single public entry and role-routed workspaces.
 ADR 0008 locks Communication Center and contextual WhatsApp behavior.
+ADR 0009 locks Help & Site Guide visibility to active modules only.
 
 ## Management lifecycle
 DRAFT -> REVIEW -> SCHEDULED -> PUBLISHED -> UNPUBLISHED -> ARCHIVED
