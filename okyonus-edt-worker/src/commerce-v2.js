@@ -65,21 +65,20 @@ async function storefront(env){
    const has=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='b2b_products_v1'").first();
    if(has){
     const hasMeta=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_product_meta_v1'").first();
-    const sql=hasMeta?`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
-    (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 AND (pr.valid_until IS NULL OR pr.valid_until>datetime('now')) ORDER BY pr.valid_from DESC LIMIT 1) effectivePrice,
-    m.description,m.seo_title,m.seo_description,m.featured,m.sort_order,m.brand_id,
-    (SELECT name FROM oky_brands_v1 b WHERE b.id=m.brand_id AND b.active=1 LIMIT 1) brand
-    FROM b2b_products_v1 p LEFT JOIN oky_product_meta_v1 m ON m.product_id=p.id
-    WHERE p.active=1 ORDER BY COALESCE(m.featured,0) DESC,COALESCE(m.sort_order,0),p.updated_at DESC LIMIT 100`
-    :`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
-    (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 AND (pr.valid_until IS NULL OR pr.valid_until>datetime('now')) ORDER BY pr.valid_from DESC LIMIT 1) effectivePrice
-    FROM b2b_products_v1 p WHERE p.active=1 ORDER BY p.updated_at DESC LIMIT 100`;
+    const hasCommerce=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_product_commerce_v1'").first();
+    const metaCols=hasMeta?",m.description,m.seo_title,m.seo_description,m.featured,m.sort_order,m.brand_id,(SELECT name FROM oky_brands_v1 b WHERE b.id=m.brand_id AND b.active=1 LIMIT 1) brand":",NULL description,NULL seo_title,NULL seo_description,0 featured,0 sort_order,NULL brand_id,NULL brand";
+    const commerceCols=hasCommerce?",pc.sku,pc.barcode,pc.subcategory,pc.origin,pc.storage_conditions,pc.cold_chain,pc.min_order_qty,pc.qty_step,pc.list_price,pc.sale_price,pc.new_until,pc.best_seller":",NULL sku,NULL barcode,NULL subcategory,NULL origin,NULL storage_conditions,0 cold_chain,1 min_order_qty,1 qty_step,NULL list_price,NULL sale_price,NULL new_until,0 best_seller";
+    const joins=(hasMeta?" LEFT JOIN oky_product_meta_v1 m ON m.product_id=p.id":"")+(hasCommerce?" LEFT JOIN oky_product_commerce_v1 pc ON pc.product_id=p.id":"");
+    const order=(hasMeta?"COALESCE(m.featured,0) DESC,":"")+(hasCommerce?"COALESCE(pc.best_seller,0) DESC,":"")+(hasMeta?"COALESCE(m.sort_order,0),":"")+"p.updated_at DESC";
+    const sql=`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
+    (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 AND (pr.valid_until IS NULL OR pr.valid_until>datetime('now')) ORDER BY pr.valid_from DESC LIMIT 1) basePrice${metaCols}${commerceCols}
+    FROM b2b_products_v1 p${joins} WHERE p.active=1 ORDER BY ${order} LIMIT 500`;
     const rows=(await DB.prepare(sql).all()).results||[];
-    products=rows;
+    products=rows.map(x=>{const sale=Number(x.sale_price),base=Number(x.basePrice),list=Number(x.list_price);const saleOk=Number.isFinite(sale)&&sale>=0;const baseOk=Number.isFinite(base)&&base>=0;const listOk=Number.isFinite(list)&&list>=0;const effectivePrice=saleOk?sale:(baseOk?base:(listOk?list:null));const listPrice=listOk?list:(saleOk&&baseOk&&base>sale?base:null);const discountPercent=listPrice!=null&&effectivePrice!=null&&listPrice>effectivePrice?Math.round((1-effectivePrice/listPrice)*100):0;return {...x,effectivePrice,listPrice,discountPercent}}); 
    }
   }
  }catch{}
- let banners=[],categories=[],sections=[],campaigns=[],brands=[],delivery=[],helpArticles=[],settings={};
+ let banners=[],categories=[],sections=[],campaigns=[],brands=[],delivery=[],helpArticles=[],seoLinks=[],settings={};
  try{
   const DB=env&& (env.DB||env.ADMIN_DB||env["Veritabanı"]||env["Veritabani"]||env["Veritabanı1"]);
   if(DB){
@@ -99,10 +98,12 @@ async function storefront(env){
    if(hhelp)helpArticles=(await DB.prepare("SELECT * FROM oky_help_articles_v1 WHERE active=1 ORDER BY sort_order,rowid LIMIT 100").all()).results||[];
    const hset=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_storefront_settings_v1'").first();
    if(hset){const sr=(await DB.prepare("SELECT key,value FROM oky_storefront_settings_v1").all()).results||[];settings=Object.fromEntries(sr.map(x=>[x.key,x.value]));}
+   const hseo=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_seo_links_v1'").first();
+   if(hseo)seoLinks=(await DB.prepare("SELECT path,label,group_name,sort_order FROM oky_seo_links_v1 WHERE active=1 ORDER BY sort_order,rowid LIMIT 200").all()).results||[];
   }
  }catch{}
  if(!products.length)products=FALLBACK_PRODUCTS;
- return json({ok:true,build:BUILD,products:products.map(p=>({...p,cardHtml:card(p)})),banners,categories,sections,campaigns,brands,delivery,help:helpArticles,settings:{...DEFAULT_SETTINGS,...settings},legacyCatalogEndpoint:"/api/products"});
+ return json({ok:true,build:BUILD,products:products.map(p=>({...p,cardHtml:card(p)})),banners,categories,sections,campaigns,brands,delivery,help:helpArticles,seo:seoLinks,settings:{...DEFAULT_SETTINGS,...settings},legacyCatalogEndpoint:"/api/products"});
 }
 
 
