@@ -425,3 +425,49 @@ test('single-file Worker bundles need no sibling modules',()=>{
   assert.match(denizSingle,/export default/);
   assert.match(zamanSingle,/export default/);
 });
+
+
+test('complete storefront exposes logo legacy catalog and central admin controls',()=>{
+  const logo=new URL('../assets/okyanus-logo.webp',import.meta.url);
+  assert.ok(fs.existsSync(logo));
+  assert.ok(fs.statSync(logo).size>1000);
+  assert.match(commerce,/DEFAULT_LOGO_URL/);
+  assert.match(commerce,/okyanus-logo\.webp/);
+  assert.match(commerce,/visualFallback/);
+  assert.match(commerce,/legacyCatalogEndpoint:"\/api\/products"/);
+  assert.match(commerce,/fetch\('\/api\/products'/);
+  assert.match(commerce,/Fiyat için teklif alın/);
+  assert.match(commerce,/← Ana Sayfa/);
+  assert.match(commerce,/contactStrip/);
+  assert.match(commerce,/fetch\("\/api\/contact"|fetch\('\/api\/contact'/);
+  assert.match(commerceAdmin,/resource==="settings"/);
+  assert.match(commerceAdmin,/Site Ayarları/);
+  assert.match(commerceAdmin,/resource==="legacy-catalog-sync"/);
+  assert.match(commerceAdmin,/Eski Okyanus Kataloğunu D1’e Aktar/);
+  assert.match(commerceAdmin,/imageUrl/);
+  assert.match(commerceAdmin,/price/);
+  assert.match(commerceAdmin,/featured/);
+});
+
+test('managed storefront section semantics remain functional',()=>{
+  assert.match(commerce,/function renderSection\(/);
+  for(const kind of ['PRODUCT_GRID','CATEGORY_STRIP','CAMPAIGN','PROMO','CONTENT']) assert.match(commerce,new RegExp(kind));
+  assert.match(commerce,/j\.sections\.map\(renderSection\)/);
+});
+
+test('single-file bundles are byte-current with canonical sources',()=>{
+  const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
+  const commerceInline=commerce
+    .replace('export async function commerceRoute','async function commerceRoute')
+    .replace(/\nexport const OKY_COMMERCE_V2_BUILD=BUILD;\s*$/,'');
+  const denizInline=deniz.replace(/^import \{ commerceRoute \} from "\.\/commerce-v2\.js";\s*/,'');
+  const expectedDeniz='/* OKYANUS EDT - SINGLE FILE DENIZ WORKER\nGenerated from canonical release sources.\ncommerce-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceRoute } = (() => {\n'+commerceInline+'\nreturn { commerceRoute };\n})();\n'+denizInline;
+  const adminInline=commerceAdmin
+    .replace('export async function commerceAdminApi','async function commerceAdminApi')
+    .replace('export function commerceAdminPage','function commerceAdminPage');
+  const zamanInline=admin.replace(/^import \{ commerceAdminApi, commerceAdminPage \} from "\.\/commerce-admin-v2\.js";\s*/,'');
+  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminInline+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zamanInline;
+  assert.equal(denizSingle,expectedDeniz);
+  assert.equal(zamanSingle,expectedZaman);
+});

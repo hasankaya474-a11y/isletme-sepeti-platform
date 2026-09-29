@@ -6,10 +6,11 @@
   "scripts": {
     "check": "node --check src/commerce-v2.js && node --check src/commerce-admin-v2.js && node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js && node --check dist/deniz-worker.single.js && node --check dist/zaman-admin-worker.single.js",
     "test": "node --test tests/*.test.mjs",
-    "verify": "npm run check && npm test",
+    "verify": "npm run build:single && npm run check && npm test",
     "release:dry-run": "node scripts/release-dry-run.mjs",
     "staging:preflight": "node scripts/staging-preflight.mjs",
     "staging:config-check": "node scripts/staging-config-check.mjs",
-    "staging:binding-check": "node scripts/binding-consistency-check.mjs"
+    "staging:binding-check": "node scripts/binding-consistency-check.mjs",
+    "build:single": "node scripts/build-single-workers.mjs"
   }
 }
