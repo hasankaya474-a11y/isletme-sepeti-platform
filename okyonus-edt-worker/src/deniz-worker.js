@@ -1,3 +1,4 @@
+import { commerceRoute } from "./commerce-v2.js";
 /* OKYANUS DENIZ FINAL-7 SON FINAL 2026-09-12 | YONETICI+YARDIM SADECE SOL MENU */
     /**
      * OKYANUS EDT V2
@@ -7717,7 +7718,7 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
               path.slice(0, -1);
           }
 
-          // OKYANUS NEW FACE V1: public sales shell; critical APIs below remain unchanged.
+          // OKYANUS COMMERCE V2: isolated public commerce shell. Critical legacy APIs remain below unchanged.\n          const commerceV2Response=await commerceRoute(request,env);\n          if(commerceV2Response)return commerceV2Response;\n\n          // OKYANUS NEW FACE V1: public sales shell; critical APIs below remain unchanged.
           if((request.method==="GET"||request.method==="HEAD")&&path==="/")return responseHTML(okySalesFirstHomeV1().replace('</body>',vitrineLiveHydrationScript()+'</body>'),200,path);
           if((request.method==="GET"||request.method==="HEAD")&&path==="/yardim")return new Response(okySalesHelpPage(),{status:200,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
           if((request.method==="GET"||request.method==="HEAD")&&path==="/dijital-menu-cozumleri")return new Response(okyDigitalMenuSolutionsV1(),{status:200,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
