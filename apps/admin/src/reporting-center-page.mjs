@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderReportingCenter({metrics=[],reports=[],jobs=[]}={}){
+ return '<section class="workspace" aria-labelledby="reporting-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="reporting-title">Raporlama & Metrik Sözlüğü</h1><p>Metrik tanımlarını, raporları ve PDF/XLSX export işlerini yönetin.</p></div></header><div class="control-grid"><article><h2>Metrikler</h2><strong>'+e(metrics.length)+'</strong></article><article><h2>Raporlar</h2><strong>'+e(reports.length)+'</strong></article><article><h2>Export İşleri</h2><strong>'+e(jobs.length)+'</strong></article></div></section>';
+}
