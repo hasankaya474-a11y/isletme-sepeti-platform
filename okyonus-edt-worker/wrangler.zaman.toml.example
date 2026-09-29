@@ -1,6 +1,17 @@
 name = "okyanus-edt-admin"
-main = "src/zaman-worker.js"
+main = "src/zaman-admin-worker.js"
 compatibility_date = "2026-09-29"
 
-# Bind the SAME production D1 used by DENIZ when deploying to ZAMAN/ADMIN.
-# SESSION_PEPPER and BOOTSTRAP_TOKEN must be Worker secrets, never committed.
+# Bind the SAME D1 used by DENIZ when deploying the matching environment.
+# Production: use the existing production D1 binding/ID.
+# Staging: use a separate staging D1.
+#
+# Expected bindings:
+# DB          -> shared Okyanus D1
+# MEDIA_STORE -> existing/staging media R2 when used by Admin Studio
+# PHOTO_TEMP  -> existing/staging photo R2 when Admin photo workflow needs it
+#
+# Required secrets/vars are NOT committed:
+# SESSION_PEPPER
+# BOOTSTRAP_TOKEN (only if bootstrap flow is intentionally enabled)
+# REQUIRE_CF_ACCESS / Cloudflare Access configuration when used
