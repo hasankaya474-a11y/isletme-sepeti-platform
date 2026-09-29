@@ -5,12 +5,15 @@ export const REQUIRED_RELEASE_GATES=Object.freeze([
  "LOAD_VERIFICATION","LEGAL_REVIEW","ACCOUNTING_REVIEW","PRIVACY_REVIEW"
 ]);
 
+const unresolvedCriticalDefect=x=>["HIGH","CRITICAL"].includes(x.severity)&&x.status!=="VERIFIED"&&x.status!=="WONT_FIX";
+
 export class ReleaseReadinessService{
  constructor(store){this.store=store;}
 
  setGate({gateKey,status,evidenceRef=null,note=null,actorId}){
   if(!REQUIRED_RELEASE_GATES.includes(gateKey))throw new Error("RELEASE_GATE_UNKNOWN");
   if(!["MISSING","PENDING","PASS","FAIL"].includes(status)||!actorId)throw new TypeError("RELEASE_GATE_FIELDS_REQUIRED");
+  if(status==="PASS"&&!evidenceRef)throw new Error("RELEASE_GATE_EVIDENCE_REQUIRED");
   const now=new Date().toISOString();
   const current=this.store.find("releaseGateEvidence",x=>x.gateKey===gateKey)[0];
   let row;
@@ -23,8 +26,21 @@ export class ReleaseReadinessService{
  evaluate(){
   const rows=this.store.find("releaseGateEvidence",()=>true);
   const byKey=new Map(rows.map(x=>[x.gateKey,x]));
-  const gates=REQUIRED_RELEASE_GATES.map(gateKey=>({gateKey,status:byKey.get(gateKey)?.status??"MISSING",evidenceRef:byKey.get(gateKey)?.evidenceRef??null}));
-  const blockers=gates.filter(x=>x.status!=="PASS");
+  const gates=REQUIRED_RELEASE_GATES.map(gateKey=>({
+    gateKey,
+    status:byKey.get(gateKey)?.status??"MISSING",
+    evidenceRef:byKey.get(gateKey)?.evidenceRef??null
+  }));
+  const blockers=gates.filter(x=>x.status!=="PASS"||!x.evidenceRef);
+  const unresolvedDefects=this.store.find("pilotDefects",unresolvedCriticalDefect);
+  if(unresolvedDefects.length){
+    blockers.push({
+      gateKey:"DEFECT_CLOSURE_RUNTIME",
+      status:"FAIL",
+      evidenceRef:null,
+      defectIds:unresolvedDefects.map(x=>x.id)
+    });
+  }
   return {eligible:blockers.length===0,gates,blockers};
  }
 
