@@ -154,3 +154,13 @@ test('Commerce extended schema remains additive',()=>{
   for(const table of ['oky_brands_v1','oky_campaigns_v1','oky_delivery_rules_v1','oky_media_assets_v1']) assert.match(sql,new RegExp(table));
   for(const table of ['audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']) assert.doesNotMatch(sql,new RegExp('CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+'+table+'\\b','i'));
 });
+
+
+test('Commerce admin extended controls are present',()=>{
+  for(const x of ['oky_brands_v1','oky_campaigns_v1','oky_delivery_rules_v1','oky_media_assets_v1']) assert.match(commerceAdmin,new RegExp(x));
+  for(const x of ['Markalar','Kampanyalar','Teslimat','Medya']) assert.match(commerceAdmin,new RegExp(x));
+  assert.match(commerceAdmin,/resource==="brands"/);
+  assert.match(commerceAdmin,/resource==="campaigns"/);
+  assert.match(commerceAdmin,/resource==="delivery"/);
+  assert.match(commerceAdmin,/resource==="media"/);
+});
