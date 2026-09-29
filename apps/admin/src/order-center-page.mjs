@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderOrderCenter({orders=[],failedOutbox=[]}={}){
+ return '<section class="workspace" aria-labelledby="order-admin-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="order-admin-title">Sipariş & Outbox Merkezi</h1><p>Sipariş durumlarını ve olay yayım kuyruğunu izleyin.</p></div></header><section><h2>Siparişler</h2>'+(orders.length?orders.map(x=>'<article><strong>'+e(x.id)+'</strong><span>'+e(x.state)+'</span></article>').join(""):'<p role="status">Sipariş yok.</p>')+'</section><section><h2>Başarısız Outbox</h2>'+(failedOutbox.length?failedOutbox.map(x=>'<article><strong>'+e(x.eventType)+'</strong><button data-id="'+e(x.id)+'">Tekrar Kuyruğa Al</button></article>').join(""):'<p role="status">Başarısız olay yok.</p>')+'</section></section>';
+}
