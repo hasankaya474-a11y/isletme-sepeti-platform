@@ -10,7 +10,7 @@
 
 ## D1
 - [ ] Run `migrations/001_sales_mode.sql`
-- [ ] Run additive Commerce V2 migrations `migrations/003_commerce_v2.sql`, `migrations/004_commerce_extended.sql` and `migrations/005_product_meta.sql`
+- [ ] Run additive Commerce V2 migrations `migrations/003_commerce_v2.sql`, `migrations/004_commerce_extended.sql`, `migrations/005_product_meta.sql` and `migrations/006_commerce_control_plane.sql`
 - [ ] Verify `oky_module_flags_v1`
 - [ ] Confirm DIGITAL_MENU = ACTIVE
 - [ ] Confirm COST / COST_RADAR / ACADEMY / CESNI / EASY_RECIPE / ABOUT = HIDDEN
@@ -73,6 +73,9 @@
 - [x] Admin-managed banner/category/section/brand/campaign/delivery/help flows wired
 - [x] Product create/edit/soft-delete and price history controls wired
 - [x] Product description/brand/SEO/featured metadata layer wired
+- [x] Product SKU/barcode/subcategory/origin/storage/cold-chain/min-order/qty-step/list-sale price control plane wired
+- [x] 200 EDT SEO links grouped into 4 admin-managed modules
+- [x] Managed banner carousel, category media, contact owner and cookie/KVKK controls wired
 - [x] Cart/quote responsive integrity checks present
 - [x] Mobile/tablet regression locks present
 - [ ] Production deployment performed
