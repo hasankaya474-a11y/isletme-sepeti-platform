@@ -16,8 +16,9 @@ export class CartService{
   const offer=this.store.get("supplierOffers",supplierOfferId);if(!offer||offer.offerStatus!=="ACTIVE")throw new Error("SUPPLIER_OFFER_NOT_ACTIVE");
   const price=this.store.get("supplierOfferPrices",priceId);if(!price||price.supplierOfferId!==offer.id||price.status!=="ACTIVE")throw new Error("OFFER_PRICE_NOT_ACTIVE");
   if(!Number.isSafeInteger(quantityMilli)||quantityMilli<=0)throw new TypeError("CART_QUANTITY_INVALID");
+  const taxProfile=price.taxProfileId?this.store.get("taxProfiles",price.taxProfileId):null;
   const now=new Date().toISOString();
-  const row={id:newId("cartline"),cartId,masterProductId:offer.masterProductId,variantId:offer.variantId??null,supplierId:offer.supplierId,supplierOfferId:offer.id,sourceQuoteId:null,sourceQuoteLineId:null,quantityMilli,unitPriceMinor:price.unitPriceMinor,currency:price.currency,taxRateBps:price.taxRateBps??0,status:"ACTIVE",createdAt:now,updatedAt:now};
+  const row={id:newId("cartline"),cartId,masterProductId:offer.masterProductId,variantId:offer.variantId??null,supplierId:offer.supplierId,supplierOfferId:offer.id,sourceQuoteId:null,sourceQuoteLineId:null,quantityMilli,unitPriceMinor:price.unitPriceMinor,currency:price.currency,taxRateBps:taxProfile?.taxRateBps??0,status:"ACTIVE",createdAt:now,updatedAt:now};
   this.store.insert("audit",{id:newId("audit"),actorId,action:"cart.line.add_offer",resourceType:"cart",resourceId:cartId,occurredAt:now});
   return this.store.insert("cartLines",row);
  }
