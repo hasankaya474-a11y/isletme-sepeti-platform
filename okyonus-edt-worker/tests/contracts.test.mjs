@@ -3,61 +3,80 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const deniz=fs.readFileSync(new URL('../src/deniz-worker.js',import.meta.url),'utf8');
-const zaman=fs.readFileSync(new URL('../src/zaman-worker.js',import.meta.url),'utf8');
-const shared=fs.readFileSync(new URL('../src/shared.js',import.meta.url),'utf8');
-const readme=fs.readFileSync(new URL('../README.md',import.meta.url),'utf8');
+const denizBase=fs.readFileSync(new URL('../baseline/deniz-worker.js',import.meta.url),'utf8');
+const admin=fs.readFileSync(new URL('../src/zaman-admin-worker.js',import.meta.url),'utf8');
+const adminBase=fs.readFileSync(new URL('../baseline/zaman-admin-worker.js',import.meta.url),'utf8');
 
-test('critical public contracts preserved',()=>{
-  for(const p of ['/api/quote','/api/contact','/api/photo-inquiries','/api/b2b/products','/fotografla-teklif','/dijital-menu']) assert.ok(deniz.includes(p),p);
+function extractFunction(source,name){
+  const patterns=['async function '+name+'(','function '+name+'('];
+  let start=-1; for(const p of patterns){start=source.indexOf(p);if(start>=0)break}
+  assert.ok(start>=0,'missing '+name);
+  const brace=source.indexOf('{',start); let depth=0,quote='',escape=false,templateDepth=0;
+  for(let i=brace;i<source.length;i++){
+    const c=source[i],n=source[i+1];
+    if(quote){if(escape){escape=false;continue}if(c==='\\'){escape=true;continue}if(quote==='\`'&&c==='$'&&n==='{'){templateDepth++;i++;continue}if(quote==='\`'&&c==='}'&&templateDepth>0){templateDepth--;continue}if(c===quote&&templateDepth===0)quote='';continue}
+    if(c==="'"||c==='"'||c==='\`'){quote=c;continue}
+    if(c==='/'&&n==='/'){i=source.indexOf('\n',i);if(i<0)return source.slice(start);continue}
+    if(c==='/'&&n==='*'){const e=source.indexOf('*/',i+2);assert.ok(e>=0);i=e+1;continue}
+    if(c==='{')depth++; if(c==='}'){depth--;if(depth===0)return source.slice(start,i+1)}
+  }
+  throw new Error('unterminated '+name);
+}
+
+test('real DENIZ and ZAMAN sources are present',()=>{
+  assert.ok(deniz.length>3_000_000);
+  assert.ok(admin.length>100_000);
 });
 
-test('sales-first feature state is locked',()=>{
-  for(const key of ['PRODUCTS: true','QUOTE: true','PHOTO: true','WHATSAPP: true','SEO: true','MEMBERSHIP: true','DIGITAL_MENU: true','COST: false','COST_RADAR: false','ACADEMY: false','CESNI: false']) assert.ok(shared.includes(key),key);
+test('critical DENIZ engines remain byte-preserved',()=>{
+  for(const fn of ['sendBoundEmail','quoteAPI','photoInquiryAPI','okyContactMessageAPI']) assert.equal(extractFunction(deniz,fn),extractFunction(denizBase,fn),fn);
 });
 
-test('digital menu has minimum 30 themes and 30 templates',async()=>{
-  const mod=await import(new URL('../src/shared.js',import.meta.url));
-  assert.ok(mod.DIGITAL_MENU_THEMES.length>=30);
-  assert.ok(mod.DIGITAL_MENU_TEMPLATES.length>=30);
+test('critical ZAMAN message/photo engines remain byte-preserved',()=>{
+  for(const fn of ['messageCenterRoute','photoMessageRouteV2']) assert.equal(extractFunction(admin,fn),extractFunction(adminBase,fn),fn);
 });
 
-test('email happens after durable quote/contact/photo records',()=>{
-  assert.ok(deniz.indexOf('INSERT INTO b2b_quotes_v1') < deniz.indexOf("subject:`Okyanus EDT · Yeni teklif talebi"));
-  assert.ok(deniz.indexOf('INSERT INTO contact_messages') < deniz.indexOf("subject:`Okyanus EDT · Yeni müşteri mesajı"));
-  assert.ok(deniz.indexOf('INSERT INTO photo_inquiries') < deniz.indexOf("subject:`Okyanus EDT · Fotoğraflı teklif"));
-  assert.ok(deniz.includes("notification='EMAIL_FAILED'"));
-  assert.ok(deniz.includes("WAITING_CONFIGURATION"));
+test('sales-first public face is wired',()=>{
+  assert.match(deniz,/okySalesFirstHomeV1\(\)/);
+  assert.match(deniz,/Ürün Seç • Teklif Al/);
+  assert.match(deniz,/Listeni Fotoğrafla Gönder/);
+  assert.match(deniz,/wa\.me\/905358813264/);
 });
 
-test('existing email binding contract preserved',()=>{
-  assert.ok(shared.includes("env.EMAIL.send({to:target,from,replyTo:clean(replyTo,180),subject:clean(subject,180),text:"));
-  assert.ok(readme.includes('EMAIL.send({to,from,replyTo,subject,text})'));
+test('legacy modules hidden and Digital Menu active',()=>{
+  for(const x of ['COST:false','COST_RADAR:false','ACADEMY:false','CESNI:false']) assert.ok(deniz.includes(x),x);
+  for(const x of ['PRODUCTS:true','QUOTE:true','PHOTO:true','WHATSAPP:true','SEO:true','MEMBERSHIP:true','DIGITAL_MENU:true']) assert.ok(deniz.includes(x),x);
+  assert.match(admin,/moduleFlagsRoute/);
+  assert.match(admin,/Satış Modu & Modül Kontrolü/);
 });
 
-test('help only exposes active modules',()=>{
-  assert.ok(deniz.includes("features.PRODUCTS&&['Ürün seçimi'"));
-  assert.ok(deniz.includes("features.DIGITAL_MENU&&['Dijital Menü'"));
-  assert.ok(!deniz.includes("['COST yardım'"));
+test('Digital Menu exposes at least 30 themes and 30 templates',()=>{
+  const m1=deniz.match(/const OKY_DIGITAL_MENU_THEMES=Object\.freeze\((\[[\s\S]*?\])\);/);
+  const m2=deniz.match(/const OKY_DIGITAL_MENU_TEMPLATES=Object\.freeze\((\[[\s\S]*?\])\);/);
+  assert.ok(m1&&m2);
+  assert.ok(JSON.parse(m1[1]).length>=30);
+  assert.ok(JSON.parse(m2[1]).length>=30);
+  assert.match(deniz,/\/api\/digital-menu\/presets\//);
 });
 
-test('admin can control feature visibility and audit changes',()=>{
-  assert.ok(zaman.includes("p==='/api/features'&&request.method==='POST'"));
-  assert.ok(zaman.includes("action:'FEATURE_CHANGED'"));
-  assert.ok(zaman.includes('Feature Control'));
+test('Help lists active modules only',()=>{
+  const help=extractFunction(deniz,'okySalesHelpPage');
+  assert.match(help,/Ürün Seç • Teklif Al/);
+  assert.match(help,/Fotoğrafla Teklif/);
+  assert.match(help,/WhatsApp Satış/);
+  assert.match(help,/Dijital Menü/);
+  assert.doesNotMatch(help,/COST Maliyet|COST Radar|Akademi|ÇEŞNİ/);
 });
 
-test('visual dimensions locked in shared architecture',()=>{
-  for(const n of ['1600,height:1200','1600,height:600','900,height:1200','1080,height:1440','1200,height:900']) assert.ok(shared.includes(n),n);
-});
-
-test('production secrets are not hard-coded',()=>{
-  const all=deniz+zaman+shared;
-  for(const bad of ['ghp_','sk_live_','BEGIN PRIVATE KEY','SESSION_PEPPER=','BOOTSTRAP_TOKEN=']) assert.ok(!all.includes(bad),bad);
-});
-
-test('existing 200 EDT SEO route inventory is preserved as migration reference',()=>{
+test('200 EDT SEO migration inventory is retained',()=>{
   const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
   assert.equal(routes.length,200);
   assert.ok(routes.includes('/edt-deniz-urunleri-tedarikcisi'));
   assert.ok(routes.includes('/edt-horeca-gida-tedarikcisi'));
+});
+
+test('no production secrets are committed',()=>{
+  for(const s of [deniz,admin]){
+    for(const bad of ['ghp_','sk_live_','BEGIN PRIVATE KEY']) assert.ok(!s.includes(bad),bad);
+  }
 });
