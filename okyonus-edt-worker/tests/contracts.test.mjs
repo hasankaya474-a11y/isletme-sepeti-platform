@@ -234,3 +234,14 @@ test('Commerce V2 catalog URL filters and product detail stay wired',()=>{
   assert.match(commerce,/effectivePrice/);
   assert.match(commerce,/stock_status/);
 });
+
+
+test('Commerce V2 cart quote flow keeps product integrity',()=>{
+  assert.match(commerce,/cartSummary/);
+  assert.match(commerce,/Ürün kodu eksik/);
+  assert.match(commerce,/Nihai fiyat teklif aşamasında netleşir/);
+  assert.match(commerce,/Array\.isArray\(a\)\?a\.filter\(x=>x&&x\.id&&x\.name\)/);
+  assert.match(commerce,/qf\.reset\(\)/);
+  assert.match(commerce,/grid-template-columns:minmax\(0,1fr\) 68px 44px/);
+  assert.match(commerce,/min-width:44px;min-height:44px/);
+});
