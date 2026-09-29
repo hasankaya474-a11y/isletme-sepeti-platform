@@ -22,7 +22,7 @@ test("live site assets are local, parseable and responsive",async()=>{
   const checked=spawnSync(process.execPath,["--check","site/app.js"],{encoding:"utf8"});
   assert.equal(checked.status,0,checked.stderr);
   assert.match(app,/Production kilitli/i);
-  assert.match(app,/Canlı demo · sandbox veri/);
+  assert.match(html,/Canlı demo · sandbox veri/);
 });
 
 test("buyer supplier and admin navigation are fully represented in live workspace",async()=>{
