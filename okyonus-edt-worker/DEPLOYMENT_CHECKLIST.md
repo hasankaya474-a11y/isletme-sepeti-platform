@@ -67,3 +67,12 @@
 - [ ] SEO redirect sample verified
 - [ ] Rollback rehearsed
 - [ ] Only then replace production route/code
+
+## Code completion status
+- [x] Commerce V2 public storefront code complete
+- [x] Admin-managed banner/category/section/brand/campaign/delivery/help flows wired
+- [x] Product create/edit/soft-delete and price history controls wired
+- [x] Cart/quote responsive integrity checks present
+- [x] Mobile/tablet regression locks present
+- [ ] Production deployment performed
+- [ ] Production D1 migrations performed
