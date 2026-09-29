@@ -1,16 +1,30 @@
 # Phase 8 Gate
-Status: IN PROGRESS
-Started: 2026-09-29
+Status: PASS FOUNDATION
+Locked: 2026-09-29
 
 Scope: Order creation/state machine, immutable commercial snapshot, idempotency and transactional outbox.
 
-Safety rules:
-- orders are created only by explicit action from a PO_READY requisition
-- each supplier becomes a distinct order; no supplier is silently selected
-- duplicate order creation is blocked by idempotency and requisition/supplier uniqueness
-- commercial terms are snapshotted at creation
-- state transitions use the existing locked order state machine
-- outbox event is written with the order transaction
-- no payment execution occurs in this phase
+Closed foundation:
+- explicit order creation only from PO_READY requisitions
+- one order per explicitly selected supplier group
+- requisition/supplier uniqueness and Idempotency-Key replay protection
+- immutable order lines and commercial snapshot with SHA-256 evidence
+- existing order-state-machine preserved as transition authority
+- business/supplier/platform tenant-scoped transitions
+- order.created and state-change outbox events
+- failed outbox retry without order recreation
+- SQLite transaction rollback coverage proving order/outbox atomicity
+- Admin Order & Outbox Center and protected APIs
+- audit, events, Help/Privacy and responsive/accessibility contracts
+- no payment execution
 
-PASS requires the architecture module rule. Production remains locked.
+Final CI evidence:
+- GitHub Actions run 36527236013: SUCCESS
+- Head commit: ce88c0d7fc24344f167c0ad2f3f0e22307fa0970
+- Architecture check: PASS
+- Test suite: PASS
+
+Gate decision:
+Phase 8 is PASS FOUNDATION and is locked as the order/snapshot/idempotency/outbox baseline.
+
+Production remains locked.
