@@ -1,15 +1,32 @@
 # Phase 5 Gate
-Status: IN PROGRESS
-Started: 2026-09-29
+Status: PASS FOUNDATION
+Locked: 2026-09-29
 
 Scope: Search, product card, buyer UX, list/photo matching.
 
-Safety principles:
-- search finds products and offers but never silently selects a supplier
-- matching produces review candidates, never automatic substitutions
-- photo/list matches require explicit human confirmation before becoming actionable
-- no order placement or payment is performed in this phase
-- Phase 2, Phase 3 and Phase 4 locked baselines remain additive and unchanged
+Closed foundation:
+- published-product search with Admin-managed synonym dictionary
+- buyer product cards with offer count, TRY price range and stock signal
+- explicit supplier-selection requirement; no hidden supplier selection
+- buyer saved-list foundation
+- text-list and photo matching request foundation
+- text matching produces PENDING candidates only
+- explicit human CONFIRMED / REJECTED candidate decisions
+- tenant-scoped buyer list and matching operations
+- codeless Admin search dictionary and matching review center
+- protected Buyer/Admin API
+- persistence E2E
+- explicit events, Help/Site Guide, privacy and search-transparency touchpoints
+- loading/empty/error states plus responsive/accessibility contracts
+- no automatic substitution, order placement or payment
 
-PASS requires the full module rule in docs/ARCHITECTURE_LOCK.md.
+Final CI evidence:
+- GitHub Actions quality run 36526061467: SUCCESS
+- Head commit: 2f2a52ad070f257aefd958c04e21992ae3927777
+- Architecture check: PASS
+- Test suite: PASS
+
+Gate decision:
+Phase 5 is PASS FOUNDATION and is locked as the search and buyer-discovery baseline. Future phases must remain additive and preserve explicit human supplier/product decisions.
+
 Production remains locked.
