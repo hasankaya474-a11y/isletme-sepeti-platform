@@ -181,3 +181,16 @@ test('Commerce admin extended controls are present',()=>{
   assert.match(commerceAdmin,/resource==="delivery"/);
   assert.match(commerceAdmin,/resource==="media"/);
 });
+
+
+test('release docs match Commerce V2 production contract',()=>{
+  const checklist=fs.readFileSync(new URL('../DEPLOYMENT_CHECKLIST.md',import.meta.url),'utf8');
+  const runbook=fs.readFileSync(new URL('../docs/WORKER_COPY_RUNBOOK.md',import.meta.url),'utf8');
+  for(const doc of [checklist,runbook]){
+    assert.match(doc,/003_commerce_v2\.sql/);
+    assert.match(doc,/004_commerce_extended\.sql/);
+  }
+  assert.match(checklist,/WhatsApp public module remains HIDDEN/);
+  assert.match(runbook,/hidden flags: WHATSAPP/);
+  assert.doesNotMatch(runbook,/active flags: PRODUCTS, QUOTE, PHOTO, WHATSAPP/);
+});
