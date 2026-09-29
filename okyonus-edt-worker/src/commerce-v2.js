@@ -51,9 +51,17 @@ async function storefront(env){
   if(DB){
    const has=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='b2b_products_v1'").first();
    if(has){
-    const rows=(await DB.prepare(`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
+    const hasMeta=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_product_meta_v1'").first();
+    const sql=hasMeta?`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
+    (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 AND (pr.valid_until IS NULL OR pr.valid_until>datetime('now')) ORDER BY pr.valid_from DESC LIMIT 1) effectivePrice,
+    m.description,m.seo_title,m.seo_description,m.featured,m.sort_order,m.brand_id,
+    (SELECT name FROM oky_brands_v1 b WHERE b.id=m.brand_id AND b.active=1 LIMIT 1) brand
+    FROM b2b_products_v1 p LEFT JOIN oky_product_meta_v1 m ON m.product_id=p.id
+    WHERE p.active=1 ORDER BY COALESCE(m.featured,0) DESC,COALESCE(m.sort_order,0),p.updated_at DESC LIMIT 100`
+    :`SELECT p.id,p.source_product_id,p.name,p.category,p.unit,p.package_text,p.image_url image,p.stock_status,
     (SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 AND (pr.valid_until IS NULL OR pr.valid_until>datetime('now')) ORDER BY pr.valid_from DESC LIMIT 1) effectivePrice
-    FROM b2b_products_v1 p WHERE p.active=1 ORDER BY p.updated_at DESC LIMIT 30`).all()).results||[];
+    FROM b2b_products_v1 p WHERE p.active=1 ORDER BY p.updated_at DESC LIMIT 100`;
+    const rows=(await DB.prepare(sql).all()).results||[];
     products=rows;
    }
   }
