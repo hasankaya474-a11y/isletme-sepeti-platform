@@ -5,10 +5,11 @@ export class DeliveryOperationService{
   const order=this.store.get("orders",orderId);if(!order||order.supplierId!==supplierId)throw new Error("ORDER_FORBIDDEN");
   if(!["ACCEPTED","PARTIALLY_ACCEPTED","PREPARING","READY"].includes(order.state))throw new Error("ORDER_NOT_DELIVERY_READY");
   if(this.store.find("deliveries",x=>x.orderId===orderId).length)throw new Error("DELIVERY_ALREADY_EXISTS");
+  const orderLines=this.store.find("orderLines",x=>x.orderId===orderId);if(!orderLines.length)throw new Error("ORDER_LINES_REQUIRED");
   this.capacity.reserve({slotId:capacitySlotId,supplierId,actorId});
   const now=new Date().toISOString(),row={id:newId("delivery"),orderId,businessId:order.businessId,supplierId,deliveryZoneId,deliverySlaId,capacitySlotId,status:"SCHEDULED",scheduledStart,scheduledEnd,etaAt:null,createdBy:actorId,createdAt:now,updatedAt:now};
   this.store.insert("deliveries",row);
-  for(const line of this.store.find("orderLines",x=>x.orderId===orderId))this.store.insert("deliveryItems",{id:newId("delitem"),deliveryId:row.id,orderLineId:line.id,plannedQtyMilli:line.quantityMilli,deliveredQtyMilli:0});
+  for(const line of orderLines)this.store.insert("deliveryItems",{id:newId("delitem"),deliveryId:row.id,orderLineId:line.id,plannedQtyMilli:line.quantityMilli,deliveredQtyMilli:0});
   this.store.insert("outboxEvents",{id:newId("outbox"),aggregateType:"delivery",aggregateId:row.id,eventType:"delivery.scheduled",payload:{deliveryId:row.id,orderId},status:"PENDING",attempts:0,createdAt:now,publishedAt:null,lastError:null});
   this.store.insert("audit",{id:newId("audit"),actorId,action:"delivery.create",resourceType:"delivery",resourceId:row.id,occurredAt:now});
   return row;
