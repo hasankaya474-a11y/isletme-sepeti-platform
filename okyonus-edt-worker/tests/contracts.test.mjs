@@ -80,3 +80,18 @@ test('no production secrets are committed',()=>{
     for(const bad of ['ghp_','sk_live_','BEGIN PRIVATE KEY']) assert.ok(!s.includes(bad),bad);
   }
 });
+
+
+test('deployment examples point to canonical Worker source files',()=>{
+  const denizWrangler=fs.readFileSync(new URL('../wrangler.deniz.toml.example',import.meta.url),'utf8');
+  const zamanWrangler=fs.readFileSync(new URL('../wrangler.zaman.toml.example',import.meta.url),'utf8');
+  assert.match(denizWrangler,/main\s*=\s*"src\/deniz-worker\.js"/);
+  assert.match(zamanWrangler,/main\s*=\s*"src\/zaman-admin-worker\.js"/);
+});
+
+test('optional migration never redefines baseline communication/security tables',()=>{
+  const sql=fs.readFileSync(new URL('../migrations/002_sales_data.sql',import.meta.url),'utf8');
+  for(const table of ['audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
+    assert.doesNotMatch(sql,new RegExp('CREATE\\s+TABLE\\s+IF\\s+NOT\\s+EXISTS\\s+'+table+'\\b','i'),table);
+  }
+});
