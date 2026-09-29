@@ -397,6 +397,6 @@ test('product metadata admin UX and SEO detail wiring are present',()=>{
   assert.match(commerceAdmin,/SEO açıklama/);
   assert.match(commerceAdmin,/Öne çıkar/);
   assert.match(commerce,/document\.title=esc\(p\.seo_title/);
-  assert.match(commerce,/meta\[name="description"\]/);
+  assert.match(commerce,/querySelector\('meta\[name=/);
   assert.match(commerce,/p\.seo_description/);
 });
