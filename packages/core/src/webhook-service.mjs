@@ -1,0 +1,6 @@
+import {newId} from "./id.mjs";
+export class WebhookService{
+ constructor(store){this.store=store;}
+ subscribe({integrationConnectionId,eventType,endpointRef,signingSecretRef,actorId}){const c=this.store.get("integrationConnections",integrationConnectionId);if(!c||c.status!=="ACTIVE")throw new Error("INTEGRATION_NOT_ACTIVE");if(!eventType||!endpointRef||!signingSecretRef||!actorId)throw new TypeError("WEBHOOK_FIELDS_REQUIRED");const now=new Date().toISOString(),row={id:newId("webhook"),integrationConnectionId,eventType,endpointRef,signingSecretRef,status:"ACTIVE",createdAt:now,updatedAt:now};return this.store.insert("webhookSubscriptions",row);}
+ enqueue({subscriptionId,eventId,actorId="system"}){const sub=this.store.get("webhookSubscriptions",subscriptionId);if(!sub||sub.status!=="ACTIVE")throw new Error("WEBHOOK_NOT_ACTIVE");if(this.store.find("webhookDeliveries",x=>x.webhookSubscriptionId===subscriptionId&&x.eventId===eventId).length)throw new Error("WEBHOOK_DELIVERY_DUPLICATE");const now=new Date().toISOString();return this.store.insert("webhookDeliveries",{id:newId("whdelivery"),webhookSubscriptionId:subscriptionId,eventId,status:"PENDING",attempts:0,responseCode:null,lastError:null,createdAt:now,updatedAt:now});}
+}

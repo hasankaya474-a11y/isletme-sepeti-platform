@@ -1,0 +1,2 @@
+export const PHASE15_UI_STATES=Object.freeze({loading:{title:"Entegrasyonlar yükleniyor"},empty:{title:"Henüz entegrasyon yok"},error:{title:"Entegrasyon verileri yüklenemedi"},failedDelivery:{title:"Webhook teslimatı başarısız"}});
+export const PHASE15_RESPONSIVE=Object.freeze({mobile:{connections:"cards",webhooks:"cards",bulk:"stacked",actions:"sticky"},tablet:{connections:"adaptive-table",webhooks:"adaptive-table",bulk:"two-column",actions:"visible"},desktop:{connections:"dense-table",webhooks:"dense-table",bulk:"grid",actions:"toolbar"}});
