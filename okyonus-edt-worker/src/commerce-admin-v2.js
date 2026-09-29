@@ -290,9 +290,9 @@ async function unsubscribeNewsletter(id){if(!confirm('Bu e-bülten aboneliği pa
 function genericUI(resource,rows){
  const fields=fieldSets[resource]||fieldSets.sections;
  return '<div class="grid"><form class="form" id="gf"><h3 id="gfTitle">Yeni Kayıt</h3>'+
- fields.map(f=>(f==='body'||f==='description'||f==='subtitle'||f==='payloadJson')?'<textarea name="'+f+'" placeholder="'+(f==='payloadJson'?'JSON: {"limit":5,"ctaText":"Tümünü Gör","ctaUrl":"/urunler"}':f)+'"></textarea>':'<input name="'+f+'" '+(f==='kind'&&resource==='sections'?'list="sectionKinds" ':'')+'placeholder="'+f+'">').join('')+(resource==='sections'?'<datalist id="sectionKinds"><option value="PRODUCT_GRID"><option value="CATEGORY_STRIP"><option value="CAMPAIGN"><option value="PROMO"><option value="CONTENT"></datalist><small>kind: PRODUCT_GRID, CATEGORY_STRIP, CAMPAIGN, PROMO veya CONTENT. source ürün grubu/marka filtresi olabilir.</small>':'')+
+ fields.map(f=>(f==='body'||f==='description'||f==='subtitle'||f==='payloadJson')?'<textarea name="'+f+'" placeholder="'+(f==='payloadJson'?'JSON: {"limit":5,"ctaText":"Tümünü Gör","ctaUrl":"/urunler"}':f)+'"></textarea>':'<input name="'+f+'" '+(f==='kind'&&resource==='sections'?'list="sectionKinds" ':'')+(f==='campaignId'&&resource==='campaign-rules'?'list="campaignIds" ':'')+'placeholder="'+f+'">').join('')+(resource==='sections'?'<datalist id="sectionKinds"><option value="PRODUCT_GRID"><option value="CATEGORY_STRIP"><option value="CAMPAIGN"><option value="PROMO"><option value="CONTENT"></datalist><small>kind: PRODUCT_GRID, CATEGORY_STRIP, CAMPAIGN, PROMO veya CONTENT. source ürün grubu/marka filtresi olabilir.</small>':'')+(resource==='campaign-rules'?'<datalist id="campaignIds"></datalist><small>Hedef: PRODUCT, CATEGORY, BRAND veya ALL. İndirim: PERCENT veya FIXED. Ürün hedefinde ürün ID / SKU / ürün adı kullanılabilir.</small>':'')+
  '<label><input type="checkbox" name="active" checked style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="submit">Kaydet</button><button type="button" id="cancelEdit" style="background:#60778a;display:none">Vazgeç</button></div></form><div class="table"><table><thead><tr><th>Kayıt</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+
- rows.map(x=>'<tr><td><b>'+esc(x.title||x.name||x.region||x.id)+'</b><br><small>'+esc(x.slug||x.kind||x.district||'')+'</small></td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="startEdit(\''+esc(resource)+'\',\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="removeRow(\''+esc(resource)+'\',\''+esc(x.id)+'\')" style="background:#9d2635">Sil</button></td></tr>').join('')+
+ rows.map(x=>'<tr><td><b>'+esc(x.title||x.name||x.label||x.target_value||x.region||x.id)+'</b><br><small>'+esc(x.slug||x.kind||x.district||'')+'</small></td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="startEdit(\''+esc(resource)+'\',\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="removeRow(\''+esc(resource)+'\',\''+esc(x.id)+'\')" style="background:#9d2635">Sil</button></td></tr>').join('')+
  '</tbody></table></div></div>';
 }
 async function startEdit(resource,id){
@@ -319,6 +319,7 @@ async function load(){
  if(current==='settings'){content.innerHTML=settingsUI(j.data||{});await bindSettings();return}
  if(current==='newsletter'){content.innerHTML=newsletterUI(j.data||[]);return}
  content.innerHTML=genericUI(current,j.data);
+ if(current==='campaign-rules'){try{const cj=await api('campaigns'),dl=document.getElementById('campaignIds');if(dl&&Array.isArray(cj.data))dl.innerHTML=cj.data.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.title||x.id)+'</option>').join('')}catch(_){}}
  const f=document.getElementById('gf');
  if(f){
    const cancel=document.getElementById('cancelEdit');
