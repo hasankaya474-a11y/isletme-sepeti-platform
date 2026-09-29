@@ -410,15 +410,15 @@ test('final release record pins architecture v15 canonical code and migration 00
   const manifest=fs.readFileSync(new URL('../docs/OKYANUS_EDT_COMMERCE_V2_FINAL_RELEASE_MANIFEST_2026-09-30.md',import.meta.url),'utf8');
   const bundle=fs.readFileSync(new URL('../docs/OKYANUS_EDT_FINAL_DEPLOYMENT_BUNDLE_INDEX_2026-09-30.md',import.meta.url),'utf8');
   for(const doc of [manifest,bundle]){
-    assert.match(doc,/96406528a399b66f986d155af4a8544f93bc46a0/);
+    assert.match(doc,/a0a33335755d626e68043bd2779eb78e036c4932/);
     assert.match(doc,/005_product_meta\.sql/);
     assert.match(doc,/006_commerce_control_plane\.sql/);
     assert.match(doc,/commerce-v2-2026-09-30-architecture-v15/);
   }
   assert.match(bundle,/7b8ff552ce0fa7fb0ee64ad7ace34eac5838ea60/);
-  assert.match(bundle,/599e47cb19dbf114c547ebf2d2205d591ce3d054/);
+  assert.match(bundle,/9356588dc60e7427932bb86b6c56724f6d52132b/);
   assert.match(bundle,/3d4220e55a4b4d480d715e49316859f2acf2e86a/);
-  assert.match(bundle,/c893e0e7574970c8b1e094065f7adcd29b3b7644/);
+  assert.match(bundle,/7c810e3b56ce4a5916351f3bc02a5e94a90ea07c/);
   assert.match(bundle,/001 → 003 → 004 → 005 → 006/);
 });
 

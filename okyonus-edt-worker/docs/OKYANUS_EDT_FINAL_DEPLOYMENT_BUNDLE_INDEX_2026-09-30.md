@@ -2,7 +2,7 @@
 
 Status: CODE COMPLETE / PRE-PRODUCTION
 Date: 2026-09-30
-Canonical code source commit: `96406528a399b66f986d155af4a8544f93bc46a0`
+Canonical code source commit: `a0a33335755d626e68043bd2779eb78e036c4932`
 Architecture build: `commerce-v2-2026-09-30-architecture-v15`
 
 ## Quality status
@@ -19,9 +19,9 @@ Architecture build: `commerce-v2-2026-09-30-architecture-v15`
 | DENİZ canonical Worker | `okyonus-edt-worker/src/deniz-worker.js` | `2cb276c926f6e924131e9e4aff36671d25f9fa34` |
 | ZAMAN / ADMIN canonical Worker | `okyonus-edt-worker/src/zaman-admin-worker.js` | `ed3ebdf1b8172fa2660b714fe9e4346d73e6b26e` |
 | Commerce public | `okyonus-edt-worker/src/commerce-v2.js` | `7b8ff552ce0fa7fb0ee64ad7ace34eac5838ea60` |
-| Commerce admin | `okyonus-edt-worker/src/commerce-admin-v2.js` | `599e47cb19dbf114c547ebf2d2205d591ce3d054` |
+| Commerce admin | `okyonus-edt-worker/src/commerce-admin-v2.js` | `9356588dc60e7427932bb86b6c56724f6d52132b` |
 | DENİZ single-file bundle | `okyonus-edt-worker/dist/deniz-worker.single.js` | `3d4220e55a4b4d480d715e49316859f2acf2e86a` |
-| ZAMAN single-file bundle | `okyonus-edt-worker/dist/zaman-admin-worker.single.js` | `c893e0e7574970c8b1e094065f7adcd29b3b7644` |
+| ZAMAN single-file bundle | `okyonus-edt-worker/dist/zaman-admin-worker.single.js` | `7c810e3b56ce4a5916351f3bc02a5e94a90ea07c` |
 | Migration 001 | `okyonus-edt-worker/migrations/001_sales_mode.sql` | `6c8fc6a4461470381a3e9d491bfc119248d209be` |
 | Migration 003 | `okyonus-edt-worker/migrations/003_commerce_v2.sql` | `aa527935ddf52c6ca08a741c167505a87b4b9316` |
 | Migration 004 | `okyonus-edt-worker/migrations/004_commerce_extended.sql` | `c2e02f7076e4ef77d0c3dbc33795f6b88e053945` |
