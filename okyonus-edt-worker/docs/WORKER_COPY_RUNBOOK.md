@@ -1,7 +1,7 @@
 # DENİZ / ZAMAN Worker Copy and Release Runbook
 
-Status: READY FOR CONTROLLED DEPLOYMENT
-Date: 2026-09-29
+Status: CODE COMPLETE / READY FOR CONTROLLED DEPLOYMENT
+Date: 2026-09-30
 
 ## Canonical files
 
@@ -113,3 +113,12 @@ Do not call production PASS until real evidence exists for:
 - Digital Menu publish/open
 - sample SEO URLs
 - rollback availability
+
+
+## Current release state
+
+- GitHub code path: COMPLETE
+- Quality gates: must remain PASS before merge/deploy
+- Production DENİZ/ZAMAN Workers: NOT DEPLOYED by this code-completion pass
+- Production D1: NOT MODIFIED by this code-completion pass
+- Live PASS can only be declared after the production evidence in section 7 exists.

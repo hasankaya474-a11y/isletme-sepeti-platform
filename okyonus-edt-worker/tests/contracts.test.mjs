@@ -258,3 +258,19 @@ test('Commerce V2 product admin supports create edit and safe soft-delete',()=>{
   assert.match(commerceAdmin,/Pasife Al/);
   assert.match(commerceAdmin,/NAME_CATEGORY_REQUIRED/);
 });
+
+
+test('Commerce V2 final admin and release state are locked',()=>{
+  assert.match(commerceAdmin,/resource==="product-history"/);
+  assert.match(commerceAdmin,/b2b_price_history_v1/);
+  assert.match(commerceAdmin,/function showPriceHistory\(/);
+  assert.match(commerceAdmin,/Fiyat Geçmişi/);
+  assert.match(commerceAdmin,/min-height:44px/);
+  const runbook=fs.readFileSync(new URL('../docs/WORKER_COPY_RUNBOOK.md',import.meta.url),'utf8');
+  const checklist=fs.readFileSync(new URL('../DEPLOYMENT_CHECKLIST.md',import.meta.url),'utf8');
+  assert.match(runbook,/CODE COMPLETE \/ READY FOR CONTROLLED DEPLOYMENT/);
+  assert.match(runbook,/Production DENİZ\/ZAMAN Workers: NOT DEPLOYED/);
+  assert.match(runbook,/Production D1: NOT MODIFIED/);
+  assert.match(checklist,/Product create\/edit\/soft-delete and price history controls wired/);
+  assert.match(checklist,/\[ \] Production deployment performed/);
+});
