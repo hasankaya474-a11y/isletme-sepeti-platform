@@ -15,21 +15,23 @@ function replaceOnce(from, to, label) {
 const home = s.indexOf('function okySalesFirstHomeV1');
 need(home >= 0, 'sales homepage');
 
+const mobileBarMarker=s.indexOf('.mobileBar{display:none}',home);
+need(mobileBarMarker>=0,'mobile bar marker');
+
 if (!s.includes('@media(max-width:980px){.shell{grid-template-columns:210px')) {
-  const mobileTop = s.indexOf('.top{height:auto;min-height:66px;flex-wrap:wrap;padding:10px 12px}', home);
-  need(mobileTop >= 0, 'mobile top css');
-  const media = s.lastIndexOf('@media(', mobileTop);
-  need(media >= home, 'mobile media start');
-  const tablet = '@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}';
-  s = s.slice(0, media) + tablet + s.slice(media);
+  const media1=s.indexOf('@media(',mobileBarMarker);
+  const media2=media1>=0?s.indexOf('@media(',media1+7):-1;
+  need(media1>=0&&media2>media1,'homepage responsive media blocks');
+  const tablet='@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+  s=s.slice(0,media2)+tablet+s.slice(media2);
 }
 
 if (!s.includes('safe-area-inset-top')) {
-  replaceOnce(
-    '.top{height:auto;min-height:66px;flex-wrap:wrap;padding:10px 12px}',
-    '.top{height:auto;min-height:66px;flex-wrap:wrap;padding:max(10px,env(safe-area-inset-top)) 12px 10px}',
-    'mobile safe area'
-  );
+  const mobileTop=s.indexOf('.top{height:auto',mobileBarMarker);
+  const mobileTopEnd=s.indexOf('}',mobileTop);
+  need(mobileTop>=0&&mobileTopEnd>mobileTop,'mobile top css');
+  const block=s.slice(mobileTop,mobileTopEnd);
+  s=s.slice(0,mobileTop)+block+';padding-top:max(10px,env(safe-area-inset-top))'+s.slice(mobileTopEnd);
 }
 
 if (!s.includes('min-height:52px;touch-action:manipulation')) {
