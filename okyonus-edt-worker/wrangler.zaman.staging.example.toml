@@ -1,0 +1,28 @@
+name = "okyanus-edt-admin-staging"
+main = "src/zaman-admin-worker.js"
+compatibility_date = "2026-09-29"
+
+# STAGING ONLY. DENIZ and ZAMAN staging must use the SAME staging D1.
+# Never copy production IDs/secrets into this file.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "REPLACE_WITH_STAGING_D1_NAME"
+database_id = "REPLACE_WITH_STAGING_D1_ID"
+
+[[r2_buckets]]
+binding = "PHOTO_TEMP"
+bucket_name = "REPLACE_WITH_STAGING_PHOTO_BUCKET"
+
+[[r2_buckets]]
+binding = "MEDIA_STORE"
+bucket_name = "REPLACE_WITH_STAGING_MEDIA_BUCKET"
+
+[vars]
+ENVIRONMENT = "staging"
+REQUIRE_CF_ACCESS = "true"
+
+# Required secrets are configured out-of-band:
+# SESSION_PEPPER
+# BOOTSTRAP_TOKEN only if bootstrap is intentionally enabled.
+# Do not commit secret values.
