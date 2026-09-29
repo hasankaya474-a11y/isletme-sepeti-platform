@@ -354,42 +354,32 @@ const APP = 'Okyanus EDT Yönetici';
     }
 
 
-    const OKYONUS_MODULE_DEFAULTS=Object.freeze({
-      PRODUCTS:1,QUOTE:1,PHOTO:1,WHATSAPP:1,SEO:1,MEMBERSHIP:1,DIGITAL_MENU:1,
-      COST:0,COST_RADAR:0,ACADEMY:0,CESNI:0,EASY_RECIPE:0,ABOUT:0
-    });
     async function moduleFlagsEnsure(env){
+      if(!env||!env.DB)throw http(503,'DB_NOT_BOUND');
       await env.DB.prepare(`CREATE TABLE IF NOT EXISTS oky_module_flags_v1(
         module_key TEXT PRIMARY KEY,
-        enabled INTEGER NOT NULL DEFAULT 0,
-        visibility TEXT NOT NULL DEFAULT 'HIDDEN',
+        enabled INTEGER NOT NULL DEFAULT 0 CHECK(enabled IN (0,1)),
+        visibility TEXT NOT NULL DEFAULT 'HIDDEN' CHECK(visibility IN ('ACTIVE','HIDDEN','INTERNAL','SCHEDULED','ARCHIVED')),
         updated_by TEXT,
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       )`).run();
-      for(const [key,enabled] of Object.entries(OKYONUS_MODULE_DEFAULTS)){
-        await env.DB.prepare(`INSERT OR IGNORE INTO oky_module_flags_v1(module_key,enabled,visibility,updated_at)
-          VALUES(?,?,?,datetime('now'))`).bind(key,enabled,enabled?'ACTIVE':'HIDDEN').run();
-      }
+      const defaults={PRODUCTS:[1,'ACTIVE'],QUOTE:[1,'ACTIVE'],PHOTO:[1,'ACTIVE'],WHATSAPP:[1,'ACTIVE'],SEO:[1,'ACTIVE'],MEMBERSHIP:[1,'ACTIVE'],DIGITAL_MENU:[1,'ACTIVE'],COST:[0,'HIDDEN'],COST_RADAR:[0,'HIDDEN'],ACADEMY:[0,'HIDDEN'],CESNI:[0,'HIDDEN'],EASY_RECIPE:[0,'HIDDEN'],ABOUT:[0,'HIDDEN']};
+      for(const [key,[enabled,visibility]] of Object.entries(defaults))await env.DB.prepare(`INSERT OR IGNORE INTO oky_module_flags_v1(module_key,enabled,visibility) VALUES(?,?,?)`).bind(key,enabled,visibility).run();
     }
     async function moduleFlagsRoute(request,env,auth,headers){
-      if(!['owner','admin','editor','viewer'].includes(auth.user.role))throw http(403,'FORBIDDEN');
       await moduleFlagsEnsure(env);
       if(request.method==='GET'){
         const rows=(await env.DB.prepare(`SELECT module_key,enabled,visibility,updated_by,updated_at FROM oky_module_flags_v1 ORDER BY module_key`).all()).results||[];
         return json({ok:true,data:rows},200,headers);
       }
-      if(!['owner','admin'].includes(auth.user.role))throw http(403,'ADMIN_REQUIRED');
-      if(request.method==='POST'){
-        const b=await readJson(request),key=String(b.key||'').toUpperCase();
-        if(!Object.prototype.hasOwnProperty.call(OKYONUS_MODULE_DEFAULTS,key))throw http(400,'INVALID_MODULE');
-        const enabled=b.enabled===true||b.enabled===1||String(b.enabled).toLowerCase()==='true';
-        const before=await env.DB.prepare('SELECT module_key,enabled,visibility FROM oky_module_flags_v1 WHERE module_key=?').bind(key).first();
-        await env.DB.prepare(`UPDATE oky_module_flags_v1 SET enabled=?,visibility=?,updated_by=?,updated_at=datetime('now') WHERE module_key=?`)
-          .bind(enabled?1:0,enabled?'ACTIVE':'HIDDEN',auth.user.id,key).run();
-        await audit(env,{actorUserId:auth.user.id,actorSessionId:auth.session.id,action:'MODULE_FLAG_CHANGED',entityType:'module_flag',entityId:key,before,after:{enabled,visibility:enabled?'ACTIVE':'HIDDEN'}});
-        return json({ok:true,key,enabled,visibility:enabled?'ACTIVE':'HIDDEN'},200,headers);
-      }
-      throw http(405,'METHOD_NOT_ALLOWED');
+      if(!['owner','admin'].includes(auth.user.role))throw http(403,'FORBIDDEN');
+      if(request.method!=='POST')throw http(405,'METHOD_NOT_ALLOWED');
+      const b=await readJson(request),key=String(b.moduleKey||'').trim().toUpperCase(),visibility=String(b.visibility||'').trim().toUpperCase(),enabled=b.enabled?1:0;
+      if(!/^[A-Z0-9_]{2,50}$/.test(key))throw http(400,'INVALID_MODULE_KEY');
+      if(!['ACTIVE','HIDDEN','INTERNAL','SCHEDULED','ARCHIVED'].includes(visibility))throw http(400,'INVALID_VISIBILITY');
+      await env.DB.prepare(`INSERT INTO oky_module_flags_v1(module_key,enabled,visibility,updated_by,updated_at) VALUES(?,?,?,?,datetime('now')) ON CONFLICT(module_key) DO UPDATE SET enabled=excluded.enabled,visibility=excluded.visibility,updated_by=excluded.updated_by,updated_at=datetime('now')`).bind(key,enabled,visibility,auth.user.id).run();
+      await audit(env,{actorUserId:auth.user.id,actorSessionId:auth.session.id,action:'MODULE_FLAG_CHANGED',entityType:'module_flag',entityId:key,after:{enabled:Boolean(enabled),visibility}});
+      return json({ok:true,moduleKey:key,enabled:Boolean(enabled),visibility},200,headers);
     }
 
 async function apiRoute(request, env, auth, headers) {
@@ -397,6 +387,7 @@ async function apiRoute(request, env, auth, headers) {
       const resource = parts[1], id = parts[2], action = parts[3];
 
       // Mesaj Merkezi: mevcut inquiries + inquiry_replies tablolarını kullanır.
+      if (resource === 'module-flags') return await moduleFlagsRoute(request,env,auth,headers);
       if (resource === 'b2b') return await b2bAdminApi(request, env, auth, headers, id, action, url);
       if (resource === 'b2b-customers') return await b2bCustomersApi(request,env,auth,headers,id,action,url);
       if (resource === 'b2b-products') return await b2bProductsAdminApi(request,env,auth,headers,id,action,url);
@@ -407,7 +398,6 @@ async function apiRoute(request, env, auth, headers) {
       if (resource === 'b2b-dashboard') return await b2bDashboardApi(request,env,auth,headers);
       if (resource === 'b2b-representatives') return await b2bRepresentativesAdminApi(request,env,auth,headers,id,action,url);
       if (resource === 'b2b-showcase') return await b2bShowcaseAdminApi(request,env,auth,headers,id,action,url);
-      if (resource === 'module-flags') return await moduleFlagsRoute(request,env,auth,headers);
       if (resource === 'messages') return await messageCenterRoute(request, env, auth, headers, id, action, url);
       if (resource === 'photo-messages') return await photoMessageRouteV2(request, env, auth, headers, id, action, url);
       if (resource === 'studio') return await studioRoute(request, env, auth, headers, id, action, url);
@@ -876,19 +866,13 @@ async function apiRoute(request, env, auth, headers) {
       const selectedId=String(url.searchParams.get('id')||'');
       const role=user.user.role;
       const canWrite=['owner','admin','editor'].includes(role);
-      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a><a href="/?view=sales-flags">⚙ Satış Modu</a><a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
+      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a><a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/?view=module-flags">◉ Satış Modu & Modül Kontrolü</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
       let title='Genel Bakış',help='Sistemin güncel durumunu izleyin.',body='';
       try{
         if(view==='summary'){
           const counts={}; for(const t of ['users','inquiries','media','content','releases']) counts[t]=Number((await env.DB.prepare(`SELECT COUNT(*) n FROM ${t}`).first())?.n||0);
           const unread=Number((await env.DB.prepare(`SELECT COUNT(*) n FROM inquiries WHERE COALESCE(status,'new')='new'`).first())?.n||0);
           body=`<div class="stats">${[['users','Kullanıcı'],['inquiries','Mesaj'],['media','Medya'],['content','İçerik'],['releases','Yayın']].map(([k,l])=>`<article><b>${counts[k]}</b><span>${l}</span></article>`).join('')}</div><section class="guide"><h3>Hızlı kullanım</h3><p>Okunmamış mesaj: <b>${unread}</b>. Sol menüdeki her bölüm sunucu tarafında bağımsız açılır.</p></section>`;
-        } else if(view==='sales-flags'){
-          title='Satış Modu & Modül Kontrolü';help='Public web sitesinde hangi Okyanus modüllerinin aktif olacağını yönetin. Pasif modüller silinmez.';
-          await moduleFlagsEnsure(env);
-          const rows=(await env.DB.prepare(`SELECT module_key,enabled,visibility,updated_at FROM oky_module_flags_v1 ORDER BY module_key`).all()).results||[];
-          const labels={PRODUCTS:'Ürün Kataloğu',QUOTE:'Ürün Seç • Teklif Al',PHOTO:'Fotoğrafla Teklif',WHATSAPP:'WhatsApp',SEO:'SEO / Index',MEMBERSHIP:'Üyelik',DIGITAL_MENU:'Dijital Menü',COST:'COST Maliyet',COST_RADAR:'COST Radar',ACADEMY:'Akademi',CESNI:'ÇEŞNİ',EASY_RECIPE:'Kolay Reçete',ABOUT:'Hakkımızda'};
-          body='<div class="guide"><h3>Okyanus satış odaklı çalışma modu</h3><p>Ürün, teklif, fotoğraf, WhatsApp, SEO, üyelik ve Dijital Menü aktif tutulur. Diğer modüller gerektiğinde buradan yeniden açılabilir.</p></div><div class="tablewrap"><table><thead><tr><th>Modül</th><th>Durum</th><th>Görünürlük</th><th>Son Güncelleme</th><th>İşlem</th></tr></thead><tbody>'+rows.map(r=>'<tr><td><b>'+escapeHtml(labels[r.module_key]||r.module_key)+'</b><br><small>'+escapeHtml(r.module_key)+'</small></td><td>'+(Number(r.enabled)===1?'● AKTİF':'○ PASİF')+'</td><td>'+escapeHtml(r.visibility)+'</td><td>'+escapeHtml(r.updated_at)+'</td><td>'+(['owner','admin'].includes(role)?'<button type="button" class="moduleFlagToggle" data-key="'+escapeHtml(r.module_key)+'" data-next="'+(Number(r.enabled)===1?'0':'1')+'">'+(Number(r.enabled)===1?'Pasife Al':'Aktif Et')+'</button>':'Salt okunur')+'</td></tr>').join('')+'</tbody></table></div>';
         } else if(view==='photo-messages'){
           title='Fotoğraflı Talepler';help='Alış listesi fotoğraflarını güvenli biçimde teslim alın; tam aktarım sonrası geçici kopya otomatik silinir.';
           if(selectedId){const p=await env.DB.prepare('SELECT * FROM photo_inquiries WHERE id=? LIMIT 1').bind(selectedId).first();if(!p)throw new Error('PHOTO_NOT_FOUND');const tel=String(p.phone||'').replace(/[^0-9+]/g,''),wa=String(p.phone||'').replace(/\D/g,'').replace(/^0/,'90');body=`<section class="guide"><h3>${escapeHtml(p.request_no)}</h3><p><b>İşletme:</b> ${escapeHtml(p.business_name)}<br><b>Yetkili:</b> ${escapeHtml(p.contact_name)}<br><b>Telefon:</b> ${escapeHtml(p.phone)}<br><b>Durum:</b> ${escapeHtml(p.status)}<br><b>Oluşturma:</b> ${escapeHtml(p.created_at)}</p><div class="actions"><a class="button" href="tel:${escapeHtml(tel)}">Ara</a><a class="button" target="_blank" rel="noopener" href="https://wa.me/${escapeHtml(wa)}">WhatsApp</a>${canWrite&&!p.deleted_at&&!['DELETE_PENDING','DELETED'].includes(p.status)?'<button id="photoDownload" type="button">Fotoğrafı İndir ve Sistemden Sil</button>':''}</div><p><small>Silme yalnız dosyanın tamamı tarayıcıya ulaştıktan ve boyut/checksum doğrulandıktan sonra başlar. Bilgisayara indirilen kopyanın korunması işletme politikanıza tabidir.</small></p></section>`}
@@ -925,7 +909,6 @@ async function apiRoute(request, env, auth, headers) {
       }catch(e){console.error('DASHBOARD_VIEW_ERROR',view,e);body=`<div class="error">Bu bölüm yüklenemedi: ${escapeHtml(e.message||'DB_ERROR')}</div>`;}
       const safePhotoId=JSON.stringify(encodeURIComponent(selectedId));
       const actionScript=`${clientHelpers()}
-      document.querySelectorAll('.moduleFlagToggle').forEach(function(b){b.onclick=async function(){const key=b.dataset.key,enabled=b.dataset.next==='1';if(!confirm(key+' modülü '+(enabled?'aktif':'pasif')+' yapılsın mı?'))return;b.disabled=true;try{await post('/api/module-flags',{key,enabled});location.reload()}catch(e){alert('Hata: '+e.message);b.disabled=false}}});
       const post=async(url,data)=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw Error(j.message||j.error||'İşlem başarısız');return j};
       const sam=document.querySelector('#selectAllMessages');if(sam)sam.onchange=()=>document.querySelectorAll('.messageSelect').forEach(x=>x.checked=sam.checked);
       const dsm=document.querySelector('#deleteSelectedMessages');if(dsm)dsm.onclick=async()=>{const ids=[...document.querySelectorAll('.messageSelect:checked')].map(x=>x.value);if(!ids.length)return alert('Silmek için en az bir mesaj seçin.');if(!confirm(ids.length+' mesaj kalıcı olarak silinsin mi?'))return;try{const j=await post('/api/admin-cleanup',{kind:'messages',ids});alert('Silinen: '+j.deleted.length+(j.failed.length?' · Hata: '+j.failed.length:''));location.reload()}catch(e){alert('Hata: '+e.message)}};

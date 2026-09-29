@@ -1,0 +1,28 @@
+name: Okyonus Worker Quality
+
+on:
+  pull_request:
+    paths:
+      - "okyonus-edt-worker/**"
+      - ".github/workflows/okyonus-worker-quality.yml"
+  push:
+    branches: [main]
+    paths:
+      - "okyonus-edt-worker/**"
+      - ".github/workflows/okyonus-worker-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify Okyonus Worker package
+        working-directory: okyonus-edt-worker
+        run: npm run verify

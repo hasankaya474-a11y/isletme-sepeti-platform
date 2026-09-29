@@ -1,70 +1,36 @@
-# Okyanus EDT Worker Build V1
+# Okyanus EDT Worker New Face v1
 
-Status: implementation candidate
-Date: 2026-09-29
+Bu klasör, Worker'a doğrudan kopyalanacak gerçek kaynak kodu içerir.
 
-This directory contains the real Cloudflare Worker sources prepared from the supplied working Okyanus EDT code.
+## Dağıtım hedefleri
+- `src/deniz-worker.js` → DENİZ public/satış Worker
+- `src/zaman-admin-worker.js` → ZAMAN / ADMIN Worker
+- `baseline/` → kullanıcı tarafından sağlanan çalışan kaynakların değişmeden saklanan regresyon referansı
+- `migrations/` → ortak D1 görünürlük ve satış katmanı
+- `docs/seo-routes.json` → mevcut 200 EDT SEO route envanteri
 
-## Targets
+## Korunan kritik akışlar
+- `POST /api/quote`
+- `POST /api/contact`
+- `POST /api/photo-inquiries`
+- mevcut e-posta binding sözleşmesi
+- ZAMAN mesaj merkezi
+- ZAMAN fotoğraf mesaj akışı
 
-- `src/deniz-worker.js` -> public DENİZ Worker
-- `src/zaman-admin-worker.js` -> ZAMAN / Admin Worker
-- `baseline/` -> exact supplied working sources, retained for regression comparison
-- `migrations/001_sales_mode.sql` -> shared D1 module visibility defaults
+Kritik DENİZ fonksiyonları baseline ile byte-byte korunur. Yeni satış yüzü ve modül görünürlüğü bu motorların dışına eklenmiştir.
 
-## Locked public behavior
+## Public varsayılan durum
+Aktif: Products, Quote, Photo, WhatsApp, SEO, Membership, Digital Menu.
 
-Active by default:
-- Products
-- Ürün Seç • Teklif Al
-- Fotoğrafla Teklif
-- WhatsApp sales contact
-- SEO/index routes
-- Membership
-- Digital Menu
+Pasif/gizli: COST, COST Radar, Akademi, ÇEŞNİ ve diğer legacy araçlar.
 
-Hidden by default, never deleted:
-- COST
-- COST Radar
-- Akademi
-- ÇEŞNİ
-- Kolay Reçete
-- Hakkımızda public module
+## Dijital Menü
+Minimum 30 tema + 30 şablon. Public landing `/dijital-menu-cozumleri`, mevcut gerçek builder `/dijital-menu`.
 
-ZAMAN Admin contains **Satış Modu & Modül Kontrolü** and writes module visibility to shared D1.
+## Kontrol
+```bash
+npm run verify
+```
 
-## Critical preservation rule
-
-The following supplied working DENİZ functions are regression-locked:
-- `sendBoundEmail`
-- `quoteAPI`
-- `photoInquiryAPI`
-- `okyContactMessageAPI`
-
-The following ZAMAN functions are regression-locked:
-- `messageCenterRoute`
-- `photoMessageRouteV2`
-
-Root CI compares the final source against the supplied baselines byte-for-byte for these functions.
-
-## Digital Menu
-
-Digital Menu stays active and now has:
-- 30 theme presets
-- 30 layout template presets
-- persisted `themePreset` and `template`
-- preset API
-- Studio selectors
-- published-menu layout classes and accent presets
-
-Existing member/business scoping and publish/update/delete authorization remain in place.
-
-## Deployment discipline
-
-Do not replace production bindings while copying code.
-
-DENİZ must keep the existing binding names used by the current working code, including its D1, admin DB where configured, photo/media storage and Email binding.
-
-ZAMAN must keep its existing D1, media/photo bindings, session secrets and access configuration.
-
-Apply the D1 migration first in staging. Run all regression tests, then copy the candidate sources to the corresponding Workers. Production routing is changed only after closed verification and rollback is ready.
+## Canlı geçiş
+Önce mevcut Worker/D1/R2/binding yedeği alınır. DENİZ ve ZAMAN kodları kendi Worker'larına kopyalanır. Secret ve binding değerleri GitHub'a yazılmaz. Dağıtım sonrası teklif, e-posta, mesaj, fotoğraf, SEO ve Dijital Menü smoke testleri yapılır. Eski Worker rollback için tutulur.

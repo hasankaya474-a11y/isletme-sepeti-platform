@@ -1,0 +1,11 @@
+{
+  "name": "okyonus-edt-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "npm run check && npm test"
+  }
+}

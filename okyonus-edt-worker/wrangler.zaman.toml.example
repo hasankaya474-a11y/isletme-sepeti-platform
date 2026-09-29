@@ -1,0 +1,6 @@
+name = "okyanus-edt-admin"
+main = "src/zaman-worker.js"
+compatibility_date = "2026-09-29"
+
+# Bind the SAME production D1 used by DENIZ when deploying to ZAMAN/ADMIN.
+# SESSION_PEPPER and BOOTSTRAP_TOKEN must be Worker secrets, never committed.
