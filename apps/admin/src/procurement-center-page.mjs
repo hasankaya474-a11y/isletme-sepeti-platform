@@ -1,0 +1,4 @@
+const e=(v="")=>String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+export function renderProcurementCenter({requisitions=[],rules=[]}={}){
+ return '<section class="workspace" aria-labelledby="proc-title"><header><div><p class="eyebrow">Komutan Admin</p><h1 id="proc-title">Sepet & Satın Alma Merkezi</h1><p>Onay kurallarını ve satın alma taleplerini kod yazmadan yönetin.</p></div></header><section><h2>Onay Kuralları</h2>'+(rules.length?rules.map(x=>'<article><strong>'+e(x.name)+'</strong><span>'+e(x.status)+'</span></article>').join(""):'<p role="status">Onay kuralı yok.</p>')+'</section><section><h2>Satın Alma Talepleri</h2>'+(requisitions.length?requisitions.map(x=>'<article><strong>'+e(x.id)+'</strong><span>'+e(x.status)+'</span><button data-id="'+e(x.id)+'">İncele</button></article>').join(""):'<p role="status">Satın alma talebi yok.</p>')+'</section></section>';
+}
