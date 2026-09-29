@@ -406,16 +406,20 @@ test('product metadata admin UX and SEO detail wiring are present',()=>{
 });
 
 
-test('final release record pins canonical code and migration 005',()=>{
+test('final release record pins architecture v15 canonical code and migration 006',()=>{
   const manifest=fs.readFileSync(new URL('../docs/OKYANUS_EDT_COMMERCE_V2_FINAL_RELEASE_MANIFEST_2026-09-30.md',import.meta.url),'utf8');
   const bundle=fs.readFileSync(new URL('../docs/OKYANUS_EDT_FINAL_DEPLOYMENT_BUNDLE_INDEX_2026-09-30.md',import.meta.url),'utf8');
   for(const doc of [manifest,bundle]){
-    assert.match(doc,/23c27fb7a07a9327184171631867c9ee296625ba/);
+    assert.match(doc,/96406528a399b66f986d155af4a8544f93bc46a0/);
     assert.match(doc,/005_product_meta\.sql/);
+    assert.match(doc,/006_commerce_control_plane\.sql/);
+    assert.match(doc,/commerce-v2-2026-09-30-architecture-v15/);
   }
-  assert.match(bundle,/2a06751a21252552e63986450d28066c94bdead2/);
-  assert.match(bundle,/1c30be2a38e80b74bf57fa9af6ef7871ef0dfbd4/);
-  assert.match(bundle,/001 → 003 → 004 → 005/);
+  assert.match(bundle,/7b8ff552ce0fa7fb0ee64ad7ace34eac5838ea60/);
+  assert.match(bundle,/599e47cb19dbf114c547ebf2d2205d591ce3d054/);
+  assert.match(bundle,/3d4220e55a4b4d480d715e49316859f2acf2e86a/);
+  assert.match(bundle,/c893e0e7574970c8b1e094065f7adcd29b3b7644/);
+  assert.match(bundle,/001 → 003 → 004 → 005 → 006/);
 });
 
 
