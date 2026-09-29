@@ -2,7 +2,7 @@
 
 Status: CODE COMPLETE / PRE-PRODUCTION
 Date: 2026-09-30
-Source main commit: `b7c38a6bc5fba162a185c188de5c53d7a2b4dccb`
+Canonical code source commit: `23c27fb7a07a9327184171631867c9ee296625ba`
 
 ## Canonical Worker sources
 
@@ -20,7 +20,7 @@ Commerce V2 admin layer:
 
 ## Required production migrations
 
-Run only after backup and controlled staging PASS:
+Run only after backup and controlled staging PASS, in this order:
 
 1. `okyonus-edt-worker/migrations/001_sales_mode.sql`
 2. `okyonus-edt-worker/migrations/003_commerce_v2.sql`
@@ -41,78 +41,77 @@ ZAMAN regression locks:
 - `messageCenterRoute`
 - `photoMessageRouteV2`
 
-These are protected by contract tests against the supplied baseline files.
+These remain byte-preserved against the supplied baseline files.
 
-## Commerce V2 completed scope
+## Completed Commerce V2 scope
 
 - sales-first responsive homepage
-- moving managed banners
-- managed categories
-- managed storefront sections
-- managed campaigns
-- managed brands
-- managed delivery rules
-- managed help content
-- storefront product catalog
-- URL search/category/filter routing
-- product detail with image, price, package and stock
+- moving admin-managed banners
+- admin-managed categories
+- functional managed storefront sections by kind
+- PRODUCT_GRID / CATEGORY_STRIP / CAMPAIGN / PROMO / CONTENT section semantics
+- campaigns, brands, delivery, help and media management
+- storefront catalog and URL search/category/filter routing
+- product detail with image, price, package, stock, brand and description
+- product SEO title and description wiring
+- product featured / sort order metadata
 - direct cart / quote add
 - cart integrity and price summary
 - quote submission through preserved quote engine
 - product create/edit/active-passive control
 - safe product soft-delete
 - product price history
-- product description / brand / SEO metadata
-- featured and product sort-order metadata
-- safe bulk catalog import
-- media management
-- responsive admin controls
+- safe bulk catalog import up to 500 rows
 - mobile/tablet navigation and touch target locks
+- staging Wrangler templates and binding checks
+- release dry-run and offline staging preflight
 - 200 EDT SEO route inventory preserved
 - DIGITAL_MENU preserved active
 - WHATSAPP remains hidden until separately verified
 
 ## Quality evidence
 
-Main commit `b7c38a6bc5fba162a185c188de5c53d7a2b4dccb`:
+Canonical code source commit `23c27fb7a07a9327184171631867c9ee296625ba`:
 - Okyonus Worker Quality: PASS
 - quality: PASS
-
-The final code-completion branch also passed both gates before merge.
 
 ## Production state
 
 - GitHub code: COMPLETE
-- DENİZ production Worker: NOT DEPLOYED by this release preparation
-- ZAMAN production Worker: NOT DEPLOYED by this release preparation
-- Production D1 migrations: NOT RUN by this release preparation
+- DENİZ production Worker: NOT DEPLOYED by this work
+- ZAMAN production Worker: NOT DEPLOYED by this work
+- Production D1 migrations: NOT RUN
 - Production bindings/secrets: NOT MODIFIED
 
 ## Controlled deployment order
 
 1. export current DENİZ source
 2. export current ZAMAN source
-3. record deployment versions and binding names
+3. record current Worker versions and binding names
 4. back up shared production D1
-5. stage canonical DENİZ and ZAMAN sources
-6. bind staging D1/R2/email/secrets
-7. run migrations 001, 003, 004 and 005 on staging
-8. execute DENİZ smoke tests
-9. execute ZAMAN smoke tests
-10. verify quote email, contact email and photo lifecycle with real evidence
-11. verify member login, Digital Menu and representative SEO URLs
-12. take fresh production backup
-13. copy canonical DENİZ source preserving existing bindings/secrets
-14. copy canonical ZAMAN source preserving existing bindings/secrets
-15. run required production migrations 001, 003, 004 and 005
-16. deploy DENİZ
-17. deploy ZAMAN
-18. repeat smoke tests in production
-19. declare production PASS only after evidence is captured
+5. create isolated staging bindings
+6. run `npm run verify`
+7. run `npm run staging:config-check`
+8. run `npm run staging:binding-check`
+9. run `npm run release:dry-run`
+10. run migrations 001, 003, 004 and 005 on staging
+11. deploy DENİZ staging
+12. deploy ZAMAN staging
+13. run `npm run staging:preflight` and collect real smoke-test evidence
+14. verify quote email, contact email and photo lifecycle
+15. verify member login, Digital Menu and representative SEO URLs
+16. take fresh production backup
+17. copy canonical DENİZ source preserving existing bindings/secrets
+18. copy canonical ZAMAN source preserving existing bindings/secrets
+19. run production migrations 001, 003, 004 and 005
+20. deploy DENİZ
+21. deploy ZAMAN
+22. repeat production smoke tests
+23. declare production PASS only after evidence is captured
 
 ## Rollback triggers
 
-Rollback immediately if any of the following fail:
+Rollback immediately if any of these fail:
 - quote intake
 - quote notification email
 - contact/message recording
@@ -125,4 +124,4 @@ Rollback immediately if any of the following fail:
 
 ## Final rule
 
-Do not label the live site PASS from GitHub test results alone. GitHub code PASS and production PASS are separate gates.
+GitHub PASS and production PASS are separate gates. Production is not considered PASS until real staging and production evidence exists.

@@ -400,3 +400,16 @@ test('product metadata admin UX and SEO detail wiring are present',()=>{
   assert.match(commerce,/querySelector\('meta\[name=/);
   assert.match(commerce,/p\.seo_description/);
 });
+
+
+test('final release record pins canonical code and migration 005',()=>{
+  const manifest=fs.readFileSync(new URL('../docs/OKYANUS_EDT_COMMERCE_V2_FINAL_RELEASE_MANIFEST_2026-09-30.md',import.meta.url),'utf8');
+  const bundle=fs.readFileSync(new URL('../docs/OKYANUS_EDT_FINAL_DEPLOYMENT_BUNDLE_INDEX_2026-09-30.md',import.meta.url),'utf8');
+  for(const doc of [manifest,bundle]){
+    assert.match(doc,/23c27fb7a07a9327184171631867c9ee296625ba/);
+    assert.match(doc,/005_product_meta\.sql/);
+  }
+  assert.match(bundle,/2a06751a21252552e63986450d28066c94bdead2/);
+  assert.match(bundle,/1c30be2a38e80b74bf57fa9af6ef7871ef0dfbd4/);
+  assert.match(bundle,/001 → 003 → 004 → 005/);
+});
