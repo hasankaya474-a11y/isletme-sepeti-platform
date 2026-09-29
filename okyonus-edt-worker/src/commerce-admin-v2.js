@@ -35,6 +35,42 @@ export async function commerceAdminApi(request,env,auth,headers){
   const rows=(await env.DB.prepare("SELECT old_price,new_price,actor,created_at FROM b2b_price_history_v1 WHERE product_id=? ORDER BY created_at DESC LIMIT 50").bind(id).all()).results||[];
   return j({ok:true,data:rows},200,headers);
  }
+ if(resource==="catalog-import"){
+  if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
+  if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
+  const b=await read(request),items=Array.isArray(b.items)?b.items:[];
+  if(!items.length||items.length>500)return j({ok:false,error:"INVALID_IMPORT_SIZE"},400,headers);
+  let created=0,updated=0;const failed=[];
+  for(let i=0;i<items.length;i++){
+    const x=items[i]||{},name=clean(x.name,220),category=clean(x.category,120),unit=clean(x.unit,30)||"Adet",sourceId=clean(x.sourceProductId||x.source_product_id,120),image=clean(x.imageUrl||x.image_url,1500);
+    if(!name||!category){failed.push({index:i,error:"NAME_CATEGORY_REQUIRED"});continue}
+    if(image&&!/^https:\/\//i.test(image)){failed.push({index:i,error:"INVALID_IMAGE_URL"});continue}
+    try{
+      let row=null;
+      if(sourceId)row=await env.DB.prepare("SELECT * FROM b2b_products_v1 WHERE source_product_id=? LIMIT 1").bind(sourceId).first();
+      if(!row)row=await env.DB.prepare("SELECT * FROM b2b_products_v1 WHERE name=? AND category=? LIMIT 1").bind(name,category).first();
+      const id=row?.id||crypto.randomUUID();
+      if(row){
+        await env.DB.prepare("UPDATE b2b_products_v1 SET source_product_id=?,name=?,category=?,unit=?,package_text=?,image_url=?,stock_status=?,active=?,updated_at=datetime('now') WHERE id=?")
+          .bind(sourceId||row.source_product_id||null,name,category,unit,clean(x.packageText||x.package_text,140),image||null,clean(x.stockStatus||x.stock_status,30)||row.stock_status||"ORDER",x.active===false?0:1,id).run();
+        updated++;
+      }else{
+        await env.DB.prepare("INSERT INTO b2b_products_v1(id,source_product_id,name,category,unit,package_text,image_url,stock_status,active,updated_at) VALUES(?,?,?,?,?,?,?,?,?,datetime('now'))")
+          .bind(id,sourceId||null,name,category,unit,clean(x.packageText||x.package_text,140),image||null,clean(x.stockStatus||x.stock_status,30)||"ORDER",x.active===false?0:1).run();
+        created++;
+      }
+      if(x.price!==undefined&&Number.isFinite(Number(x.price))){
+        const current=await env.DB.prepare("SELECT price FROM b2b_prices_v1 WHERE product_id=? AND active=1 ORDER BY valid_from DESC LIMIT 1").bind(id).first();
+        if(Number(current?.price)!==Number(x.price)){
+          await env.DB.prepare("UPDATE b2b_prices_v1 SET active=0 WHERE product_id=? AND active=1").bind(id).run();
+          await env.DB.prepare("INSERT INTO b2b_prices_v1(id,product_id,price,currency,active) VALUES(?,?,?,?,1)").bind(crypto.randomUUID(),id,Number(x.price),"TRY").run();
+          await env.DB.prepare("INSERT INTO b2b_price_history_v1(id,product_id,old_price,new_price,actor) VALUES(?,?,?,?,?)").bind(crypto.randomUUID(),id,current?.price??null,Number(x.price),auth.user.id).run();
+        }
+      }
+    }catch(e){failed.push({index:i,error:"IMPORT_ROW_FAILED"})}
+  }
+  return j({ok:failed.length===0,created,updated,failed},failed.length?207:200,headers);
+ }
  if(resource==="products"){
   if(request.method==="GET"){const rows=(await env.DB.prepare(`SELECT p.*,(SELECT price FROM b2b_prices_v1 pr WHERE pr.product_id=p.id AND pr.active=1 ORDER BY valid_from DESC LIMIT 1) current_price FROM b2b_products_v1 p ORDER BY active DESC,name LIMIT 500`).all()).results||[];return j({ok:true,data:rows},200,headers)}
   if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
@@ -100,7 +136,15 @@ async function summary(){const j=await api('summary');stats.innerHTML=Object.ent
 function productForm(x={}){
  return '<div class="grid"><form class="form" id="pf"><h3>'+(x.id?'Ürün Düzenle':'Yeni Ürün')+'</h3><input name="name" value="'+esc(x.name||'')+'" placeholder="Ürün adı" required><input name="category" value="'+esc(x.category||'')+'" placeholder="Kategori" required><input name="unit" value="'+esc(x.unit||'Adet')+'" placeholder="Birim" required><input name="packageText" value="'+esc(x.package_text||'')+'" placeholder="Paket"><input name="imageUrl" value="'+esc(x.image_url||'')+'" placeholder="https:// görsel"><input name="price" type="number" step="0.01" min="0" value="'+esc(x.current_price??'')+'" placeholder="Fiyat"><select name="stockStatus"><option value="'+esc(x.stock_status||'ORDER')+'">'+esc(x.stock_status||'ORDER')+'</option><option>AVAILABLE</option><option>LIMITED</option><option>ORDER</option><option>OUT</option></select><label><input type="checkbox" name="active" '+(Number(x.active)!==0?'checked':'')+' style="width:auto;display:inline-block;margin-right:8px">Aktif</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button>Kaydet</button>'+(x.id?'<button type="button" id="cancelProduct" style="background:#60778a">Vazgeç</button>':'')+'</div></form><div><h3>Ürün Yönetimi</h3><p>Görsel, fiyat, kategori, paket, stok ve görünürlük buradan yönetilir.</p><p>Silme işlemi güvenlik için ürünü pasife alır ve aktif fiyatını kapatır.</p></div></div>';
 }
-function productUI(rows){return productForm()+'<div class="table" style="margin-top:14px"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="editProduct(\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="showPriceHistory(\''+esc(x.id)+'\')">Fiyat Geçmişi</button><button type="button" onclick="disableProduct(\''+esc(x.id)+'\')" style="background:#9d2635">Pasife Al</button></td></tr>').join('')+'</tbody></table></div>'}
+function catalogImportUI(){return '<div class="panel" style="margin:0 0 14px"><h3>Toplu Katalog İçe Aktar</h3><p>En fazla 500 ürün. JSON dizi formatı: name, category, unit, packageText, imageUrl, stockStatus, price, sourceProductId.</p><textarea id="catalogImportJson" style="width:100%;min-height:150px" placeholder=\'[{"name":"Donuk Patates","category":"Donuk Ürünler","unit":"Koli","packageText":"4x2,5 kg","imageUrl":"https://...","stockStatus":"AVAILABLE","price":0}]\'></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" onclick="runCatalogImport()">İçe Aktar</button><span id="catalogImportResult"></span></div></div>'}
+function productUI(rows){return catalogImportUI()+productForm()+'<div class="table" style="margin-top:14px"><table><thead><tr><th>Görsel</th><th>Ürün</th><th>Kategori</th><th>Paket</th><th>Fiyat</th><th>Stok</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+(x.image_url?'<img src="'+esc(x.image_url)+'">':'—')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.category)+'</td><td>'+esc(x.package_text)+'</td><td>'+esc(x.current_price??'—')+'</td><td>'+esc(x.stock_status)+'</td><td>'+(Number(x.active)!==0?'Aktif':'Pasif')+'</td><td><button type="button" onclick="editProduct(\''+esc(x.id)+'\')">Düzenle</button><button type="button" onclick="showPriceHistory(\''+esc(x.id)+'\')">Fiyat Geçmişi</button><button type="button" onclick="disableProduct(\''+esc(x.id)+'\')" style="background:#9d2635">Pasife Al</button></td></tr>').join('')+'</tbody></table></div>'}
+async function runCatalogImport(){
+ const out=document.getElementById('catalogImportResult'),ta=document.getElementById('catalogImportJson');if(!out||!ta)return;
+ let items;try{items=JSON.parse(ta.value)}catch(_){out.textContent='Geçersiz JSON';return}
+ if(!Array.isArray(items)){out.textContent='JSON bir dizi olmalı';return}
+ out.textContent='İçe aktarılıyor...';
+ try{const j=await api('catalog-import',{method:'POST',body:JSON.stringify({items})});out.textContent='Oluşturulan: '+(j.created||0)+' • Güncellenen: '+(j.updated||0)+' • Hatalı: '+((j.failed||[]).length);await load();await summary()}catch(e){out.textContent=e.message}
+}
 async function bindProductForm(id=''){
  const f=document.getElementById('pf');if(!f)return;
  const cancel=document.getElementById('cancelProduct');if(cancel)cancel.onclick=()=>load();
