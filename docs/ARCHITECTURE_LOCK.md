@@ -38,5 +38,12 @@ Edit -> Validate -> Preview -> Approval when required -> Publish -> Audit -> Ver
 ## Core domains
 Identity, Authorization, Business, Supplier, Catalog/PIM, Search, Pricing, Money/Tax, Stock, Reservation, Delivery, RFQ/Quote, Cart, Order, Snapshot, Receiving, Returns/RMA, Invoice/Three-way Match, Commission Ledger, Visibility, Rules, Configuration, Feature Flags, Workflow, Events/Outbox, Jobs, Notifications, Reports, Files/Media, Contracts, Trust/Risk, Privacy, Audit, Support/Case, Advertising, Analytics, Help/CMS/SEO, Integration Hub.
 
+## Architecture intake and execution rule
+- During architecture-definition mode, user ideas, rules and requested capabilities are captured, developed and incorporated into the architecture without changing the live system.
+- When the user asks to "bring the architecture", return the consolidated current architecture together with the latest additions, unresolved gaps and remaining work.
+- Implementation begins only after an explicit execution command from the user.
+- After that command, carry the approved architecture through implementation, regression testing, release checks and live publication without requesting routine intermediate approvals.
+- Production publication still requires the explicit execution/live-release command and must preserve rollback capability.
+
 ## PASS rule
 A module is not PASS until purpose, roles, fields, actions, states, responsive behavior, permissions, Admin counterpart, API, events, audit, help, privacy/legal touchpoints, error/empty/loading states, tests and regression are defined and normal operations are code-free.
