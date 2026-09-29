@@ -170,7 +170,7 @@ function card(title,subtitle,body,extra){
   return '<section class="card"><div class="card-head"><div><h3>'+esc(title)+'</h3>'+(subtitle?'<p>'+esc(subtitle)+'</p>':"")+'</div>'+(extra||"")+'</div>'+body+'</section>';
 }
 function guardNote(){
-  return '<div class="alert warn"><strong>Architecture Lock:</strong> AI yardımcı olabilir ancak tedarikçiyi sessizce seçemez, ürünü ikame edemez, sipariş veremez, fiyat/credit değiştiremez veya ödeme çalıştıramaz. Production release gerçek kanıt kapıları olmadan kilitlidir.</div>';
+  return '<div class="alert warn"><strong>Architecture Lock:</strong> AI yardımcı olabilir ancak tedarikçiyi sessizce seçemez, ürünü ikame edemez, sipariş veremez, fiyat/credit değiştiremez veya ödeme çalıştıramaz. Production kilitli. Production release gerçek kanıt kapıları olmadan açılamaz.</div>';
 }
 function architectureCoverage(meta){
   const items=["Amaç & roller","Responsive UX","Yetki & scope","Admin karşılığı","API & event","Audit geçmişi","Help içeriği","Privacy/legal","Error/loading/empty","Regresyon testi"];
