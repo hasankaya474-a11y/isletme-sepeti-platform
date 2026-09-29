@@ -12,6 +12,8 @@ const deniz=fs.readFileSync(p("okyonus-edt-worker","src","deniz-worker.js"),"utf
 const denizBase=fs.readFileSync(p("okyonus-edt-worker","baseline","deniz-worker.js"),"utf8");
 const admin=fs.readFileSync(p("okyonus-edt-worker","src","zaman-admin-worker.js"),"utf8");
 const adminBase=fs.readFileSync(p("okyonus-edt-worker","baseline","zaman-admin-worker.js"),"utf8");
+const commerce=fs.readFileSync(p("okyonus-edt-worker","src","commerce-v2.js"),"utf8");
+const commerceAdmin=fs.readFileSync(p("okyonus-edt-worker","src","commerce-admin-v2.js"),"utf8");
 
 function syntaxCheck(source,name){
   const file=path.join(os.tmpdir(),name+".mjs");
@@ -136,20 +138,21 @@ test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",asy
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"oky-runtime-"));
   const file=path.join(dir,"deniz.mjs");
   fs.writeFileSync(file,deniz);
+  fs.writeFileSync(path.join(dir,"commerce-v2.js"),commerce);
   const mod=await import(pathToFileURL(file).href+"?v="+Date.now());
   assert.ok(mod.default&&typeof mod.default.fetch==="function");
   const home=await mod.default.fetch(new Request("https://www.okyonusedt.com/"),{}, {waitUntil(){}});
   assert.equal(home.status,200);
   const homeText=await home.text();
-  assert.match(homeText,/Profesyonel Mutfağınız İçin Güvenilir Gıda Tedariki/);
-  assert.match(homeText,/Ürün Seç • Teklif Al/);
+  assert.match(homeText,/Profesyonel mutfağın alışverişi burada başlar/);
+  assert.match(homeText,/Sepet \/ Teklif/);
   assert.match(homeText,/İletişim/);
-  assert.match(homeText,/Hakkımızda/);
-  assert.match(homeText,/api\.whatsapp\.com\/send\?phone=905358813264/);
+  assert.match(homeText,/Site Yardım/);
+  assert.match(homeText,/wa\.me\/905358813264/);
   const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
   assert.equal(help.status,200);
   const helpText=await help.text();
-  assert.match(helpText,/AKTİF MODÜL KILAVUZLARI/);
+  assert.match(helpText,/Site Yardım/);
   assert.doesNotMatch(helpText,/COST Maliyet/);
   const dm=await mod.default.fetch(new Request("https://www.okyonusedt.com/dijital-menu-cozumleri"),{}, {waitUntil(){}});
   assert.equal(dm.status,200);
@@ -166,6 +169,7 @@ test("ZAMAN runtime smoke: login surface remains available",async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"oky-admin-runtime-"));
   const file=path.join(dir,"zaman.mjs");
   fs.writeFileSync(file,admin);
+  fs.writeFileSync(path.join(dir,"commerce-admin-v2.js"),commerceAdmin);
   const mod=await import(pathToFileURL(file).href+"?v="+Date.now());
   assert.ok(mod.default&&typeof mod.default.fetch==="function");
   const res=await mod.default.fetch(new Request("https://admin.example.test/login"),{SESSION_PEPPER:"x".repeat(64)});
