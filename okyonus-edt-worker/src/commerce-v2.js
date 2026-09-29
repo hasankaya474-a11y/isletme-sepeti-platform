@@ -69,7 +69,7 @@ async function storefront(env){
    }
   }
  }catch{}
- let banners=[],categories=[],sections=[],campaigns=[],brands=[],delivery=[],helpArticles=[];
+ let banners=[],categories=[],sections=[],campaigns=[],brands=[],delivery=[],helpArticles=[],settings={};
  try{
   const DB=env&& (env.DB||env.ADMIN_DB||env["Veritabanı"]||env["Veritabani"]||env["Veritabanı1"]);
   if(DB){
@@ -87,13 +87,16 @@ async function storefront(env){
    if(hdel)delivery=(await DB.prepare("SELECT * FROM oky_delivery_rules_v1 WHERE active=1 ORDER BY sort_order,rowid LIMIT 100").all()).results||[];
    const hhelp=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_help_articles_v1'").first();
    if(hhelp)helpArticles=(await DB.prepare("SELECT * FROM oky_help_articles_v1 WHERE active=1 ORDER BY sort_order,rowid LIMIT 100").all()).results||[];
+   const hset=await DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='oky_storefront_settings_v1'").first();
+   if(hset){const sr=(await DB.prepare("SELECT key,value FROM oky_storefront_settings_v1").all()).results||[];settings=Object.fromEntries(sr.map(x=>[x.key,x.value]));}
   }
  }catch{}
  if(!products.length)products=FALLBACK_PRODUCTS;
- return json({ok:true,build:BUILD,products:products.map(p=>({...p,cardHtml:card(p)})),banners,categories,sections,campaigns,brands,delivery,help:helpArticles});
+ return json({ok:true,build:BUILD,products:products.map(p=>({...p,cardHtml:card(p)})),banners,categories,sections,campaigns,brands,delivery,help:helpArticles,settings:{...DEFAULT_SETTINGS,...settings},legacyCatalogEndpoint:"/api/products"});
 }
 
 
+function runtimeSettingsScript(){return `<script>(function(){function apply(s){s=s||{};var set=(id,key)=>{var e=document.getElementById(id);if(e&&s[key])e.textContent=s[key]};set("siteAnnouncement","announcement");set("siteTitle","siteTitle");set("footerSiteTitle","siteTitle");set("footerText","footerText");set("heroTitle","heroTitle");set("heroSubtitle","heroSubtitle");var logo=document.getElementById("siteLogo");if(logo&&s.logoUrl)logo.src=s.logoUrl;var phone=String(s.phone||"").replace(/[^+0-9]/g,""),wa=String(s.whatsapp||"").replace(/\D/g,""),email=String(s.email||"");["footerPhone","contactPhone"].forEach(id=>{var e=document.getElementById(id);if(e&&s.phone){e.textContent=s.phone;e.href="tel:"+phone}});["footerEmail","contactEmail"].forEach(id=>{var e=document.getElementById(id);if(e&&email){e.href="mailto:"+email;if(id==="footerEmail")e.textContent=email}});["contactWhatsapp","floatWhatsapp"].forEach(id=>{var e=document.getElementById(id);if(e&&wa)e.href="https://api.whatsapp.com/send?phone="+wa})}fetch("/api/storefront-v2",{headers:{accept:"application/json"},cache:"no-store"}).then(r=>r.json()).then(j=>apply(j.settings)).catch(()=>{})})();</script>`}
 function commerceClientShell(title,body,script){
  return '<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>'+esc(title)+'</title><style>'+css()+'.catalogTools{display:grid;grid-template-columns:1fr auto;gap:8px;margin:0 0 14px}.catalogTools input,.catalogTools select{padding:11px;border:1px solid #bfd3e1;border-radius:10px}.commerceGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.commerceBox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}.commerceCartRow{display:grid;grid-template-columns:1fr 90px 80px 38px;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;margin:7px 0}@media(max-width:1000px){.commerceGrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:620px){.commerceGrid{grid-template-columns:repeat(2,1fr);gap:8px}.catalogTools{grid-template-columns:1fr}.commerceCartRow{grid-template-columns:minmax(0,1fr) 68px 44px}.commerceCartRow .u{display:none}.commerceCartRow input{min-width:0;width:100%}.commerceCartRow button{min-width:44px;min-height:44px}.page .form input,.page .form textarea,.page .form select{min-width:0}}</style></head><body>'+header()+body+footer()+mobile()+(script?'<script>'+script+'</script>':'')+'</body></html>';
 }
