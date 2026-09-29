@@ -9,6 +9,7 @@ import {registerPhase5Routes} from "./phase5-routes.mjs";
 import {registerPhase6Routes} from "./phase6-routes.mjs";
 import {registerPhase7Routes} from "./phase7-routes.mjs";
 import {registerPhase8Routes} from "./phase8-routes.mjs";
+import {registerPhase9Routes} from "./phase9-routes.mjs";
 
 export function createTestApp(deps){
   const router=new Router();
@@ -22,5 +23,6 @@ export function createTestApp(deps){
   if(deps.rfqs&&deps.quotes&&deps.comparison&&deps.messages&&deps.rfqAdmin) registerPhase6Routes(router,deps);
   if(deps.carts&&deps.requisitions&&deps.approvals&&deps.policies&&deps.poReadiness&&deps.procurementAdmin) registerPhase7Routes(router,deps);
   if(deps.orderCreation&&deps.orderTransitions&&deps.outbox) registerPhase8Routes(router,deps);
+  if(deps.capacity&&deps.deliveryOps&&deps.eta&&deps.receiving&&deps.rmas&&deps.deliveryAdmin) registerPhase9Routes(router,deps);
   return router;
 }
