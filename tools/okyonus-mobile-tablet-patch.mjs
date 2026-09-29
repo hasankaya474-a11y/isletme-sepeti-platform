@@ -11,8 +11,8 @@ function replaceOnce(from,to,label){
 }
 
 replaceOnce(
-  '@media(max-width:1150px){.products{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.popular{display:none}.quick{grid-template-columns:repeat(2,1fr)}}@media(max-width:860px)',
-  '@media(max-width:1150px){.products{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.popular{display:none}.quick{grid-template-columns:repeat(2,1fr)}}@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px)',
+  '@media(max-width:860px){.top{',
+  '@media(max-width:980px){.shell{grid-template-columns:210px minmax(0,1fr)}.side{padding-left:8px;padding-right:8px}.products{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px){.top{',
   'tablet breakpoint'
 );
 
