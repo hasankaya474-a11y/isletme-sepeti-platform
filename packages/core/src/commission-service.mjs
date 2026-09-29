@@ -1,6 +1,8 @@
 import {newId} from "./id.mjs";
 import {assertMinorUnits,normalizeCurrency} from "./money-tax-service.mjs";
 
+const STATES=new Set(["DRAFT","REVIEW","ACTIVE","INACTIVE","ARCHIVED"]);
+
 export class CommissionService{
   constructor(store,ledger){this.store=store;this.ledger=ledger;}
 
@@ -10,6 +12,14 @@ export class CommissionService{
     const row={id:newId("commissionrule"),name,rateBps,currency:currency?normalizeCurrency(currency):null,status:"DRAFT",createdAt:now,updatedAt:now};
     this.store.insert("audit",{id:newId("audit"),actorId,action:"commission.rule.create",resourceType:"commission_rule",resourceId:row.id,occurredAt:now});
     return this.store.insert("commissionRules",row);
+  }
+
+  transitionRule({id,to,actorId}){
+    if(!actorId||!STATES.has(to)) throw new Error("COMMISSION_RULE_STATE_INVALID");
+    const now=new Date().toISOString();
+    const row=this.store.update("commissionRules",id,x=>({...x,status:to,updatedAt:now}));
+    this.store.insert("audit",{id:newId("audit"),actorId,action:"commission.rule."+to.toLowerCase(),resourceType:"commission_rule",resourceId:id,occurredAt:now});
+    return row;
   }
 
   accrue({ruleId,organizationId,baseAmountMinor,currency,referenceType,referenceId,actorId}){
