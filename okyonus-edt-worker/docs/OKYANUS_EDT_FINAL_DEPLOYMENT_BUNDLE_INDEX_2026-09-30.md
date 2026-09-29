@@ -2,102 +2,74 @@
 
 Status: CODE COMPLETE / PRE-PRODUCTION
 Date: 2026-09-30
-Source main commit: `34df01b836b17e0184f576f6439fb18ccc2f956c`
+Canonical code source commit: `23c27fb7a07a9327184171631867c9ee296625ba`
 
-## Main quality status
+## Quality status
 
 - quality: PASS
 - Okyonus Worker Quality: PASS
 
 ## Canonical bundle files
 
-### DENİZ public Worker
-Path:
-`okyonus-edt-worker/src/deniz-worker.js`
-
-Git blob SHA:
-`2cb276c926f6e924131e9e4aff36671d25f9fa34`
-
-### ZAMAN / ADMIN Worker
-Path:
-`okyonus-edt-worker/src/zaman-admin-worker.js`
-
-Git blob SHA:
-`ed3ebdf1b8172fa2660b714fe9e4346d73e6b26e`
-
-### Commerce V2 public module
-Path:
-`okyonus-edt-worker/src/commerce-v2.js`
-
-Git blob SHA:
-`fbb1a6d6b509461e3c2d9a7cdd9bf7351a6da34e`
-
-### Commerce V2 admin module
-Path:
-`okyonus-edt-worker/src/commerce-admin-v2.js`
-
-Git blob SHA:
-`840299e20a056fa512146bf3c3b38d11c4d657c6`
+| Purpose | Path | Git blob SHA |
+|---|---|---|
+| DENİZ public Worker | `okyonus-edt-worker/src/deniz-worker.js` | `2cb276c926f6e924131e9e4aff36671d25f9fa34` |
+| ZAMAN / ADMIN Worker | `okyonus-edt-worker/src/zaman-admin-worker.js` | `ed3ebdf1b8172fa2660b714fe9e4346d73e6b26e` |
+| Commerce public | `okyonus-edt-worker/src/commerce-v2.js` | `2a06751a21252552e63986450d28066c94bdead2` |
+| Commerce admin | `okyonus-edt-worker/src/commerce-admin-v2.js` | `1c30be2a38e80b74bf57fa9af6ef7871ef0dfbd4` |
+| Migration 001 | `okyonus-edt-worker/migrations/001_sales_mode.sql` | `6c8fc6a4461470381a3e9d491bfc119248d209be` |
+| Migration 003 | `okyonus-edt-worker/migrations/003_commerce_v2.sql` | `aa527935ddf52c6ca08a741c167505a87b4b9316` |
+| Migration 004 | `okyonus-edt-worker/migrations/004_commerce_extended.sql` | `c2e02f7076e4ef77d0c3dbc33795f6b88e053945` |
+| Migration 005 | `okyonus-edt-worker/migrations/005_product_meta.sql` | `38e574a7ae0d16c4766f546afc38887c8e00f903` |
+| Release dry-run | `okyonus-edt-worker/scripts/release-dry-run.mjs` | `0a99760c6865049aba9dd149059676475f40bb25` |
+| Staging preflight | `okyonus-edt-worker/scripts/staging-preflight.mjs` | `963aa080b10cf6535abfbdce09f6466a2e9a6f99` |
+| Staging config check | `okyonus-edt-worker/scripts/staging-config-check.mjs` | `68fad606d8e84d2fb93223967c0588ba6761bd7f` |
+| Binding consistency check | `okyonus-edt-worker/scripts/binding-consistency-check.mjs` | `44d5130eb329ba0f47e08b06e6b88f641232f52e` |
+| DENİZ staging template | `okyonus-edt-worker/wrangler.deniz.staging.example.toml` | `518ec5d8fa0fc5175ad47efceebcd2d76d42435e` |
+| ZAMAN staging template | `okyonus-edt-worker/wrangler.zaman.staging.example.toml` | `b71f3501fd526184cf37743732d4695531c2a8c5` |
 
 ## Required migration order
 
-1. `okyonus-edt-worker/migrations/001_sales_mode.sql`
-   Blob: `6c8fc6a4461470381a3e9d491bfc119248d209be`
-2. `okyonus-edt-worker/migrations/003_commerce_v2.sql`
-   Blob: `aa527935ddf52c6ca08a741c167505a87b4b9316`
-3. `okyonus-edt-worker/migrations/004_commerce_extended.sql`
-4. `okyonus-edt-worker/migrations/005_product_meta.sql`
-   Blob: `c2e02f7076e4ef77d0c3dbc33795f6b88e053945`
+`001 → 003 → 004 → 005`
 
 Do not insert migration 002 into the required production sequence.
 
-## Release control files
-
-- `okyonus-edt-worker/docs/WORKER_COPY_RUNBOOK.md`
-  Blob: `364158bfd3e7596ece2e4349e6f2f629260f49b7`
-
-- `okyonus-edt-worker/DEPLOYMENT_CHECKLIST.md`
-  Blob: `b201fae3dddbd491926f9985ca12b9e6b41243de`
-
-- `okyonus-edt-worker/docs/OKYANUS_EDT_COMMERCE_V2_FINAL_RELEASE_MANIFEST_2026-09-30.md`
-  Blob: `5f615fb25955bffeb589c5806268b406df14aeee`
-
 ## Binding rule
 
-Do not replace or invent production binding names or secret values.
+Never replace or invent production binding names or secret values.
 
-DENİZ must preserve the existing production bindings for:
+DENİZ must preserve:
 - DB
 - PHOTO_TEMP
 - EMAIL
 - MAIL_FROM
 - MAIL_TO / ADMIN_MAIL_TO
-- existing quote/contact/photo webhook variables
-- existing membership/session secrets
+- quote/contact/photo webhook variables
+- membership/session secrets
 
-ZAMAN must preserve the existing production bindings for:
+ZAMAN must preserve:
 - DB
-- MEDIA_STORE where used
+- MEDIA_STORE
 - PHOTO_TEMP
 - SESSION_PEPPER
-- BOOTSTRAP_TOKEN only where intentionally configured
+- BOOTSTRAP_TOKEN only when intentionally configured
 - existing Cloudflare Access configuration
+- legacy aliases documented in `docs/BINDINGS_MATRIX.md`
 
-## Deployment gate
-
-This index is not proof of live production PASS.
+## Production gate
 
 Production remains blocked until:
 1. current Workers are exported
-2. D1 backup exists
+2. production D1 backup exists
 3. staging uses isolated bindings
 4. migrations 001, 003, 004, 005 pass in staging
-5. quote, email, contact and photo evidence passes
-6. member login and Digital Menu pass
-7. rollback source/version is confirmed
-8. only then production copy/deploy occurs
+5. DENİZ and ZAMAN staging smoke tests pass
+6. quote, email, contact and photo evidence passes
+7. member login and Digital Menu pass
+8. rollback source/version is confirmed
+9. only then production copy/deploy occurs
 
-## Production state at index creation
+## Production state at bundle finalization
 
 - DENİZ production deployment: NOT PERFORMED
 - ZAMAN production deployment: NOT PERFORMED
