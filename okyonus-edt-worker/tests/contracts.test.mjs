@@ -413,3 +413,15 @@ test('final release record pins canonical code and migration 005',()=>{
   assert.match(bundle,/1c30be2a38e80b74bf57fa9af6ef7871ef0dfbd4/);
   assert.match(bundle,/001 → 003 → 004 → 005/);
 });
+
+
+test('single-file Worker bundles need no sibling modules',()=>{
+  const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
+  assert.match(denizSingle,/const \{ commerceRoute \} = \(\(\) => \{/);
+  assert.match(zamanSingle,/const \{ commerceAdminApi, commerceAdminPage \} = \(\(\) => \{/);
+  assert.doesNotMatch(denizSingle,/from "\.\/commerce-v2\.js"/);
+  assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
+  assert.match(denizSingle,/export default/);
+  assert.match(zamanSingle,/export default/);
+});
