@@ -287,3 +287,16 @@ test('release dry-run command pack is non-destructive',()=>{
   assert.match(dry,/Production remains blocked until staging smoke-test evidence/);
   assert.doesNotMatch(dry,/execSync|spawnSync|child_process/);
 });
+
+
+test('staging preflight is offline and production-gated',()=>{
+  const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
+  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
+  assert.equal(pkg.scripts['staging:preflight'],'node scripts/staging-preflight.mjs');
+  assert.match(pre,/No network, Cloudflare, D1, email, R2 or production action is performed/);
+  assert.match(pre,/DENIZ_QUOTE_API/);
+  assert.match(pre,/ZAMAN_B2B/);
+  assert.match(pre,/RESPONSIVE_360/);
+  assert.match(pre,/every row above requires real staging evidence before production/);
+  assert.doesNotMatch(pre,/fetch\(|https?:\/\/|child_process|execSync|spawnSync/);
+});
