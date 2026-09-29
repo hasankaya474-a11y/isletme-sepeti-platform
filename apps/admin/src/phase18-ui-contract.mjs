@@ -1,0 +1,2 @@
+export const PHASE18_UI_STATES=Object.freeze({loading:{title:"Release gate kanıtları yükleniyor"},blocked:{title:"Production kilitli"},eligible:{title:"Tüm zorunlu gate kanıtları PASS"},error:{title:"Release gate verileri yüklenemedi"}});
+export const PHASE18_RESPONSIVE=Object.freeze({mobile:{gates:"cards",defects:"cards",decisions:"stacked",actions:"sticky"},tablet:{gates:"adaptive-table",defects:"adaptive-table",decisions:"two-column",actions:"visible"},desktop:{gates:"dense-table",defects:"dense-table",decisions:"audit-panel",actions:"toolbar"}});
