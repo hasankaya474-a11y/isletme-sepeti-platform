@@ -72,6 +72,7 @@ async function ensure(env){
 }
 
 async function commerceAdminApi(request,env,auth,headers){
+ if(auth?.user?.role!=="owner")return j({ok:false,error:"OWNER_ONLY"},403,headers);
  await ensure(env);const u=new URL(request.url),p=u.pathname.split("/").filter(Boolean),resource=p[2],id=p[3];
  const tables={categories:"oky_storefront_categories_v1",banners:"oky_storefront_banners_v1",sections:"oky_storefront_sections_v1",help:"oky_help_articles_v1",brands:"oky_brands_v1",campaigns:"oky_campaigns_v1",delivery:"oky_delivery_rules_v1",media:"oky_media_assets_v1",seo:"oky_seo_links_v1","campaign-rules":"oky_campaign_rules_v1"};
  if(resource==="summary"){
@@ -90,7 +91,7 @@ async function commerceAdminApi(request,env,auth,headers){
   if(request.method==="GET"){const rows=(await env.DB.prepare("SELECT key,value,updated_at FROM oky_storefront_settings_v1 ORDER BY key").all()).results||[];return j({ok:true,data:Object.fromEntries(rows.map(x=>[x.key,x.value])),rows},200,headers)}
   if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
   if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
-  const b=await read(request),allowed=["siteTitle","logoUrl","contactName","phone","email","whatsapp","announcement","heroTitle","heroSubtitle","address","footerText"];
+  const b=await read(request),allowed=["siteTitle","logoUrl","contactName","phone","whatsapp","secondContactName","secondPhone","secondWhatsapp","email","adminUrl","announcement","heroTitle","heroSubtitle","address","footerText"];
   for(const key of allowed)if(Object.prototype.hasOwnProperty.call(b,key))await env.DB.prepare("INSERT INTO oky_storefront_settings_v1(key,value,updated_by,updated_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=datetime('now')").bind(key,clean(b[key],key==="heroSubtitle"||key==="footerText"?1000:500),auth.user.id).run();
   return j({ok:true},200,headers);
  }
@@ -249,8 +250,8 @@ async function runLegacyCatalogSync(){
  try{const j=await api('legacy-catalog-sync',{method:'POST',body:'{}'});out.textContent='Toplam: '+(j.count||0)+' • Yeni: '+(j.created||0)+' • Güncel: '+(j.updated||0)+' • Hatalı: '+(j.failed||0);await load();await summary()}catch(e){out.textContent='Aktarım hatası: '+e.message}
 }
 function settingsUI(x={}){
- const d={siteTitle:'Okyanus EDT',logoUrl:'https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp',contactName:'Hasan Kaya',phone:'+90 532 346 99 25',email:'info@okyonusedt.com',whatsapp:'905323469925',announcement:'İstanbul HORECA tedariki • Profesyonel ürün • Hızlı teklif • Güvenli iletişim',heroTitle:'Profesyonel mutfağın alışverişi burada başlar.',heroSubtitle:'Ürünleri kategori kategori inceleyin, miktarı belirleyin ve sepetten sipariş veya teklif akışına geçin.',address:'İstanbul',footerText:'Restoran, kafe, otel, catering ve profesyonel mutfaklar için ürün, teklif ve tedarik çözümleri.',...x};
- return '<div class="grid"><form class="form" id="settingsForm"><h3>Site Ayarları</h3><input name="siteTitle" value="'+esc(d.siteTitle)+'" placeholder="Site adı"><input name="logoUrl" value="'+esc(d.logoUrl)+'" placeholder="Logo URL"><input name="contactName" value="'+esc(d.contactName||'Hasan Kaya')+'" placeholder="Satış yetkilisi"><input name="phone" value="'+esc(d.phone)+'" placeholder="Telefon"><input name="email" value="'+esc(d.email)+'" placeholder="E-posta"><input name="whatsapp" value="'+esc(d.whatsapp)+'" placeholder="WhatsApp numarası"><textarea name="announcement" placeholder="Üst duyuru">'+esc(d.announcement)+'</textarea><input name="heroTitle" value="'+esc(d.heroTitle)+'" placeholder="Ana banner başlığı"><textarea name="heroSubtitle" placeholder="Ana banner açıklaması">'+esc(d.heroSubtitle)+'</textarea><input name="address" value="'+esc(d.address)+'" placeholder="Adres / bölge"><textarea name="footerText" placeholder="Footer açıklaması">'+esc(d.footerText)+'</textarea><button>Site Ayarlarını Kaydet</button><div id="settingsResult" role="status"></div></form><div><h3>Merkezi Yönetim</h3><p>Logo, iletişim, duyuru, ana banner metni ve alt bilgi bu ekrandan değişir.</p><p>Ürün görseli/fiyatı Ürün & Fiyat; kategori, banner, vitrin, kampanya, marka, teslimat, medya ve yardım içerikleri üst sekmelerden yönetilir.</p><p><b>Not:</b> Logo için GitHub’daki resmî Okyanus EDT görseli varsayılan olarak bağlıdır.</p></div></div>';
+ const d={siteTitle:'Okyanus EDT',logoUrl:'https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp',contactName:'Hasan Kaya',phone:'+90 532 346 99 25',whatsapp:'905323469925',secondContactName:'Orhan Güngör',secondPhone:'+90 535 881 32 64',secondWhatsapp:'905358813264',email:'info@okyonusedt.com',adminUrl:'https://okyonus-edt-admin.hasan-kaya474.workers.dev/commerce',announcement:'İstanbul HORECA tedariki • Profesyonel ürün • Hızlı teklif • Güvenli iletişim',heroTitle:'Profesyonel mutfağın alışverişi burada başlar.',heroSubtitle:'Ürünleri kategori kategori inceleyin, miktarı belirleyin ve sepetten sipariş veya teklif akışına geçin.',address:'İstanbul',footerText:'Restoran, kafe, otel, catering ve profesyonel mutfaklar için ürün, teklif ve tedarik çözümleri.',...x};
+ return '<div class="grid"><form class="form" id="settingsForm"><h3>Site Ayarları</h3><input name="siteTitle" value="'+esc(d.siteTitle)+'" placeholder="Site adı"><input name="logoUrl" value="'+esc(d.logoUrl)+'" placeholder="Logo URL"><input name="contactName" value="'+esc(d.contactName||'Hasan Kaya')+'" placeholder="1. Satış yetkilisi"><input name="phone" value="'+esc(d.phone)+'" placeholder="1. Telefon"><input name="whatsapp" value="'+esc(d.whatsapp)+'" placeholder="1. WhatsApp numarası"><input name="secondContactName" value="'+esc(d.secondContactName||'Orhan Güngör')+'" placeholder="2. Satış yetkilisi"><input name="secondPhone" value="'+esc(d.secondPhone)+'" placeholder="2. Telefon"><input name="secondWhatsapp" value="'+esc(d.secondWhatsapp)+'" placeholder="2. WhatsApp numarası"><input name="email" value="'+esc(d.email)+'" placeholder="E-posta"><input name="adminUrl" value="'+esc(d.adminUrl)+'" placeholder="Yönetici paneli URL"><textarea name="announcement" placeholder="Üst duyuru">'+esc(d.announcement)+'</textarea><input name="heroTitle" value="'+esc(d.heroTitle)+'" placeholder="Ana banner başlığı"><textarea name="heroSubtitle" placeholder="Ana banner açıklaması">'+esc(d.heroSubtitle)+'</textarea><input name="address" value="'+esc(d.address)+'" placeholder="Adres / bölge"><textarea name="footerText" placeholder="Footer açıklaması">'+esc(d.footerText)+'</textarea><button>Site Ayarlarını Kaydet</button><div id="settingsResult" role="status"></div></form><div><h3>Merkezi Yönetim</h3><p>Logo, iki satış yetkilisi, telefon/WhatsApp, yönetici paneli bağlantısı, duyuru, ana banner metni ve alt bilgi bu ekrandan değişir.</p><p>Ürün görseli/fiyatı Ürün & Fiyat; kategori, banner, vitrin, kampanya, marka, teslimat, medya ve yardım içerikleri üst sekmelerden yönetilir.</p><p><b>Not:</b> Logo için GitHub’daki resmî Okyanus EDT görseli varsayılan olarak bağlıdır.</p><p><b>Varsayılan ekip:</b> Hasan Kaya · +90 532 346 99 25 / Orhan Güngör · +90 535 881 32 64</p><p><a href="'+esc(d.adminUrl)+'" target="_blank" rel="noopener">Yönetici panelini yeni sekmede aç →</a></p></div></div>';
 }
 async function bindSettings(){
  const f=document.getElementById('settingsForm');if(!f)return;
@@ -367,7 +368,7 @@ const APP = 'Okyanus EDT Yönetici';
           if (url.pathname === '/health') return json({
             ok: true,
             app: APP,
-            release: '1.12.0-product-card-contact-flow-candidate',
+            release: '1.12.1-owner-only-commerce-admin',
             bindings: {
               database: !!env.DB,
               mediaStore: !!env.MEDIA_STORE,
@@ -385,7 +386,10 @@ const APP = 'Okyanus EDT Yönetici';
             : json({ ok: false, error: 'UNAUTHORIZED' }, 401, headers);
 
           if (url.pathname === '/') return html(await dashboard(auth, env, url), 200, headers);
-          if (url.pathname === '/commerce') return commerceAdminPage(headers);
+          if (url.pathname === '/commerce') {
+            if (auth.user.role !== 'owner') return json({ ok: false, error: 'OWNER_ONLY' }, 403, headers);
+            return commerceAdminPage(headers);
+          }
            if (url.pathname === '/cesni') return html(await cesniAdminPage(auth, env), 200, headers);
           if (url.pathname === '/account/password') return await passwordRoute(request, env, auth, headers);
           if (url.pathname === '/print') return html(printPage(), 200, headers);
@@ -737,7 +741,10 @@ async function apiRoute(request, env, auth, headers) {
 
       // Mesaj Merkezi: mevcut inquiries + inquiry_replies tablolarını kullanır.
       if (resource === 'module-flags') return await moduleFlagsRoute(request,env,auth,headers);
-      if (resource === 'commerce-admin') return await commerceAdminApi(request,env,auth,headers);
+      if (resource === 'commerce-admin') {
+        if (auth.user.role !== 'owner') throw http(403,'OWNER_ONLY');
+        return await commerceAdminApi(request,env,auth,headers);
+      }
       if (resource === 'b2b') return await b2bAdminApi(request, env, auth, headers, id, action, url);
       if (resource === 'b2b-customers') return await b2bCustomersApi(request,env,auth,headers,id,action,url);
       if (resource === 'b2b-products') return await b2bProductsAdminApi(request,env,auth,headers,id,action,url);
@@ -1216,7 +1223,8 @@ async function apiRoute(request, env, auth, headers) {
       const selectedId=String(url.searchParams.get('id')||'');
       const role=user.user.role;
       const canWrite=['owner','admin','editor'].includes(role);
-      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a><a href="/commerce">🛒 Ticaret Yönetimi</a><a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/?view=module-flags">◉ Satış Modu & Modül Kontrolü</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
+      const commerceNav=role==='owner'?'<a href="/commerce">🛒 Ticaret Yönetimi</a>':'';
+      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a>${commerceNav}<a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/?view=module-flags">◉ Satış Modu & Modül Kontrolü</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
       let title='Genel Bakış',help='Sistemin güncel durumunu izleyin.',body='';
       try{
         if(view==='summary'){
