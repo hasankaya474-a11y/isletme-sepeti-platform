@@ -4,12 +4,10 @@ const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
 
 function inlineDeniz(){
-  let commerce=read('src/commerce-v2.js')
-    .replace('export async function commerceRoute','async function commerceRoute')
-    .replace(/\nexport const OKY_COMMERCE_V2_BUILD=BUILD;\s*$/,'');
-  let deniz=read('src/deniz-worker.js')
-    .replace(/^import \{ commerceRoute \} from "\.\/commerce-v2\.js";\s*/,'');
-  return '/* OKYANUS EDT - SINGLE FILE DENIZ WORKER\nGenerated from canonical release sources.\ncommerce-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceRoute } = (() => {\n'+commerce+'\nreturn { commerceRoute };\n})();\n'+deniz;
+  const full=read('dist/deniz-worker.monolithic.final.js');
+  if(!full.includes('OKY_COMMERCE_ROUTE_V18')) throw new Error('MONOLITH_V18_REQUIRED');
+  if(Buffer.byteLength(full,'utf8')<3900000) throw new Error('MONOLITH_TOO_SMALL');
+  return full;
 }
 
 function inlineZaman(){
