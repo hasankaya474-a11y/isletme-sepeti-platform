@@ -1,4 +1,4 @@
-const BUILD="commerce-v2-2026-09-30-controlled-storefront-v20";
+const BUILD="commerce-v2-2026-09-30-controlled-storefront-v21-ai-categories";
 // V20_CONTROLLED_STOREFRONT: compact cards, visible prices, category visuals, hidden SEO modules, mobile/tablet rail and seafood showcase.
 const DEFAULT_LOGO_URL="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp";
 const DEFAULT_SETTINGS=Object.freeze({siteTitle:"Okyanus EDT",logoUrl:DEFAULT_LOGO_URL,contactName:"Hasan Kaya",phone:"+90 532 346 99 25",whatsapp:"905323469925",secondContactName:"Orhan Güngör",secondPhone:"+90 535 881 32 64",secondWhatsapp:"905358813264",email:"info@okyonusedt.com",adminUrl:"https://okyanus-edt-admin.hasan-kaya474.workers.dev/commerce",announcement:"İstanbul HORECA tedariki • Profesyonel ürün • Hızlı teklif • Güvenli iletişim",heroTitle:"Profesyonel mutfağın alışverişi burada başlar.",heroSubtitle:"Ürünleri kategori kategori inceleyin, miktarı belirleyin ve sepetten sipariş veya teklif akışına geçin.",address:"İstanbul",footerText:"Restoran, kafe, otel, catering ve profesyonel mutfaklar için ürün, teklif ve tedarik çözümleri."});
@@ -13,16 +13,17 @@ function json(data,status=200){return new Response(JSON.stringify(data),{status,
 function html(body,status=200){return new Response(body,{status,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store","x-okyanus-commerce":BUILD}})}
 
 const STOREFRONT_ASSET_ROOT="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/";
+const CATEGORY_ASSET_ROOT="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/";
 const CATEGORY_VISUALS=Object.freeze({
- "deniz-urunleri":STOREFRONT_ASSET_ROOT+"cat-deniz.svg",
- "donuk-urunler":STOREFRONT_ASSET_ROOT+"cat-donuk.svg",
- "et-sarkuteri":STOREFRONT_ASSET_ROOT+"cat-et.svg",
- "et-kanatli":STOREFRONT_ASSET_ROOT+"cat-et.svg",
- "sut-sarkuteri":STOREFRONT_ASSET_ROOT+"cat-sut.svg",
- "yaglar":STOREFRONT_ASSET_ROOT+"cat-yag.svg",
- "soslar":STOREFRONT_ASSET_ROOT+"cat-sos.svg",
- "kuru-gida":STOREFRONT_ASSET_ROOT+"cat-kuru.svg",
- "baharat":STOREFRONT_ASSET_ROOT+"cat-baharat.svg"
+ "deniz-urunleri":CATEGORY_ASSET_ROOT+"cat-deniz-ai.webp",
+ "donuk-urunler":CATEGORY_ASSET_ROOT+"cat-donuk-ai.webp",
+ "et-sarkuteri":CATEGORY_ASSET_ROOT+"cat-et-ai.webp",
+ "et-kanatli":CATEGORY_ASSET_ROOT+"cat-et-ai.webp",
+ "sut-sarkuteri":CATEGORY_ASSET_ROOT+"cat-sut-ai.webp",
+ "yaglar":CATEGORY_ASSET_ROOT+"cat-yag-ai.webp",
+ "soslar":CATEGORY_ASSET_ROOT+"cat-sos-ai.webp",
+ "kuru-gida":CATEGORY_ASSET_ROOT+"cat-kuru-ai.webp",
+ "baharat":CATEGORY_ASSET_ROOT+"cat-baharat-ai.webp"
 });
 const SEAFOOD_PRODUCTS=[
 {id:"sea-gigas-u5-10",source_product_id:"sea-gigas-u5-10",name:"Gigas Kalamar Tüp U5 %10 Glaze",brand:"Okyanus EDT",package_text:"Kg • %10 Glaze",unit:"Kg",price:285.66,stock_status:"Siparişe uygun",category:"Deniz Ürünleri",image:STOREFRONT_ASSET_ROOT+"seafood-kalamar.svg",best_seller:1},
@@ -161,7 +162,7 @@ async function storefront(env){
  }catch{}
  if(products.length&&campaignRules.length){products=products.map(p=>{let price=Number(p.effectivePrice),list=Number(p.listPrice),campaignLabel="";if(!Number.isFinite(price))return p;for(const r of campaignRules){const type=String(r.target_type||"PRODUCT").toUpperCase(),target=String(r.target_value||"").toLocaleLowerCase("tr-TR"),match=type==="ALL"||(type==="PRODUCT"&&[p.id,p.source_product_id,p.sku,p.name].some(x=>String(x||"").toLocaleLowerCase("tr-TR")===target))||(type==="CATEGORY"&&String(p.category||"").toLocaleLowerCase("tr-TR")===target)||(type==="BRAND"&&String(p.brand||"").toLocaleLowerCase("tr-TR")===target);if(!match||Number(r.min_cart||0)>0)continue;const d=Number(r.discount_value||0);if(!Number.isFinite(d)||d<=0)continue;const next=String(r.discount_type||"PERCENT").toUpperCase()==="FIXED"?Math.max(0,price-d):Math.max(0,price*(1-Math.min(100,d)/100));if(next<price){if(!Number.isFinite(list)||list<=price)list=price;price=next;campaignLabel=String(r.campaign_type||"Kampanya")}if(Number(r.combinable)!==1)break}const discountPercent=Number.isFinite(list)&&list>price?Math.round((1-price/list)*100):Number(p.discountPercent||0);return {...p,effectivePrice:price,listPrice:Number.isFinite(list)?list:p.listPrice,discountPercent,campaignLabel}});}
  const seedSeen=new Set(products.map(p=>String(p.source_product_id||p.id||p.name||"").toLocaleLowerCase("tr-TR")));for(const seed of FALLBACK_PRODUCTS){const k=String(seed.source_product_id||seed.id||seed.name||"").toLocaleLowerCase("tr-TR");if(!seedSeen.has(k)){seedSeen.add(k);products.push(seed)}}
- const defaultCategories=[["Deniz Ürünleri","deniz-urunleri","🐟"],["Donuk Ürünler","donuk-urunler","❄"],["Et & Şarküteri","et-sarkuteri","🥩"],["Süt & Şarküteri","sut-sarkuteri","🧀"],["Yağlar","yaglar","🫗"],["Soslar","soslar","🥫"],["Kuru Gıda","kuru-gida","🌾"],["Baharat","baharat","✦"]];const catSeen=new Set(categories.map(c=>String(c.slug||"").toLocaleLowerCase("tr-TR")));categories=categories.map(c=>({...c,image_url:c.image_url||CATEGORY_VISUALS[String(c.slug||"").toLocaleLowerCase("tr-TR")]||""}));for(let i=0;i<defaultCategories.length;i++){const [name,slug,icon]=defaultCategories[i];if(!catSeen.has(slug))categories.push({id:"fallback-"+slug,name,slug,icon,image_url:CATEGORY_VISUALS[slug]||"",sort_order:i,active:1})}
+ const defaultCategories=[["Deniz Ürünleri","deniz-urunleri","🐟"],["Donuk Ürünler","donuk-urunler","❄"],["Et & Şarküteri","et-sarkuteri","🥩"],["Süt & Şarküteri","sut-sarkuteri","🧀"],["Yağlar","yaglar","🫗"],["Soslar","soslar","🥫"],["Kuru Gıda","kuru-gida","🌾"],["Baharat","baharat","✦"]];const catSeen=new Set(categories.map(c=>String(c.slug||"").toLocaleLowerCase("tr-TR")));categories=categories.map(c=>{const slugKey=String(c.slug||"").toLocaleLowerCase("tr-TR"),currentImage=String(c.image_url||"");const legacyCategoryImage=/\/assets\/storefront\/cat-(deniz|donuk|et|sut|yag|sos|kuru|baharat)\.svg(?:\?|$)/.test(currentImage);return {...c,image_url:(!currentImage||legacyCategoryImage)?(CATEGORY_VISUALS[slugKey]||currentImage):currentImage}});for(let i=0;i<defaultCategories.length;i++){const [name,slug,icon]=defaultCategories[i];if(!catSeen.has(slug))categories.push({id:"fallback-"+slug,name,slug,icon,image_url:CATEGORY_VISUALS[slug]||"",sort_order:i,active:1})}
  return json({ok:true,build:BUILD,products:products.map(p=>({...p,cardHtml:card(p)})),banners,categories,sections,campaigns,campaignRules,brands,delivery,help:helpArticles,seo:seoLinks,settings:{...DEFAULT_SETTINGS,...settings},legacyCatalogEndpoint:"/api/products"});
 }
 
