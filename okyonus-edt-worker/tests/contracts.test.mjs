@@ -642,3 +642,14 @@ test('full monolithic DENIZ final preserves legacy and commerce layers',()=>{
   ]) assert.ok(full.includes(token),token);
   assert.match(full,/buildId: "v1\.52-commerce-v17-monolithic-full"/);
 });
+
+
+test('full monolithic DENIZ avoids archived catalog TDZ',()=>{
+  const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V17_2026-09-30.txt',import.meta.url),'utf8');
+  assert.equal(full,txt);
+  assert.doesNotMatch(full,/const EDT_LANDING_INDEXABLE_ROUTES=Object\.freeze\(EDT_LANDING_ROUTES\.filter/);
+  assert.match(full,/const EDT_LANDING_INDEXABLE_ROUTES=EDT_LANDING_ROUTES/);
+  assert.ok(Buffer.byteLength(full,'utf8')>3900000);
+  assert.ok(full.split('\n').length>8200);
+});
