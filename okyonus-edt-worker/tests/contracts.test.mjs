@@ -667,8 +667,9 @@ test('contact admin and product v18 public contract',()=>{
     'secondPhone:"+90 535 881 32 64"',
     'secondWhatsapp:"905358813264"',
     'adminUrl:"https://okyonus-edt-admin.hasan-kaya474.workers.dev/commerce"',
-    'Hasan WhatsApp',
-    'Orhan WhatsApp',
+    'contactWhatsapp1Page',
+    'contactWhatsapp2Page',
+    'https://api.whatsapp.com/send?phone=905358813264',
     'data-admin-link',
     'p==="/yonetici"',
     'class="desc"'
