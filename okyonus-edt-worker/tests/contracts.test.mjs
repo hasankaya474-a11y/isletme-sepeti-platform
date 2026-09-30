@@ -470,8 +470,12 @@ test('single-file bundles are byte-current with canonical delivery sources',()=>
   const denizFull=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
+  const zamanAlias=fs.readFileSync(new URL('../exports/OKYANUS_ZAMAN_ADMIN_FINAL_R4_TAM_KOD_2026-09-30.txt',import.meta.url),'utf8');
+  const zamanV19=fs.readFileSync(new URL('../exports/OKYANUS_ZAMAN_ADMIN_FINAL_V19_OWNER_ONLY_2026-09-30.txt',import.meta.url),'utf8');
   assert.equal(denizSingle,denizFull);
   assert.equal(denizSingle,denizTxt);
+  assert.equal(zamanSingle,zamanAlias);
+  assert.equal(zamanSingle,zamanV19);
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
   const adminInline=commerceAdmin
     .replace('export async function commerceAdminApi','async function commerceAdminApi')
@@ -679,10 +683,15 @@ test('contact admin and product v18 public contract',()=>{
   assert.ok(commerce.includes("description:String(x.detail||x.description||'')"));
 });
 
-test('commerce admin controls both contacts and admin URL',()=>{
+test('commerce admin controls both contacts, admin URL and owner-only access',()=>{
   for(const token of ['secondContactName','secondPhone','secondWhatsapp','adminUrl','Orhan Güngör','+90 535 881 32 64','905358813264']) assert.ok(commerceAdmin.includes(token),token);
   assert.ok(admin.includes('href="/commerce">🛒 Ticaret Yönetimi'));
   assert.ok(admin.includes("url.pathname === '/commerce'"));
+  assert.ok(admin.includes("auth.user.role !== 'owner'"));
+  assert.ok(admin.includes("const commerceNav=role==='owner'"));
+  assert.ok(admin.includes("throw http(403,'OWNER_ONLY')"));
+  assert.ok(commerceAdmin.includes('auth?.user?.role!=="owner"'));
+  assert.ok(commerceAdmin.includes('error:"OWNER_ONLY"'));
 });
 
 test('product cards do not publish zero as a real price',()=>{
