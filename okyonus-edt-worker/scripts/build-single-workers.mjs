@@ -1,3 +1,4 @@
+// Current-final generator: keeps Cloudflare single-file deploy bundles and final TXT exports in sync.
 import fs from 'node:fs';
 
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
