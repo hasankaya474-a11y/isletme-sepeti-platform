@@ -468,7 +468,7 @@ test('managed storefront section semantics remain functional',()=>{
 test('single-file bundles are byte-current with canonical delivery sources',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const denizFull=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
-  const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
+  const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V19_2026-09-30.txt',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   const zamanAlias=fs.readFileSync(new URL('../exports/OKYANUS_ZAMAN_ADMIN_FINAL_R4_TAM_KOD_2026-09-30.txt',import.meta.url),'utf8');
   const zamanV19=fs.readFileSync(new URL('../exports/OKYANUS_ZAMAN_ADMIN_FINAL_V19_OWNER_ONLY_2026-09-30.txt',import.meta.url),'utf8');
@@ -626,7 +626,7 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
 });
 
-test('full monolithic DENIZ final preserves legacy and commerce v18 layers',()=>{
+test('full monolithic DENIZ final preserves legacy and locked v19 contact delivery',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
   assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
@@ -653,7 +653,7 @@ test('full monolithic DENIZ final preserves legacy and commerce v18 layers',()=>
 
 test('full monolithic DENIZ avoids archived catalog TDZ and all exports are complete',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
-  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
+  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V19_2026-09-30.txt',import.meta.url),'utf8');
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const legacyAlias=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',import.meta.url),'utf8');
   assert.equal(full,txt);
