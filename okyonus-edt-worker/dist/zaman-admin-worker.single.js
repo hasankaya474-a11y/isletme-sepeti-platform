@@ -346,7 +346,6 @@ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{current=b.datase
 
 return { commerceAdminApi, commerceAdminPage };
 })();
-import { commerceAdminApi, commerceAdminPage } from "./commerce-admin-v2.js";
 /*
 OKYANUS EDT — ZAMAN/ADMIN B2B YONETIM WORKER
 v1.40 PRODUCT-CARD + CONTACT-FLOW PASS — 2026-09-23
