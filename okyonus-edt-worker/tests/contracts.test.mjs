@@ -477,7 +477,7 @@ test('single-file bundles are byte-current with canonical delivery sources',()=>
     .replace('export async function commerceAdminApi','async function commerceAdminApi')
     .replace('export function commerceAdminPage','function commerceAdminPage');
   const zamanInline=admin.replace(/^import \{ commerceAdminApi, commerceAdminPage \} from "\.\/commerce-admin-v2\.js";\s*/,'');
-  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\\nGenerated from canonical sources.\\n*/\\nconst { commerceAdminApi, commerceAdminPage } = (() => {\\n'+adminInline+'\\nreturn { commerceAdminApi, commerceAdminPage };\\n})();\\n'+zamanInline;
+  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminInline+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zamanInline;
   assert.equal(zamanSingle,expectedZaman);
 });
 
