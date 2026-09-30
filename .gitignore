@@ -9,3 +9,8 @@ coverage/
 .wrangler/
 .dev.vars
 *.log
+
+# Okyanus EDT generated deployment bundles are intentionally versioned
+!okyonus-edt-worker/dist/
+!okyonus-edt-worker/dist/deniz-worker.single.js
+!okyonus-edt-worker/dist/zaman-admin-worker.single.js
