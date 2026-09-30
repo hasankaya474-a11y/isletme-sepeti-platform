@@ -620,3 +620,25 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.equal(routes.length,200);
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
 });
+
+test('full monolithic DENIZ final preserves legacy and commerce layers',()=>{
+  const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
+  assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
+  assert.equal((full.match(/export default/g)||[]).length,1);
+  for(const token of [
+    'async function quoteAPI',
+    'async function photoInquiryAPI',
+    'async function okyContactMessageAPI',
+    'EDT_LANDING_ROUTES',
+    'CESNI_SOURCE_MANIFEST',
+    'memberSession',
+    'OKY_COMMERCE_ROUTE_V17',
+    'commerce-v2-2026-09-30-architecture-v15',
+    'oky_product_commerce_v1',
+    'oky_campaign_rules_v1',
+    'newsletterApi',
+    'const SEO_ROUTES='
+  ]) assert.ok(full.includes(token),token);
+  assert.match(full,/buildId: "v1\.52-commerce-v17-monolithic-full"/);
+});
