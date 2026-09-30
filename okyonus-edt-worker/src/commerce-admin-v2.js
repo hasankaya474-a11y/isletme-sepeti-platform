@@ -67,6 +67,7 @@ async function ensure(env){
 }
 
 export async function commerceAdminApi(request,env,auth,headers){
+ if(auth?.user?.role!=="owner")return j({ok:false,error:"OWNER_ONLY"},403,headers);
  await ensure(env);const u=new URL(request.url),p=u.pathname.split("/").filter(Boolean),resource=p[2],id=p[3];
  const tables={categories:"oky_storefront_categories_v1",banners:"oky_storefront_banners_v1",sections:"oky_storefront_sections_v1",help:"oky_help_articles_v1",brands:"oky_brands_v1",campaigns:"oky_campaigns_v1",delivery:"oky_delivery_rules_v1",media:"oky_media_assets_v1",seo:"oky_seo_links_v1","campaign-rules":"oky_campaign_rules_v1"};
  if(resource==="summary"){
