@@ -19,6 +19,10 @@ function inlineZaman(){
   return '/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminModule+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zaman;
 }
 
-write('dist/deniz-worker.single.js',inlineDeniz());
-write('dist/zaman-admin-worker.single.js',inlineZaman());
-console.log('SINGLE WORKER BUNDLES BUILT');
+const denizSingle=inlineDeniz();
+const zamanSingle=inlineZaman();
+write('dist/deniz-worker.single.js',denizSingle);
+write('dist/zaman-admin-worker.single.js',zamanSingle);
+write('exports/OKYANUS_ZAMAN_ADMIN_FINAL_R4_TAM_KOD_2026-09-30.txt',zamanSingle);
+write('exports/OKYANUS_ZAMAN_ADMIN_FINAL_V19_OWNER_ONLY_2026-09-30.txt',zamanSingle);
+console.log('SINGLE WORKER BUNDLES BUILT + ZAMAN FINAL EXPORTS SYNCED');
