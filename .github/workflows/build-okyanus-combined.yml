@@ -1,0 +1,57 @@
+name: Build Okyanus Combined Final
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build-okyanus-combined.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build single complete TXT
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="okyonus-edt-worker/exports/OKYANUS_EDT_TUM_KODLAR_TEK_DOSYA_FINAL_2026-09-30.txt"
+          DENIZ="okyonus-edt-worker/exports/OKYANUS_DENIZ_FINAL_LOCK_15C31909_2026-09-30.txt"
+          ZAMAN="okyonus-edt-worker/exports/OKYANUS_ZAMAN_ADMIN_FINAL_LOCK_15C31909_2026-09-30.txt"
+
+          {
+            echo "OKYANUS EDT — TEK DOSYA TAM KOD PAKETİ"
+            echo "Tarih: 2026-09-30"
+            echo
+            echo "==================== 1/2 DENİZ PUBLIC WORKER BAŞLANGIÇ ===================="
+            echo
+            cat "$DENIZ"
+            echo
+            echo "==================== 1/2 DENİZ PUBLIC WORKER BİTİŞ ========================"
+            echo
+            echo "==================== 2/2 ZAMAN / ADMIN WORKER BAŞLANGIÇ =================="
+            echo
+            cat "$ZAMAN"
+            echo
+            echo "==================== 2/2 ZAMAN / ADMIN WORKER BİTİŞ ======================"
+          } > "$OUT"
+
+          test -s "$OUT"
+          grep -q "OKYANUS DENIZ" "$OUT"
+          grep -q "commerce-admin" "$OUT"
+          wc -l "$DENIZ" "$ZAMAN" "$OUT"
+
+      - name: Commit combined TXT
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add okyonus-edt-worker/exports/OKYANUS_EDT_TUM_KODLAR_TEK_DOSYA_FINAL_2026-09-30.txt
+          git diff --cached --quiet || git commit -m "Okyanus EDT: build complete single-file final export"
+          git push
