@@ -12,15 +12,10 @@ function inlineDeniz(){
     .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
   const start=full.indexOf('const BUILD="commerce-v2-2026-09-30-contact-admin-products-v18";');
   if(start<0) throw new Error('COMMERCE_BLOCK_START_NOT_FOUND');
-  const patterns=['OKY_COMMERCE_V2_BUILD','function commerceRoute','adminPanelRedirect','OKY_COMMERCE_ROUTE_V18'];
-  for(const p of patterns){
-    let at=full.indexOf(p,start),n=0;
-    while(at>=0&&n<5){
-      console.log('BOUNDARY_MATCH '+p+' '+at+'\\n'+full.slice(Math.max(start,at-500),at+700)+'\\nBOUNDARY_MATCH_END');
-      at=full.indexOf(p,at+p.length);n++;
-    }
-  }
-  throw new Error('COMMERCE_BOUNDARY_DIAGNOSTIC_2');
+  const at=full.indexOf('async function commerceRoute',start);
+  if(at<0) throw new Error('COMMERCE_ROUTE_FUNCTION_NOT_FOUND');
+  console.log('ROUTE_END_CONTEXT_START\\n'+full.slice(at,at+6500)+'\\nROUTE_END_CONTEXT_END');
+  throw new Error('COMMERCE_BOUNDARY_DIAGNOSTIC_3');
   if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')) throw new Error('COMMERCE_V19_INJECTION_FAILED');
   return full;
 }
