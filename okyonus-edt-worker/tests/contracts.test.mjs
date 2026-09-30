@@ -681,6 +681,9 @@ test('contact admin and product v18 public contract',()=>{
   ]) assert.ok(commerce.includes(token),token);
   assert.match(commerce,/!Number\.isFinite\(n\)\|\|n<=0/);
   assert.ok(commerce.includes("description:String(x.detail||x.description||'')"));
+  assert.equal((commerce.match(/class="salesPerson"/g)||[]).length,2);
+  assert.ok(commerce.includes('class="contactCenter"'));
+  assert.ok(commerce.includes('class="contactPeople"'));
 });
 
 test('commerce admin controls both contacts, admin URL and owner-only access',()=>{
