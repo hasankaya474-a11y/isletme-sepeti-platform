@@ -30,8 +30,11 @@ function inlineZaman(){
 
 const deniz=inlineDeniz();
 const zaman=inlineZaman();
+write('dist/deniz-worker.monolithic.final.js',deniz);
 write('dist/deniz-worker.single.js',deniz);
 write('dist/zaman-admin-worker.single.js',zaman);
+write('exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',deniz);
+write('exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',deniz);
 write('exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',deniz);
 write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt',zaman);
-console.log('SINGLE WORKER BUNDLES + CURRENT FINAL EXPORTS BUILT');
+console.log('MONOLITH + SINGLE WORKER BUNDLES + ALL FINAL EXPORT ALIASES BUILT');
