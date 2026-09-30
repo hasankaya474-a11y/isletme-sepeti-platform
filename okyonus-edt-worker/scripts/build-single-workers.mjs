@@ -5,18 +5,10 @@ const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
 
 function inlineDeniz(){
-  let full=read('dist/deniz-worker.monolithic.final.js');
-  if(!full.includes('OKY_COMMERCE_ROUTE_V18')&&!full.includes('OKY_COMMERCE_ROUTE_V19')&&!full.includes('OKY_COMMERCE_ROUTE_V20')) throw new Error('MONOLITH_COMMERCE_ROUTE_REQUIRED');
-  if(Buffer.byteLength(full,'utf8')<3900000) throw new Error('MONOLITH_TOO_SMALL');
-  let commerce=read('src/commerce-v2.js')
-    .replace('export async function commerceRoute','async function commerceRoute')
-    .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
-  const start=full.search(/const BUILD=\"commerce-v2-[^\"]+\";/);
-  if(start<0) throw new Error('COMMERCE_BLOCK_START_NOT_FOUND');
-  const end=full.indexOf('return { commerceRoute };',start);
-  if(end<0) throw new Error('COMMERCE_WRAPPER_RETURN_NOT_FOUND');
-  full=full.slice(0,start)+commerce+'\n'+full.slice(end);
-  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('controlled-storefront-v20')) throw new Error('COMMERCE_V20_INJECTION_FAILED');
+  const full=read('src/deniz-worker.js');
+  if(!full.includes('controlled-storefront-v20')) throw new Error('DENIZ_V20_REQUIRED');
+  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')) throw new Error('DENIZ_V20_CONTRACT_MISSING');
+  if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
 
