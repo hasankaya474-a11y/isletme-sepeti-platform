@@ -41,6 +41,11 @@ async function upsertProductCommerce(env,productId,b){
 }
 
 async function ensure(env){
+ if(!env?.DB) throw new Error("D1_DB_BINDING_MISSING");
+ await env.DB.prepare("CREATE TABLE IF NOT EXISTS oky_schema_meta_v1(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
+ const schemaKey="commerce-admin-v21-2026-09-30";
+ const ready=await env.DB.prepare("SELECT value FROM oky_schema_meta_v1 WHERE key=?").bind(schemaKey).first();
+ if(ready?.value==="ready") return;
  const q=[
  `CREATE TABLE IF NOT EXISTS b2b_products_v1(id TEXT PRIMARY KEY,source_product_id TEXT,name TEXT NOT NULL,category TEXT NOT NULL,unit TEXT NOT NULL DEFAULT 'Adet',package_text TEXT,image_url TEXT,stock_status TEXT NOT NULL DEFAULT 'ORDER',active INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL DEFAULT (datetime('now')))`,
  `CREATE INDEX IF NOT EXISTS idx_b2b_products_v1_source ON b2b_products_v1(source_product_id)`,
@@ -64,7 +69,9 @@ async function ensure(env){
  `CREATE TABLE IF NOT EXISTS oky_seo_links_v1(id TEXT PRIMARY KEY,path TEXT NOT NULL UNIQUE,label TEXT NOT NULL,group_name TEXT NOT NULL DEFAULT 'EDT Rehberi',sort_order INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL DEFAULT (datetime('now')))`,
  `CREATE TABLE IF NOT EXISTS oky_campaign_rules_v1(id TEXT PRIMARY KEY,campaign_id TEXT NOT NULL,campaign_type TEXT NOT NULL DEFAULT 'product_discount',target_type TEXT NOT NULL DEFAULT 'PRODUCT',target_value TEXT,discount_type TEXT NOT NULL DEFAULT 'PERCENT',discount_value REAL NOT NULL DEFAULT 0,min_cart REAL,customer_segment TEXT,delivery_zone TEXT,combinable INTEGER NOT NULL DEFAULT 0,sort_order INTEGER NOT NULL DEFAULT 0,active INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL DEFAULT (datetime('now')))`,
  `CREATE TABLE IF NOT EXISTS oky_newsletter_subscribers_v1(id TEXT PRIMARY KEY,email TEXT NOT NULL UNIQUE,name TEXT,consent_version TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'ACTIVE',created_at TEXT NOT NULL DEFAULT (datetime('now')),updated_at TEXT NOT NULL DEFAULT (datetime('now')))`
- ];for(const s of q)await env.DB.prepare(s).run();
+ ];
+ if(typeof env.DB.batch==="function") await env.DB.batch(q.map(s=>env.DB.prepare(s)));
+ else for(const s of q) await env.DB.prepare(s).run();
  const cats=[
  ["deniz-urunleri","Deniz Ürünleri","🐟","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-deniz.svg"],
  ["donuk-urunler","Donuk Ürünler","❄","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-donuk.svg"],
@@ -92,10 +99,16 @@ async function ensure(env){
   }
  }
  const seoGroups=["HORECA & İşletme","Ürün & Kategori","İstanbul & Tedarik","EDT Rehberi"];
- for(let i=0;i<SEO_ROUTES.length;i++){
-  const path=SEO_ROUTES[i],label=path.replace(/^\//,"").split("-").map(x=>x==="edt"?"EDT":x.charAt(0).toLocaleUpperCase("tr-TR")+x.slice(1)).join(" ");
-  await env.DB.prepare("INSERT OR IGNORE INTO oky_seo_links_v1(id,path,label,group_name,sort_order,active) VALUES(?,?,?,?,?,1)").bind(crypto.randomUUID(),path,label,seoGroups[Math.min(3,Math.floor(i/50))],i).run();
+ const seoStatements=SEO_ROUTES.map((path,i)=>{
+  const label=path.replace(/^\//,"").split("-").map(x=>x==="edt"?"EDT":x.charAt(0).toLocaleUpperCase("tr-TR")+x.slice(1)).join(" ");
+  return env.DB.prepare("INSERT OR IGNORE INTO oky_seo_links_v1(id,path,label,group_name,sort_order,active) VALUES(?,?,?,?,?,1)").bind(crypto.randomUUID(),path,label,seoGroups[Math.min(3,Math.floor(i/50))],i);
+ });
+ if(typeof env.DB.batch==="function"){
+  for(let i=0;i<seoStatements.length;i+=50) await env.DB.batch(seoStatements.slice(i,i+50));
+ }else{
+  for(const st of seoStatements) await st.run();
  }
+ await env.DB.prepare("INSERT INTO oky_schema_meta_v1(key,value,updated_at) VALUES(?, 'ready', datetime('now')) ON CONFLICT(key) DO UPDATE SET value='ready',updated_at=datetime('now')").bind(schemaKey).run();
 
 }
 
