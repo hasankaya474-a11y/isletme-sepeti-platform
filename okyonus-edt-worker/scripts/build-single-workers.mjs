@@ -11,7 +11,7 @@ function inlineDeniz(){
   let commerce=read('src/commerce-v2.js')
     .replace('export async function commerceRoute','async function commerceRoute')
     .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
-  const start=full.indexOf('const BUILD="commerce-v2-2026-09-30-contact-admin-products-v18";');
+  const start=full.indexOf('const BUILD="commerce-v2-2026-09-30-responsive-seafood-admin-v19";');
   if(start<0) throw new Error('COMMERCE_BLOCK_START_NOT_FOUND');
   const end=full.indexOf('return { commerceRoute };',start);
   if(end<0) throw new Error('COMMERCE_WRAPPER_RETURN_NOT_FOUND');
