@@ -20,7 +20,7 @@ const APP = 'Okyanus EDT Yönetici';
           if (url.pathname === '/health') return json({
             ok: true,
             app: APP,
-            release: '1.12.0-product-card-contact-flow-candidate',
+            release: '1.13.0-commerce-admin-route-final',
             bindings: {
               database: !!env.DB,
               mediaStore: !!env.MEDIA_STORE,
@@ -31,6 +31,7 @@ const APP = 'Okyanus EDT Yönetici';
           if (url.pathname.startsWith('/studio-media/')) return await publicStudioMedia(request, env, headers, url);
           if (url.pathname === '/login') return await loginRoute(request, env, headers);
           if (url.pathname === '/logout') return await logoutRoute(request, env, headers);
+          if (url.pathname === '/commerce/' || url.pathname === '/yonetici' || url.pathname === '/yonetici/') return redirect('/commerce', headers);
 
           const auth = await authenticate(request, env);
           if (!auth) return request.method === 'GET' && !url.pathname.startsWith('/api/')
