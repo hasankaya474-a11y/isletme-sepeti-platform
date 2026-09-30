@@ -1,6 +1,5 @@
 /* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER
-Generated from canonical release sources.
-commerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.
+Generated from canonical release sources. No relative imports.
 */
 const { commerceAdminApi, commerceAdminPage } = (() => {
 function j(data,status=200,headers={}){const h=new Headers(headers);h.set("content-type","application/json; charset=utf-8");h.set("cache-control","no-store");return new Response(JSON.stringify(data),{status,headers:h})}
