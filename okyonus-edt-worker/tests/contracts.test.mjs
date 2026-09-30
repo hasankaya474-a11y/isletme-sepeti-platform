@@ -642,3 +642,42 @@ test('full monolithic DENIZ final preserves legacy and commerce layers',()=>{
   ]) assert.ok(full.includes(token),token);
   assert.match(full,/buildId: "v1\.52-commerce-v17-monolithic-full"/);
 });
+
+
+test('full monolithic DENIZ preserves legacy body and latest commerce',()=>{
+  const mono=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V17_2026-09-30.txt',import.meta.url),'utf8');
+  assert.equal(mono,txt);
+  assert.ok(Buffer.byteLength(mono,'utf8')>3900000);
+  assert.ok(mono.split('\n').length>8200);
+  for(const token of [
+    'async function sendBoundEmail',
+    'async function quoteAPI',
+    'async function photoInquiryAPI',
+    'async function okyContactMessageAPI',
+    'ACTIVE_PRODUCT_CATALOG',
+    'EDT_LANDING_ROUTES',
+    'CESNI_SOURCE_MANIFEST',
+    'commerce-v2-2026-09-30-architecture-v15',
+    'OKY_COMMERCE_ROUTE_V17',
+    'v1.52-commerce-v17-monolithic-full'
+  ]) assert.match(mono,new RegExp(token));
+  assert.doesNotMatch(mono,/const EDT_LANDING_INDEXABLE_ROUTES=Object\.freeze\(EDT_LANDING_ROUTES\.filter/);
+  assert.match(mono,/const EDT_LANDING_INDEXABLE_ROUTES=EDT_LANDING_ROUTES/);
+});
+
+test('full monolithic DENIZ keeps legacy API precedence before commerce hook',()=>{
+  const mono=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  const hook=mono.indexOf('const commerceV17Response = await OKY_COMMERCE_ROUTE_V17');
+  assert.ok(hook>0);
+  for(const token of [
+    'if (path === "/api/quote"',
+    'if (path === "/api/products"',
+    'if (path === "/api/contact"',
+    'if (path === "/api/photo'
+  ]){
+    const i=mono.indexOf(token);
+    assert.ok(i>=0,token);
+    assert.ok(i<hook,token+' must stay before commerce hook');
+  }
+});
