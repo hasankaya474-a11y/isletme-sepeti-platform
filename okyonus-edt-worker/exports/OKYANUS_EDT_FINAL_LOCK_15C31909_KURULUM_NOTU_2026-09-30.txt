@@ -1,0 +1,35 @@
+OKYANUS EDT — FINAL LOCK 15C31909
+Tarih: 2026-09-30
+Kaynak commit: 15c319098ead3303892f3ec91e963f3b700a6938
+
+MİMARİ:
+1/2 DENİZ PUBLIC WORKER
+Dosya: OKYANUS_DENIZ_FINAL_LOCK_15C31909_2026-09-30.txt
+- 8.278 satır
+- Tek export default
+- Commerce V18 + legacy kritik motorlar
+- Hasan Kaya + Orhan Güngör iletişim/WhatsApp
+- Ürün kartı, sepet, çoklu ürün, teklif /api/quote
+- Fiyat 0 ise "Fiyat için teklif alın"
+- /yonetici yönlendirmesi
+- E-posta / fotoğraf / mesaj motorları korunur
+
+2/2 ZAMAN / ADMIN WORKER
+Dosya: OKYANUS_ZAMAN_ADMIN_FINAL_LOCK_15C31909_2026-09-30.txt
+- Commerce admin owner-only
+- /commerce sayfası owner-only
+- /api/commerce-admin owner-only
+- Ürün/fiyat/görsel/banner/kategori/site yardım yönetimi
+- Mesaj Merkezi ve fotoğraf akışları korunur
+
+KALİTE:
+- Okyonus Worker Quality: PASS
+- quality: PASS
+- Okyanus sözleşme testleri: 60/60 PASS
+- Genel test paketi: 257 PASS, 0 FAIL (280 test içinde skip/todo olabilir)
+- Production Cloudflare / D1 dağıtımı yapılmadı.
+
+KULLANIM:
+DENİZ dosyasını sadece DENİZ public Worker'a,
+ZAMAN dosyasını sadece ZAMAN/ADMIN Worker'a yapıştırın.
+İki dosyayı birbirine birleştirip tek Worker'a yapıştırmayın.
