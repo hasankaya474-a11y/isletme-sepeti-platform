@@ -22,6 +22,8 @@ function inlineZaman(){
 const denizSingle=inlineDeniz();
 const zamanSingle=inlineZaman();
 write('dist/deniz-worker.single.js',denizSingle);
+write('exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',denizSingle);
+write('exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V19_2026-09-30.txt',denizSingle);
 write('dist/zaman-admin-worker.single.js',zamanSingle);
 write('exports/OKYANUS_ZAMAN_ADMIN_FINAL_R4_TAM_KOD_2026-09-30.txt',zamanSingle);
 write('exports/OKYANUS_ZAMAN_ADMIN_FINAL_V19_OWNER_ONLY_2026-09-30.txt',zamanSingle);
