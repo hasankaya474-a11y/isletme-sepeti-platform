@@ -1,0 +1,37 @@
+OKYANUS EDT FINAL V17 TESLIM NOTU
+Tarih: 2026-09-30
+
+1) DENIZ / PUBLIC WORKER
+Dosya:
+okyonus-edt-worker/exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V17_2026-09-30.txt
+
+Bu dosya 27 Eylul 2026 tarihli dogrulanmis 3.813.090 byte / 8.040 satir DENIZ ana govdesini korur.
+Yeni Commerce V17 katmani additive olarak eklenmistir.
+Eski quote / photo / contact / membership / COST / CESNI / Akademi / EDT landing motorlari silinmemistir.
+
+2) ZAMAN / ADMIN WORKER
+Dosya:
+okyonus-edt-worker/exports/OKYANUS_ZAMAN_ADMIN_FINAL_V17_2026-09-30.txt
+
+Commerce Admin, urun/fiyat, kategori, banner, vitrin, kampanya kurallari, SEO 200 link, medya,
+site ayarlari, e-bulten ve mevcut ZAMAN operasyon motorlarini birlikte tasir.
+
+3) ZORUNLU D1 MIGRATION SIRASI
+001_sales_mode.sql
+003_commerce_v2.sql
+004_commerce_extended.sql
+005_product_meta.sql
+006_commerce_control_plane.sql
+
+002_sales_data.sql zorunlu production sirasi icinde degildir.
+
+4) KRITIK KURAL
+DENIZ ve ZAMAN kodlari iki ayri Worker'dir. Birbirine yapistirilmaz.
+Canli D1 / Worker / binding degisikligi bu teslim sirasinda yapilmamistir.
+Once staging ve gercek smoke test, sonra production.
+
+5) BUILD
+DENIZ buildId:
+v1.52-commerce-v17-monolithic-full
+Commerce build:
+commerce-v2-2026-09-30-architecture-v15
