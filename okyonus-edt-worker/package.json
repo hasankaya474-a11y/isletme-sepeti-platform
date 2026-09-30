@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check src/commerce-v2.js && node --check src/commerce-admin-v2.js && node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js && node --check dist/deniz-worker.single.js && node --check dist/deniz-worker.monolithic.final.js && node --check dist/zaman-admin-worker.single.js",
+    "check": "node --check scripts/build-single-workers.mjs && node --check scripts/release-dry-run.mjs && node --check scripts/staging-preflight.mjs && node --check scripts/staging-config-check.mjs && node --check scripts/binding-consistency-check.mjs && node --check src/commerce-v2.js && node --check src/commerce-admin-v2.js && node --check src/deniz-worker.js && node --check src/zaman-admin-worker.js && node --check dist/deniz-worker.single.js && node --check dist/deniz-worker.monolithic.final.js && node --check dist/zaman-admin-worker.single.js",
     "test": "node --test tests/*.test.mjs",
     "verify": "npm run build:single && npm run check && npm run check:monolith-runtime && npm test",
     "release:dry-run": "node scripts/release-dry-run.mjs",
