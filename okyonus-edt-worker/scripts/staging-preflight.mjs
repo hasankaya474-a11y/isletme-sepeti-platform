@@ -10,7 +10,7 @@ const mustContain = [
   'Managed banner carousel',
   '200 EDT links render as 4 x 50 modules',
   'KVKK + cookie preference UI persists choice',
-  'Newsletter explicit-consent signup'
+  'Newsletter explicit-consent signup',
   'POST /api/quote creates request',
   'Quote notification email still arrives',
   'POST /api/contact stores message before notification',

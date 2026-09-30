@@ -691,3 +691,16 @@ test('product cards do not publish zero as a real price',()=>{
   assert.ok(commerce.includes('p.description||p.detail'));
   assert.ok(commerce.includes("image:String(x.image||x.image_url||x.imageUrl||'')"));
 });
+
+
+test('Commerce management is owner-only',()=>{
+  assert.match(commerceAdmin,/function canWrite\(auth\)\{return auth\?\.user\?\.role==="owner"\}/);
+  assert.ok((admin.match(/OWNER_ONLY/g)||[]).length>=2);
+  assert.match(admin,/url\.pathname === '\/commerce'/);
+  assert.match(admin,/resource === 'commerce-admin'/);
+});
+
+test('staging preflight keeps newsletter and quote checks as separate entries',()=>{
+  const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
+  assert.match(pre,/Newsletter explicit-consent signup',\s*\n\s*'POST \/api\/quote creates request'/);
+});

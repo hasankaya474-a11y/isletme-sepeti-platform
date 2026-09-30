@@ -38,7 +38,7 @@ const APP = 'Okyanus EDT Yönetici';
             : json({ ok: false, error: 'UNAUTHORIZED' }, 401, headers);
 
           if (url.pathname === '/') return html(await dashboard(auth, env, url), 200, headers);
-          if (url.pathname === '/commerce') return commerceAdminPage(headers);
+          if (url.pathname === '/commerce') { if (auth.user.role !== 'owner') throw http(403, 'OWNER_ONLY'); return commerceAdminPage(headers); }
            if (url.pathname === '/cesni') return html(await cesniAdminPage(auth, env), 200, headers);
           if (url.pathname === '/account/password') return await passwordRoute(request, env, auth, headers);
           if (url.pathname === '/print') return html(printPage(), 200, headers);
@@ -390,7 +390,7 @@ async function apiRoute(request, env, auth, headers) {
 
       // Mesaj Merkezi: mevcut inquiries + inquiry_replies tablolarını kullanır.
       if (resource === 'module-flags') return await moduleFlagsRoute(request,env,auth,headers);
-      if (resource === 'commerce-admin') return await commerceAdminApi(request,env,auth,headers);
+      if (resource === 'commerce-admin') { if (auth.user.role !== 'owner') throw http(403,'OWNER_ONLY'); return await commerceAdminApi(request,env,auth,headers); }
       if (resource === 'b2b') return await b2bAdminApi(request, env, auth, headers, id, action, url);
       if (resource === 'b2b-customers') return await b2bCustomersApi(request,env,auth,headers,id,action,url);
       if (resource === 'b2b-products') return await b2bProductsAdminApi(request,env,auth,headers,id,action,url);
