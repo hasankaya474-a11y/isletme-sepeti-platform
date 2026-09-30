@@ -1,4 +1,8 @@
-/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources. No relative imports.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\nfunction j(data,status=200,headers={}){const h=new Headers(headers);h.set("content-type","application/json; charset=utf-8");h.set("cache-control","no-store");return new Response(JSON.stringify(data),{status,headers:h})}
+/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER
+Generated from canonical release sources. No relative imports.
+*/
+const { commerceAdminApi, commerceAdminPage } = (() => {
+function j(data,status=200,headers={}){const h=new Headers(headers);h.set("content-type","application/json; charset=utf-8");h.set("cache-control","no-store");return new Response(JSON.stringify(data),{status,headers:h})}
 function page(body,headers={}){const h=new Headers(headers);h.set("content-type","text/html; charset=utf-8");h.set("cache-control","no-store");return new Response(body,{status:200,headers:h})}
 function clean(v,n=500){return String(v==null?"":v).trim().slice(0,n)}
 function canWrite(auth){return auth?.user?.role==="owner"}
@@ -367,7 +371,10 @@ async function load(){
 }
 document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{current=b.dataset.r;editingId='';document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('active',x===b));try{await load()}catch(e){content.innerHTML='<div style="padding:18px;border:1px solid #efb4b4;background:#fff5f5;border-radius:12px"><b>Yönetim verisi yüklenemedi</b><p>'+esc(e.message||e)+'</p><button type="button" onclick="location.reload()">Tekrar Dene</button></div>'}});async function boot(){try{await summary();await load()}catch(e){stats.innerHTML='';content.innerHTML='<div style="padding:18px;border:1px solid #efb4b4;background:#fff5f5;border-radius:12px"><b>Yönetim paneli bağlantı hatası</b><p>'+esc(e.message||e)+'</p><p>Oturum, D1 veritabanı bağlantısı ve Worker sürümünü kontrol edin.</p><button type="button" onclick="location.reload()">Tekrar Dene</button></div>'}}boot();
 </script></body></html>`,headers)}
-\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n/*
+
+return { commerceAdminApi, commerceAdminPage };
+})();
+/*
 OKYANUS EDT — ZAMAN/ADMIN B2B YONETIM WORKER
 v1.40 PRODUCT-CARD + CONTACT-FLOW PASS — 2026-09-23
 Mimari: ZAMAN/ADMIN -> D1 -> DENIZ
