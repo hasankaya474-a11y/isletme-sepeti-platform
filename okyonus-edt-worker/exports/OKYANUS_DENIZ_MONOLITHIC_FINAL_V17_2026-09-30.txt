@@ -333,7 +333,7 @@ function edtProducts(def,limit=18){
   const keys=(def.keywords||[]).map(salesNorm).filter(Boolean),all=Array.isArray(ACTIVE_PRODUCT_CATALOG)?ACTIVE_PRODUCT_CATALOG:[];
   return all.map(p=>{const h=salesCatalogText(p);let score=0;for(const k of keys)if(k&&h.includes(k))score+=10;return{p,score}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,limit).map(x=>x.p);
 }
-const EDT_LANDING_INDEXABLE_ROUTES=Object.freeze(EDT_LANDING_ROUTES.filter(path=>path==="/edt"||edtProducts(EDT_LANDING_DATA[path],1).length>0));
+const EDT_LANDING_INDEXABLE_ROUTES=EDT_LANDING_ROUTES; // V17: avoid ACTIVE_PRODUCT_CATALOG TDZ during module initialization
 function edtRelated(path,def){return EDT_LANDING_ROUTES.filter(p=>p!==path&&EDT_LANDING_DATA[p].group===def.group).slice(0,6).concat(EDT_LANDING_ROUTES.filter(p=>p!==path&&EDT_LANDING_DATA[p].group!==def.group).slice(0,4));}
 function edtLandingPage(path){
   const d=EDT_LANDING_DATA[path];if(!d)return "";const origin=GOOGLE_GROWTH_ARCHITECTURE.canonicalOrigin,products=edtProducts(d,18),indexable=path==="/edt"||products.length>0;
@@ -7602,8 +7602,7 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
 /* ============================================================
    OKYANUS EDT COMMERCE V17 MONOLITHIC ADDITIVE LAYER
    Source: commerce-v2.js architecture-v15 + SEO CRUD final state
-   Legacy DENIZ engines are preserved byte-for-byte outside the
-   build id and the two explicit additive insertion points below.
+   Legacy DENIZ quote/email/photo/member/SEO engines stay intact.
    ============================================================ */
 const { commerceRoute: OKY_COMMERCE_ROUTE_V17 } = (() => {
 const BUILD="commerce-v2-2026-09-30-architecture-v15";
@@ -8004,7 +8003,7 @@ return { commerceRoute };
             }
           }
 
-          // Commerce V17 additive route layer. Critical legacy APIs above remain authoritative.
+          // Commerce V17 additive route layer. Legacy APIs above remain authoritative.
           const commerceV17Response = await OKY_COMMERCE_ROUTE_V17(request, env);
           if (commerceV17Response) return commerceV17Response;
 
