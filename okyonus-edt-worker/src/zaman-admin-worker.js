@@ -20,7 +20,7 @@ const APP = 'Okyanus EDT Yönetici';
           if (url.pathname === '/health') return json({
             ok: true,
             app: APP,
-            release: '1.12.0-product-card-contact-flow-candidate',
+            release: '1.12.1-owner-only-commerce-admin',
             bindings: {
               database: !!env.DB,
               mediaStore: !!env.MEDIA_STORE,
@@ -38,7 +38,10 @@ const APP = 'Okyanus EDT Yönetici';
             : json({ ok: false, error: 'UNAUTHORIZED' }, 401, headers);
 
           if (url.pathname === '/') return html(await dashboard(auth, env, url), 200, headers);
-          if (url.pathname === '/commerce') return commerceAdminPage(headers);
+          if (url.pathname === '/commerce') {
+            if (auth.user.role !== 'owner') return json({ ok: false, error: 'OWNER_ONLY' }, 403, headers);
+            return commerceAdminPage(headers);
+          }
            if (url.pathname === '/cesni') return html(await cesniAdminPage(auth, env), 200, headers);
           if (url.pathname === '/account/password') return await passwordRoute(request, env, auth, headers);
           if (url.pathname === '/print') return html(printPage(), 200, headers);
@@ -390,7 +393,10 @@ async function apiRoute(request, env, auth, headers) {
 
       // Mesaj Merkezi: mevcut inquiries + inquiry_replies tablolarını kullanır.
       if (resource === 'module-flags') return await moduleFlagsRoute(request,env,auth,headers);
-      if (resource === 'commerce-admin') return await commerceAdminApi(request,env,auth,headers);
+      if (resource === 'commerce-admin') {
+        if (auth.user.role !== 'owner') throw http(403,'OWNER_ONLY');
+        return await commerceAdminApi(request,env,auth,headers);
+      }
       if (resource === 'b2b') return await b2bAdminApi(request, env, auth, headers, id, action, url);
       if (resource === 'b2b-customers') return await b2bCustomersApi(request,env,auth,headers,id,action,url);
       if (resource === 'b2b-products') return await b2bProductsAdminApi(request,env,auth,headers,id,action,url);
@@ -869,7 +875,8 @@ async function apiRoute(request, env, auth, headers) {
       const selectedId=String(url.searchParams.get('id')||'');
       const role=user.user.role;
       const canWrite=['owner','admin','editor'].includes(role);
-      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a><a href="/commerce">🛒 Ticaret Yönetimi</a><a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/?view=module-flags">◉ Satış Modu & Modül Kontrolü</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
+      const commerceNav=role==='owner'?'<a href="/commerce">🛒 Ticaret Yönetimi</a>':'';
+      const nav=`<nav class="sideNav"><a href="/?view=summary">⌂ Genel Bakış</a>${commerceNav}<a href="/?view=photo-messages">▣ Fotoğraflı Talepler</a><a href="/?view=messages&box=inbox">✉ Mesaj Merkezi</a><a href="/?view=studio">🎬 İçerik Stüdyosu</a><a href="/?view=media">▣ Medya</a><a href="/?view=content">▤ İçerik</a><a href="/?view=content_revisions">↻ Revizyonlar</a><a href="/?view=releases">✓ Yayınlar</a><a href="/?view=users">♙ Kullanıcılar</a><a href="/?view=module-flags">◉ Satış Modu & Modül Kontrolü</a><a href="/cesni">♨ ÇEŞNİ Yönetimi</a><a href="/account/password">⚿ Parola</a><a href="/print" target="_blank">▧ Rapor</a><a href="https://www.okyonusedt.com/" rel="noopener">🏠 Ana Siteye Geç</a><button id="logout" class="danger" type="button">Çıkış</button></nav>`;
       let title='Genel Bakış',help='Sistemin güncel durumunu izleyin.',body='';
       try{
         if(view==='summary'){
