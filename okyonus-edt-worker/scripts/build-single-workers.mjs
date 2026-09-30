@@ -18,7 +18,14 @@ function inlineZaman(){
     .replace('export function commerceAdminPage','function commerceAdminPage');
   let zaman=read('src/zaman-admin-worker.js')
     .replace(/^import \{ commerceAdminApi, commerceAdminPage \} from "\.\/commerce-admin-v2\.js";\s*/,'');
-  return '/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminModule+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zaman;
+  return `/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER
+Generated from canonical release sources. No relative imports.
+*/
+const { commerceAdminApi, commerceAdminPage } = (() => {
+${adminModule}
+return { commerceAdminApi, commerceAdminPage };
+})();
+${zaman}`;
 }
 
 const deniz=inlineDeniz();
