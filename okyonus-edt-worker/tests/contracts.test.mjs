@@ -413,7 +413,7 @@ test('final release record pins architecture v15 canonical code and migration 00
     assert.match(doc,/a0a33335755d626e68043bd2779eb78e036c4932/);
     assert.match(doc,/005_product_meta\.sql/);
     assert.match(doc,/006_commerce_control_plane\.sql/);
-    assert.match(doc,/commerce-v2-2026-09-30-contact-admin-products-v18/);
+    assert.match(doc,/commerce-v2-2026-09-30-architecture-v15/);
   }
   assert.match(bundle,/7b8ff552ce0fa7fb0ee64ad7ace34eac5838ea60/);
   assert.match(bundle,/9356588dc60e7427932bb86b6c56724f6d52132b/);
