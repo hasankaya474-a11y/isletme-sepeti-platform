@@ -428,7 +428,7 @@ test('single-file Worker bundles need no sibling modules',()=>{
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
   assert.match(denizSingle,/OKY_COMMERCE_ROUTE_V18/);
-  assert.match(denizSingle,/commerce-v2-2026-09-30-contact-admin-products-v18/);
+  assert.match(denizSingle,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
   assert.match(zamanSingle,/const \{ commerceAdminApi, commerceAdminPage \} = \(\(\) => \{/);
   assert.doesNotMatch(denizSingle,/from "\.\/commerce-v2\.js"/);
   assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
@@ -483,7 +483,7 @@ test('single-file bundles are byte-current with canonical delivery sources',()=>
 
 
 test('cart flow v14 keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-contact-admin-products-v18/);
+  assert.match(commerce,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
   assert.match(commerce,/data-cart-count/);
   assert.match(commerce,/cartRuntimeScript/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
@@ -531,7 +531,7 @@ test('architecture v15 commerce control plane is additive',()=>{
 });
 
 test('architecture v15 public storefront matches locked sales architecture',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-contact-admin-products-v18/);
+  assert.match(commerce,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
   assert.match(commerce,/contactName:"Hasan Kaya"/);
   assert.match(commerce,/\+90 532 346 99 25/);
   assert.match(commerce,/905323469925/);
@@ -604,7 +604,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-09-30-contact-admin-products-v18','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-09-30-responsive-seafood-admin-v19','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
@@ -622,7 +622,7 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
 });
 
-test('full monolithic DENIZ final preserves legacy and commerce v18 layers',()=>{
+test('full monolithic DENIZ final preserves legacy and commerce v19 layers',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
   assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
@@ -635,7 +635,7 @@ test('full monolithic DENIZ final preserves legacy and commerce v18 layers',()=>
     'CESNI_SOURCE_MANIFEST',
     'memberSession',
     'OKY_COMMERCE_ROUTE_V18',
-    'commerce-v2-2026-09-30-contact-admin-products-v18',
+    'commerce-v2-2026-09-30-responsive-seafood-admin-v19',
     'oky_product_commerce_v1',
     'oky_campaign_rules_v1',
     'newsletterApi',
@@ -661,13 +661,13 @@ test('full monolithic DENIZ avoids archived catalog TDZ and all exports are comp
   assert.ok(full.split('\n').length>8200);
 });
 
-test('contact admin and product v18 public contract',()=>{
+test('contact admin and product v19 public contract',()=>{
   for(const token of [
     'contactName:"Hasan Kaya"',
     'secondContactName:"Orhan Güngör"',
     'secondPhone:"+90 535 881 32 64"',
     'secondWhatsapp:"905358813264"',
-    'adminUrl:"https://okyonus-edt-admin.hasan-kaya474.workers.dev/commerce"',
+    'adminUrl:"https://okyanus-edt-admin.hasan-kaya474.workers.dev/commerce"',
     'contactWhatsapp1Page',
     'contactWhatsapp2Page',
     'https://api.whatsapp.com/send?phone=905358813264',
