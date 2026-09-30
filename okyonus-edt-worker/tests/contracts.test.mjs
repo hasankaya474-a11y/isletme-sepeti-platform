@@ -413,7 +413,7 @@ test('final release record pins architecture v15 canonical code and migration 00
     assert.match(doc,/a0a33335755d626e68043bd2779eb78e036c4932/);
     assert.match(doc,/005_product_meta\.sql/);
     assert.match(doc,/006_commerce_control_plane\.sql/);
-    assert.match(doc,/commerce-v2-2026-09-30-architecture-v15/);
+    assert.match(doc,/commerce-v2-2026-09-30-contact-admin-products-v18/);
   }
   assert.match(bundle,/7b8ff552ce0fa7fb0ee64ad7ace34eac5838ea60/);
   assert.match(bundle,/9356588dc60e7427932bb86b6c56724f6d52132b/);
@@ -426,7 +426,9 @@ test('final release record pins architecture v15 canonical code and migration 00
 test('single-file Worker bundles need no sibling modules',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  assert.match(denizSingle,/const \{ commerceRoute \} = \(\(\) => \{/);
+  assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
+  assert.match(denizSingle,/OKY_COMMERCE_ROUTE_V18/);
+  assert.match(denizSingle,/commerce-v2-2026-09-30-contact-admin-products-v18/);
   assert.match(zamanSingle,/const \{ commerceAdminApi, commerceAdminPage \} = \(\(\) => \{/);
   assert.doesNotMatch(denizSingle,/from "\.\/commerce-v2\.js"/);
   assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
@@ -463,26 +465,25 @@ test('managed storefront section semantics remain functional',()=>{
   assert.match(commerce,/j\.sections\.map\(renderSection\)/);
 });
 
-test('single-file bundles are byte-current with canonical sources',()=>{
+test('single-file bundles are byte-current with canonical delivery sources',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const denizFull=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  const commerceInline=commerce
-    .replace('export async function commerceRoute','async function commerceRoute')
-    .replace(/\nexport const OKY_COMMERCE_V2_BUILD=BUILD;\s*$/,'');
-  const denizInline=deniz.replace(/^import \{ commerceRoute \} from "\.\/commerce-v2\.js";\s*/,'');
-  const expectedDeniz='/* OKYANUS EDT - SINGLE FILE DENIZ WORKER\nGenerated from canonical release sources.\ncommerce-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceRoute } = (() => {\n'+commerceInline+'\nreturn { commerceRoute };\n})();\n'+denizInline;
+  assert.equal(denizSingle,denizFull);
+  assert.equal(denizSingle,denizTxt);
+  assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
   const adminInline=commerceAdmin
     .replace('export async function commerceAdminApi','async function commerceAdminApi')
     .replace('export function commerceAdminPage','function commerceAdminPage');
   const zamanInline=admin.replace(/^import \{ commerceAdminApi, commerceAdminPage \} from "\.\/commerce-admin-v2\.js";\s*/,'');
-  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminInline+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zamanInline;
-  assert.equal(denizSingle,expectedDeniz);
+  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\\nGenerated from canonical sources.\\n*/\\nconst { commerceAdminApi, commerceAdminPage } = (() => {\\n'+adminInline+'\\nreturn { commerceAdminApi, commerceAdminPage };\\n})();\\n'+zamanInline;
   assert.equal(zamanSingle,expectedZaman);
 });
 
 
 test('cart flow v14 keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-architecture-v15/);
+  assert.match(commerce,/commerce-v2-2026-09-30-contact-admin-products-v18/);
   assert.match(commerce,/data-cart-count/);
   assert.match(commerce,/cartRuntimeScript/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
@@ -530,7 +531,7 @@ test('architecture v15 commerce control plane is additive',()=>{
 });
 
 test('architecture v15 public storefront matches locked sales architecture',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-architecture-v15/);
+  assert.match(commerce,/commerce-v2-2026-09-30-contact-admin-products-v18/);
   assert.match(commerce,/contactName:"Hasan Kaya"/);
   assert.match(commerce,/\+90 532 346 99 25/);
   assert.match(commerce,/905323469925/);
@@ -603,7 +604,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-09-30-architecture-v15','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-09-30-contact-admin-products-v18','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
