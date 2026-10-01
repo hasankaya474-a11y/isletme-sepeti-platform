@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720">
+<defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#062f53"/><stop offset=".55" stop-color="#075f94"/><stop offset="1" stop-color="#0a2538"/></linearGradient><linearGradient id="gold" x1="0" x2="1"><stop stop-color="#f7d36b"/><stop offset="1" stop-color="#dba933"/></linearGradient></defs>
+<rect width="1600" height="720" fill="url(#bg)"/>
+<circle cx="1235" cy="210" r="330" fill="#ffffff0d"/><circle cx="1170" cy="220" r="220" fill="#ffffff08"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp" x="70" y="50" width="150" height="150"/>
+<text x="245" y="105" font-family="Arial,sans-serif" font-size="58" font-weight="800" fill="white">Okyanus EDT</text>
+<text x="245" y="150" font-family="Arial,sans-serif" font-size="25" letter-spacing="4" fill="#d9edf7">HORECA GIDA TEDARİKÇİSİ</text>
+<text x="70" y="280" font-family="Arial,sans-serif" font-size="76" font-weight="900" fill="white">Profesyonel mutfağın</text>
+<text x="70" y="355" font-family="Arial,sans-serif" font-size="76" font-weight="900" fill="url(#gold)">güvenilir tedarikçisi</text>
+<text x="72" y="410" font-family="Arial,sans-serif" font-size="24" fill="#eef9ff">Kaliteli ürün • Hızlı tedarik • Doğru fiyat • İstanbul geneli</text>
+<g transform="translate(70 475)">
+<rect width="355" height="82" rx="20" fill="white"/><text x="34" y="52" font-family="Arial,sans-serif" font-size="29" font-weight="800" fill="#07345e">Ürün Seç • Teklif Al</text>
+<rect x="380" width="390" height="82" rx="20" fill="#082f50" stroke="#f0c458" stroke-width="2"/><text x="414" y="52" font-family="Arial,sans-serif" font-size="27" font-weight="800" fill="white">Listeni Fotoğrafla Gönder</text>
+</g>
+<g transform="translate(900 405)">
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-et-ai.webp" x="0" y="0" width="170" height="170"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-deniz-ai.webp" x="155" y="20" width="170" height="170"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-sut-ai.webp" x="310" y="0" width="170" height="170"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-donuk-ai.webp" x="465" y="20" width="170" height="170"/>
+</g>
+</svg>
