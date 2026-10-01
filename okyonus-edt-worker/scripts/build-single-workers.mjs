@@ -35,10 +35,7 @@ function syncDenizSource(){
 
 function inlineDeniz(){
   const base=syncDenizSource();
-  const hero64=['00','01','02','03','04','05'].map(n=>read('assets/storefront/hero-inline/hero-'+n+'.b64').trim()).join('');
-  if(hero64.length<200000) throw new Error('DENIZ_MOBILE_HERO_INCOMPLETE');
-
-  const full=replaceCommerceBlock(base,commerceBody({inlineHero:'data:image/webp;base64,'+hero64}));
+  const full=replaceCommerceBlock(base,commerceBody());
   for(const token of [
     'commerce-v2-2026-10-01-mobile-storefront-v22',
     'grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px',
@@ -47,13 +44,13 @@ function inlineDeniz(){
     'cat-yag-ai.webp','cat-sut-ai.webp','cat-sos-ai.webp','cat-baharat-ai.webp',
     'Hasan Kaya','Orhan Güngör','905323469925','905358813264',
     'Listeni Fotoğrafla Gönder','Ürün Seç • Teklif Al',
-    'defaultHeroMedia','data:image/webp;base64,',
+    'defaultHeroMedia','okyanus-main-hero.svg',
     'async function quoteAPI','async function photoInquiryAPI','async function okyContactMessageAPI'
   ]) if(!full.includes(token)) throw new Error('DENIZ_FINAL_CONTRACT_MISSING:'+token);
 
   if(!full.includes('mobile-storefront-v22')) throw new Error('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED');
   if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
-  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('data:image/webp;base64,')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
+  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('okyanus-main-hero.svg')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
