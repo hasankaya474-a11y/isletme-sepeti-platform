@@ -242,7 +242,7 @@ test('Commerce V2 cart quote flow keeps product integrity',()=>{
   assert.match(commerce,/ürünün fiyatı teklifte netleşecek/);
   assert.match(commerce,/Array\.isArray\(raw\)\?raw:\[\]/);
   assert.match(commerce,/qf\.reset\(\)/);
-  assert.match(commerce,/grid-template-columns:minmax\(0,1fr\) 68px 44px/);
+  assert.match(commerce,/grid-template-columns:minmax\(0,1fr\) 128px 44px/);
   assert.match(commerce,/min-width:44px;min-height:44px/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
 });
@@ -501,7 +501,7 @@ test('cart flow keeps product selection quote scenario intact',()=>{
 
 test('cart add paths carry current price and product metadata',()=>{
   assert.match(commerce,/package_text:pack,category,image/);
-  assert.match(commerce,/sale_price\?\?p\.effectivePrice\?\?p\.price\?\?p\.list_price\?\?null/);
+  assert.match(commerce,/effectivePrice\?\?p\.sale_price\?\?p\.price\?\?p\.list_price\?\?null/);
   assert.match(commerce,/stok yok\|tükendi\|pasif\|inactive\|out of stock/);
   assert.match(commerce,/Math\.min\(999/);
   assert.match(commerce,/x\.price=price/);
