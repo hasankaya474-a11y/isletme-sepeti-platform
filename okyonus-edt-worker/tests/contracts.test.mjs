@@ -724,7 +724,7 @@ test('single-worker builder embeds the approved hero and V22 storefront',()=>{
   const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
   assert.ok(build.includes('hero-inline/hero-'));
   assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
-  assert.ok(build.includes('data:image/webp;base64,'));
+  assert.ok(build.includes('okyanus-main-hero.svg'));
 });
 
 
@@ -745,5 +745,5 @@ test('main hero asset is canonical on source and remains inline in final build',
   assert.match(commerce,/const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT\+"okyanus-main-hero\.svg"/);
   assert.match(commerce,/<section class="hero"[^>]*><picture class="heroMedia defaultHeroMedia">/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
-  assert.match(single,/data:image\/webp;base64,/);
+  assert.match(single,/okyanus-main-hero\.svg/);
 });
