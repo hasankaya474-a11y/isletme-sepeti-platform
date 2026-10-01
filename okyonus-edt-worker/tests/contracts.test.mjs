@@ -726,3 +726,16 @@ test('single-worker builder embeds the approved hero and V22 storefront',()=>{
   assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
   assert.ok(build.includes('data:image/webp;base64,'));
 });
+
+
+test('final mobile cards stay two-column compact and dated export is canonical',()=>{
+  assert.match(commerce,/\.products,\.seafoodProducts\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important;gap:6px\}/);
+  assert.match(commerce,/\.product \.img\{aspect-ratio:4\/3;max-height:112px/);
+  assert.match(commerce,/@media\(max-width:420px\)[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important;gap:5px/);
+  const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt',import.meta.url),'utf8');
+  assert.equal(single,dated);
+  assert.match(single,/cat-deniz-ai\.webp/);
+  assert.match(single,/Orhan Güngör/);
+  assert.match(single,/Listeni Fotoğrafla Gönder/);
+});
