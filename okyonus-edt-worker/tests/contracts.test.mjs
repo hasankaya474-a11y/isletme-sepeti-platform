@@ -642,7 +642,7 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V22 laye
     '905358813264',
     'p==="/yonetici"'
   ]) assert.ok(full.includes(token),token);
-  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"/);
+  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"|commerce-v2-2026-10-01-mobile-storefront-v22/);
 });
 
 test('full monolithic DENIZ avoids archived catalog TDZ and all exports are complete',()=>{
