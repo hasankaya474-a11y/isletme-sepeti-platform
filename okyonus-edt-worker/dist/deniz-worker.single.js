@@ -7738,14 +7738,18 @@ function css(){return `
 @media(max-width:1024px){.commerceLayout{display:block!important}.sideNav{display:none!important}.products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important}.hero{min-height:300px}.slide{min-height:300px}}
 @media(max-width:760px){
  .ann{display:none}.head{position:sticky;top:0;z-index:150;background:#fff;border-bottom:1px solid var(--line)}.headtop,.nav{display:none!important}.mobileTop{display:grid;grid-template-columns:44px 44px minmax(0,1fr) 44px 44px;align-items:center;gap:4px;min-height:68px;padding:7px 10px;background:#fff}.mobileTopIcon{font-size:25px}.mobileBrand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wrap{padding:0 0 24px!important;max-width:none}.commerceLayout{display:block!important}.commerceMain{min-width:0;display:flex;flex-direction:column}.sideNav{display:none!important}
- .hero{order:1;border-radius:0;min-height:auto!important;aspect-ratio:16/9;overflow:visible;box-shadow:none;margin:0 0 48px;background:#052b4c}.hero .slide{min-height:0!important;height:100%;padding:0}.hero .slide:first-child .slidein{display:none}.defaultHeroMedia{position:absolute;inset:0;display:block}.defaultHeroMedia img{width:100%;height:100%;object-fit:contain;background:#052b4c}.hero .dots{bottom:-38px;left:0;right:0;justify-content:center;gap:9px}.hero .dots button{width:15px;height:15px;border-radius:50%;background:#dbe2e7;border:3px solid #fff;box-shadow:0 0 0 1px #d9e1e6}.hero .dots button.active{background:var(--b)}.heroArrow{display:none!important}
- .homeBest{order:2;margin:0!important;padding:48px 10px 0}.homeBest .sectionhead{display:block;text-align:center;margin-bottom:26px}.homeBest .sectionhead h2{font-size:34px;letter-spacing:.01em;text-transform:uppercase;margin:0;color:#4b4d49;font-weight:950}.homeBest .sectionhead h2:after{content:"";display:block;width:72%;max-width:340px;height:6px;border-radius:99px;background:var(--b);margin:18px auto 0}.homeBest .sectionhead p,.homeBest .sectionhead>a{display:none}.homeCategories{order:3;padding:0 10px}.homePromo{order:4;padding:0 10px}.homeSeafood{order:5;padding:0 10px}.homeNew{order:6;padding:0 10px}.homeManaged{order:7;padding:0 10px}.homeTools{order:8;padding:0 10px}.commerceMain>#commerce-seo-guide{order:9;padding:0 10px}.commerceMain>.contactStrip{order:10;margin-left:10px;margin-right:10px}
+ .hero{order:1;border-radius:0;min-height:auto!important;aspect-ratio:16/9;overflow:visible;box-shadow:none;margin:0 0 32px;background:#052b4c}.hero .slide{min-height:0!important;height:100%;padding:0}.hero .slide:first-child .slidein{display:none}.heroVisualSlide .heroMedia{position:absolute;inset:0;display:block}.heroVisualSlide .heroMedia img{width:100%;height:100%;object-fit:contain;background:#052b4c}.hero .dots{bottom:-29px;left:0;right:0;justify-content:center;gap:9px}.hero .dots button{width:15px;height:15px;border-radius:50%;background:#dbe2e7;border:3px solid #fff;box-shadow:0 0 0 1px #d9e1e6}.hero .dots button.active{background:var(--b)}.heroArrow{display:none!important}
+ .homeBest{order:2;margin:0!important;padding:10px 6px 0}.homeBest .sectionhead{display:block;text-align:center;margin-bottom:14px}.homeBest .sectionhead h2{font-size:clamp(21px,4vw,28px);letter-spacing:.01em;text-transform:uppercase;margin:0;color:#4b4d49;font-weight:950}.homeBest .sectionhead h2:after{content:"";display:block;width:72%;max-width:340px;height:4px;border-radius:99px;background:var(--b);margin:9px auto 0}.homeBest .sectionhead p,.homeBest .sectionhead>a{display:none}.homeCategories{order:3;padding:0 10px}.homePromo{order:4;padding:0 10px}.homeSeafood{order:5;padding:0 10px}.homeNew{order:6;padding:0 10px}.homeManaged{order:7;padding:0 10px}.homeTools{order:8;padding:0 10px}.commerceMain>#commerce-seo-guide{order:9;padding:0 10px}.commerceMain>.contactStrip{order:10;margin-left:10px;margin-right:10px}
  .products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px}.product{padding:5px;border-radius:11px}.product .img{aspect-ratio:4/3;max-height:112px;border-radius:8px}.fav{width:28px;height:28px;right:8px;top:8px;font-size:15px}.badges{min-height:18px;margin-top:5px;gap:3px}.badge{font-size:8px;padding:3px 5px}.product h3{font-size:11px;line-height:1.22;min-height:27px;margin:4px 0 2px}.meta{font-size:9px;line-height:1.2;min-height:22px}.desc{display:none}.price{grid-template-columns:1fr!important;min-height:42px;padding:5px;border-radius:8px}.priceLabel{font-size:8px}.price strong{font-size:13px}.stock{font-size:9px;min-height:20px;margin:4px 0}.qty{grid-template-columns:26px 1fr 26px;gap:3px;margin-top:3px}.qty button,.qty input{height:30px}.add{height:34px;font-size:10px;border-radius:8px;padding:0 3px}.cats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cat{min-height:78px;padding:4px}.cat img{height:48px}.cat b{font-size:9px}.section{margin-top:20px}.sectionhead h2{font-size:20px}.promogrid{grid-template-columns:1fr}.adminManagedNote{display:none}.mobile{display:none!important}.cookieBar{left:8px;right:8px;bottom:8px;grid-template-columns:1fr}.float{bottom:14px;right:12px}.seoGuide .sectionhead p{display:none}
 }
-@media(max-width:420px){.mobileTop{grid-template-columns:40px 40px minmax(0,1fr) 40px 40px;padding-left:6px;padding-right:6px}.mobileTopIcon{width:40px;height:40px}.mobileBrand{font-size:18px}.mobileBrand img{width:40px;height:40px}.homeBest .sectionhead h2{font-size:28px}.products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px}.product{padding:4px}.product .img{max-height:96px}.product h3{font-size:10.5px;min-height:25px}.meta{font-size:8.5px;min-height:20px}.price{min-height:39px;padding:4px}.price strong{font-size:12px}.qty{grid-template-columns:25px 1fr 25px}.qty button,.qty input{height:29px}.add{height:32px;font-size:9.5px}.cats{grid-template-columns:repeat(4,minmax(0,1fr))}.cat{min-height:68px}.cat img{height:40px}}
+@media(max-width:420px){.mobileTop{grid-template-columns:40px 40px minmax(0,1fr) 40px 40px;padding-left:6px;padding-right:6px}.mobileTopIcon{width:40px;height:40px}.mobileBrand{font-size:18px}.mobileBrand img{width:40px;height:40px}.homeBest .sectionhead h2{font-size:22px}.products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px}.product{padding:4px}.product .img{max-height:96px}.product h3{font-size:10.5px;min-height:25px}.meta{font-size:8.5px;min-height:20px}.price{min-height:39px;padding:4px}.price strong{font-size:12px}.qty{grid-template-columns:25px 1fr 25px}.qty button,.qty input{height:29px}.add{height:32px;font-size:9.5px}.cats{grid-template-columns:repeat(4,minmax(0,1fr))}.cat{min-height:68px}.cat img{height:40px}}
 /* V24 FINAL RESPONSIVE CASCADE LOCK: keep 3 product cards across tablet + mobile; no 1/2-column fallback allowed */
 @media(max-width:1024px){
  html,body{width:100%;max-width:100%;overflow-x:hidden}
+ .heroVisualSlide .heroMedia img{object-fit:contain;background:#052b4c}
+ .float{position:static;flex-direction:row;justify-content:flex-end;margin:12px 10px;padding-bottom:env(safe-area-inset-bottom);gap:8px}
+ .float a{width:44px;height:44px;flex-shrink:0}
+ .product,.product .price,.product .meta{min-width:0;overflow-wrap:anywhere}
  .wrap,.commerceLayout,.commerceMain,.section,.products,.seafoodProducts{min-width:0;max-width:100%}
  .products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
@@ -7753,21 +7757,21 @@ function css(){return `
  .products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;padding-left:4px;padding-right:4px}
  .product{min-width:0!important;padding:4px!important;border-radius:9px!important;overflow:hidden}
  .product .img{width:100%!important;aspect-ratio:4/3!important;max-height:92px!important;border-radius:6px!important}
- .product h3{font-size:10px!important;line-height:1.15!important;min-height:23px!important;margin:4px 0 2px!important;overflow-wrap:anywhere}
- .product .meta{font-size:8px!important;line-height:1.15!important;min-height:18px!important}
+ .product h3{font-size:11px!important;line-height:1.25!important;min-height:28px!important;margin:4px 0 2px!important;overflow-wrap:anywhere}
+ .product .meta{font-size:10px!important;line-height:1.2!important;min-height:24px!important}
  .product .desc,.product .stock{display:none!important}
  .product .price{min-height:35px!important;padding:3px 4px!important}
- .product .price strong{font-size:11px!important;line-height:1.05!important}
- .product .qty{grid-template-columns:24px minmax(0,1fr) 24px!important;gap:2px!important}
- .product .qty button,.product .qty input{height:28px!important;min-width:0!important;font-size:10px!important;padding:0!important}
- .product .add{height:31px!important;font-size:9px!important;padding:0 2px!important;white-space:normal!important;line-height:1.05!important}
+ .product .price strong{font-size:12px!important;line-height:1.2!important}
+ .product .qty{grid-template-columns:28px minmax(0,1fr) 28px!important;gap:2px!important}
+ .product .qty button,.product .qty input{height:40px!important;min-width:0!important;font-size:12px!important;padding:0!important}
+ .product .add{height:44px!important;font-size:10px!important;padding:0 2px!important;white-space:normal!important;line-height:1.05!important}
 }
 @media(max-width:360px){
  .products,.seafoodProducts{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important}
  .product{padding:3px!important}
  .product .img{max-height:82px!important}
- .product h3{font-size:9.5px!important}
- .product .price strong{font-size:10.5px!important}
+ .product h3{font-size:10.5px!important}
+ .product .price strong{font-size:11px!important}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 `}

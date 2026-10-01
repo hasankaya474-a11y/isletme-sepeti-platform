@@ -604,7 +604,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','defaultHeroMedia','mobileTop']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','heroVisualSlide','mobileTop']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
@@ -635,7 +635,7 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V24 laye
     'CESNI_SOURCE_MANIFEST',
     'memberSession',
     'commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col',
-    'defaultHeroMedia',
+    'heroVisualSlide',
     'oky_product_commerce_v1',
     'oky_campaign_rules_v1',
     'newsletterApi',
@@ -713,7 +713,7 @@ test('V24 mobile storefront follows controlled compact flow',()=>{
     'class="mobileTop"',
     'class="mobileDrawer"',
     'class="mobileSearchPanel"',
-    'defaultHeroMedia',
+    'heroVisualSlide',
     'homeBest',
     'homeCategories',
     'grid-template-columns:repeat(3,minmax(0,1fr))!important',
