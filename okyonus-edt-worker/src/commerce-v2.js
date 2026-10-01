@@ -14,7 +14,8 @@ function html(body,status=200){return new Response(body,{status,headers:{"conten
 
 const STOREFRONT_ASSET_ROOT="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/";
 const CATEGORY_ASSET_ROOT="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/";
-const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT+"okyanus-main-hero.svg";\nconst MOBILE_HERO_INLINE=DEFAULT_HERO_URL; // __OKYANUS_MOBILE_HERO_INLINE__
+const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT+"okyanus-main-hero.svg";
+const MOBILE_HERO_INLINE=DEFAULT_HERO_URL; // __OKYANUS_MOBILE_HERO_INLINE__
 const CATEGORY_VISUALS=Object.freeze({
  "deniz-urunleri":CATEGORY_ASSET_ROOT+"cat-deniz-ai.webp",
  "donuk-urunler":CATEGORY_ASSET_ROOT+"cat-donuk-ai.webp",

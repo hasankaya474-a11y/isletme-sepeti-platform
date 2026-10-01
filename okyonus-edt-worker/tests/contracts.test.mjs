@@ -742,7 +742,7 @@ test('final mobile cards stay two-column compact and dated export is canonical',
 
 
 test('main hero asset is canonical on source and remains inline in final build',()=>{
-  assert.match(commerce,/const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT\+"okyanus-main-hero\\.svg"/);
+  assert.match(commerce,/const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT\+"okyanus-main-hero\.svg"/);
   assert.match(commerce,/<section class="hero"[^>]*><picture class="heroMedia defaultHeroMedia">/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   assert.match(single,/data:image\/webp;base64,/);
