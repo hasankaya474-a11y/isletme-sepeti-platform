@@ -1,3 +1,4 @@
+/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R27 */
 /* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER
 Generated from canonical release sources. No relative imports.
 */
@@ -466,10 +467,13 @@ async function uploadImageToEditor(box){
   input.value=j.url||'';input.dispatchEvent(new Event('input',{bubbles:true}));
  }finally{if(button){button.disabled=false;button.textContent='G\u00f6rsel Y\u00fckle'}}
 }
+const imageEditorBindings=new WeakSet();
 function bindImageEditors(root=document){
  root.querySelectorAll('[data-image-editor]').forEach(box=>{
   const input=box.querySelector('[data-image-url]')||box.querySelector('input'),img=box.querySelector('[data-image-preview]'),clear=box.querySelector('[data-clear-image]'),upload=box.querySelector('[data-upload-image]');
   const paint=()=>{const v=(input?.value||'').trim();if(img){img.src=v;img.hidden=!v}};
+  if(imageEditorBindings.has(box)){paint();return}
+  imageEditorBindings.add(box);
   input?.addEventListener('input',paint);
   clear?.addEventListener('click',()=>{input.value='';const file=box.querySelector('[data-image-file]');if(file)file.value='';paint()});
   upload?.addEventListener('click',async()=>{try{await uploadImageToEditor(box)}catch(e){alert('G\u00f6rsel y\u00fckleme hatas\u0131: '+(e.message||e))}});
@@ -533,8 +537,11 @@ async function load(){
      b.active=!!f.elements.active?.checked;if(f.elements.coldChain)b.coldChain=!!f.elements.coldChain.checked;if(f.elements.combinable)b.combinable=!!f.elements.combinable.checked;
      for(const k of ['sortOrder','priority','minOrder','fee','freeThreshold','discountValue','minCart']) if(k in b)b[k]=Number(b[k]||0);
      const target=current+(editingId?'/'+encodeURIComponent(editingId):'');
-     await api(target,{method:'POST',body:JSON.stringify(b)});
-     editingId='';await load();await summary();
+     let status=f.querySelector('[data-save-status]');if(!status){status=document.createElement('p');status.dataset.saveStatus='';status.setAttribute('role','status');f.append(status)}
+     const button=f.querySelector('[type="submit"]');if(button)button.disabled=true;status.textContent='Kaydediliyor\u2026';
+     try{await api(target,{method:'POST',body:JSON.stringify(b)});editingId='';await load();await summary()}
+     catch(error){status.textContent='Kay\u0131t tamamlanamad\u0131: '+(error.message||error)+'. Bilgileriniz ekranda korundu.'}
+     finally{if(button)button.disabled=false}
    };
  }
 }

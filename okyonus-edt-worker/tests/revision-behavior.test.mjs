@@ -266,3 +266,62 @@ test('opening editor text-only save preserves default image and explicit clear p
  assert.equal(Object.prototype.hasOwnProperty.call(await submit(false),'openingCampaignImage'),false);
  assert.equal((await submit(true)).openingCampaignImage,'');
 });
+
+test('reopening admin image editors binds one upload and refreshes the current preview',async()=>{
+ const html=await commerceAdminPage({}).text(),script=html.match(/<script>([\s\S]*?)<\/script>/)[1],listeners=new Map(),input={value:'https://example.com/one.webp',addEventListener(k,v){listeners.set('input',v)}},image={},file={},clear={},upload={};
+ clear.addEventListener=(k,v)=>listeners.set('clear',v);let uploads=0;const uploadHandlers=[];upload.addEventListener=(k,v)=>uploadHandlers.push(v);
+ const box={querySelector(selector){return {'[data-image-url]':input,'[data-image-preview]':image,'[data-image-file]':file,'[data-clear-image]':clear,'[data-upload-image]':upload}[selector]||null}},root={querySelectorAll(){return[box]}};
+ const code=script.slice(script.indexOf('const imageEditorBindings'),script.indexOf('const dbMap'));
+ const bind=new Function('uploadImageToEditor','alert',code+';return bindImageEditors;')(async()=>uploads++,()=>{});
+ bind(root);input.value='https://example.com/two.webp';bind(root);assert.equal(image.src,input.value);assert.equal(uploadHandlers.length,1);await uploadHandlers[0]();assert.equal(uploads,1);listeners.get('clear')();assert.equal(input.value,'');assert.equal(image.hidden,true);
+});
+
+test('guest photo quote opens login separately while preserving selected photo and form',async()=>{
+ const response=await worker.fetch(new Request('https://www.okyonusedt.com/fotografla-teklif'),{},{}),html=await response.text();assert.equal(response.status,200);
+ const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes("getElementById('photoForm')"));assert.ok(script);
+ const selected={name:'list.jpeg',size:100},photo={files:[selected],value:'chosen'},button={},error={textContent:'',children:[],append(x){this.children.push(x)}},result={style:{}},form={reset(){throw Error('guest form reset')}};
+ const document={getElementById:id=>({photoForm:form,photo,submit:button,error,result}[id]),createElement:()=>({})},requests=[];
+ const fetch=async path=>{requests.push(path);return {ok:false,status:401}};
+ new Function('document','fetch',script)(document,fetch);await form.onsubmit({preventDefault(){}});
+ assert.deepEqual(requests,['/api/member/me']);assert.equal(photo.files[0],selected);assert.equal(photo.value,'chosen');assert.equal(button.disabled,false);assert.equal(error.children[0].target,'_blank');assert.equal(new URL(error.children[0].href,'https://www.okyonusedt.com').searchParams.get('next'),'/fotografla-teklif');
+});
+
+test('every generic commerce management tab performs SQLite create edit list and delete',async()=>{
+ const db=sqliteD1(),env={DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const call=(path,method='GET',body)=>commerceAdminApi(new Request('https://admin.example/api/commerce-admin/'+path,{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,auth,{});
+ try{
+  const bodies={categories:{name:'Test category',slug:'test-category',imageUrl:'https://example.com/category.webp'},banners:{title:'Test banner',desktopImage:'https://example.com/desktop.webp',mobileImage:'https://example.com/mobile.webp',ctaUrl:'/urunler'},sections:{title:'Test section',kind:'PRODUCT_GRID',source:'Deniz Ürünleri',payloadJson:'{"limit":3}'},brands:{name:'Test brand',slug:'test-brand',logoUrl:'https://example.com/logo.webp'},campaigns:{title:'Test campaign',imageUrl:'https://example.com/campaign.webp'},delivery:{region:'İstanbul',district:'Kadıköy',fee:25,coldChain:true},media:{name:'Test image',url:'https://example.com/image.webp',kind:'IMAGE',altText:'Test'},seo:{path:'/edt-audit-test',label:'EDT audit test',groupName:'EDT'},help:{title:'Test help',slug:'test-help',body:'Test help body'}};
+  let campaignId;
+  for(const [resource,body] of Object.entries(bodies)){
+   const response=await call(resource,'POST',{...body,active:true});assert.equal(response.status,201,resource+' create: '+await response.clone().text());const {id}=await response.json();if(resource==='campaigns')campaignId=id;
+   assert.ok((await(await call(resource)).json()).data.some(x=>x.id===id),resource+' list');
+   assert.equal((await call(resource+'/'+id,'POST',{...body,active:false})).status,200,resource+' edit');assert.equal((await(await call(resource)).json()).data.find(x=>x.id===id).active,0,resource+' toggle');
+   if(resource!=='campaigns'){assert.equal((await call(resource+'/'+id,'DELETE')).status,200);assert.ok(!(await(await call(resource)).json()).data.some(x=>x.id===id),resource+' delete')}
+  }
+  const rule={campaignId,targetType:'ALL',discountType:'PERCENT',discountValue:10,active:true};let response=await call('campaign-rules','POST',rule);assert.equal(response.status,201,await response.clone().text());const {id}=await response.json();assert.ok((await(await call('campaign-rules')).json()).data.some(x=>x.id===id));assert.equal((await call('campaign-rules/'+id,'POST',{...rule,active:false})).status,200);assert.equal((await call('campaign-rules/'+id,'DELETE')).status,200);assert.equal((await call('campaigns/'+campaignId,'DELETE')).status,200);
+ }finally{db.sqlite.close()}
+});
+
+test('executed catalog and informational renderers emit real HTML attributes',async()=>{
+  const {runInNewContext}=await import('node:vm');
+  const product={id:'test',source_product_id:'test',name:'Test Ürün',category:'Deniz Ürünleri',unit:'Kg',price:12,image:'https://example.com/test.webp'};
+  const payload={products:[product],brands:[{name:'Test Marka'}],campaigns:[{title:'Test Kampanya',cta_url:'/urunler'}],delivery:[{district:'Kadıköy',min_order:10}],settings:{},sections:[],seo:[]};
+  for(const [path,id,selector] of [['/markalar','brands','brands.innerHTML'],['/kampanyalar','campaignList','campaignList.innerHTML'],['/teslimat','deliveryList','deliveryList.innerHTML'],['/urunler','catalogGrid',"const K='oky-commerce-cart-v2'"],['/urun/test-urun','pd','const target=']]){
+    const response=await commerceRoute(new Request('https://www.okyonusedt.com'+path),{});
+    const html=await response.text(),scripts=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]);
+    const script=scripts.find(s=>s.includes(selector)&&s.includes(id));assert.ok(script,path+' page script found');
+    const nodes=new Map();
+    const node=key=>{if(!nodes.has(key))nodes.set(key,{innerHTML:'',textContent:'',value:'',style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelectorAll(){return[]},querySelector(){return node('child:'+key)},setAttribute(){}});return nodes.get(key)};
+    const doc={getElementById:node,querySelectorAll(){return[]},querySelector:node,addEventListener(){},dispatchEvent(){}};
+    const context={document:doc,fetch:async()=>({json:async()=>payload}),localStorage:{getItem:()=>null,setItem(){}},location:{search:''},URLSearchParams,Event,Intl,setTimeout(){},clearTimeout(){},console};
+    for(const key of ['brands','campaignList','deliveryList','catalogGrid','catalogCount','cq','cc','pd','rel'])context[key]=node(key);
+    runInNewContext(script,context);
+    for(let i=0;i<10;i++)await Promise.resolve();
+    const markup=node(id).innerHTML;
+    assert.ok(markup.includes('Test')||markup.includes('Kadıköy'),path+' renderer completed with fixture data');
+    assert.doesNotMatch(markup,/\\["']/ ,path+' HTML attributes contain literal backslashes');
+    assert.match(markup,/(?:class|href|src)="[^"\\]*"/,path+' renderer emits quoted attributes');
+    if(path==='/markalar')assert.match(markup,/href="\/urunler\?q=Test%20Marka"/);
+    if(path==='/kampanyalar')assert.match(markup,/href="\/urunler"/);
+  }
+});
