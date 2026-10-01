@@ -720,11 +720,11 @@ test('V22 mobile storefront follows controlled compact flow',()=>{
   ]) assert.ok(commerce.includes(token),token);
 });
 
-test('single-worker builder embeds the approved hero and V22 storefront',()=>{
+test('single-worker builder keeps the approved four-slide hero and V22 storefront',()=>{
   const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
-  assert.ok(build.includes('hero-inline/hero-'));
   assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
-  assert.ok(build.includes('okyanus-main-hero.svg'));
+  assert.ok(build.includes('hero-01.webp'));
+  assert.ok(build.includes('hero-04.webp'));
 });
 
 
@@ -741,9 +741,12 @@ test('final mobile cards stay two-column compact and dated export is canonical',
 });
 
 
-test('main hero asset is canonical on source and remains inline in final build',()=>{
-  assert.match(commerce,/const DEFAULT_HERO_URL=STOREFRONT_ASSET_ROOT\+"okyanus-main-hero\.svg"/);
-  assert.match(commerce,/<section class="hero"[^>]*><picture class="heroMedia defaultHeroMedia">/);
+test('approved homepage hero is four external visuals with no duplicate text overlay',()=>{
+  for(const n of ['01','02','03','04']) assert.match(commerce,new RegExp('hero-'+n+'\\\\.webp'));
+  assert.match(commerce,/HERO_VISUALS\.map/);
+  assert.match(commerce,/heroVisualSlide/);
+  assert.doesNotMatch(commerce,/const hero='[^']*Profesyonel mutfağın alışverişi burada başlar/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
-  assert.match(single,/okyanus-main-hero\.svg/);
+  assert.match(single,/hero-01\.webp/);
+  assert.match(single,/hero-04\.webp/);
 });
