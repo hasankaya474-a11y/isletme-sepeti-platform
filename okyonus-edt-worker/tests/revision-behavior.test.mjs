@@ -169,3 +169,73 @@ test('authenticated full Worker saves quotes for newly managed product and rejec
   assert.equal((await submit([p.id])).status,400);assert.equal(db.sqlite.prepare('SELECT COUNT(*) n FROM inquiries').get().n,1);
  } finally {db.sqlite.close();}
 });
+
+ test('guest cart login destination returns to the cart after member entry',async()=>{
+  const response=await commerceRoute(new Request('https://www.okyonusedt.com/sepet'),{}),html=await response.text();
+  const match=html.match(/qf\.onsubmit=async e=>\{([\s\S]*?)const a=read\(\);/);assert.ok(match);
+  const location={href:''};
+  await new Function('window','fetch','location','encodeURIComponent','return (async e=>{'+match[1]+'})({preventDefault(){}})')({},async()=>({json:async()=>({ok:false})}),location,encodeURIComponent);
+  const target=new URL(location.href,'https://www.okyonusedt.com');assert.equal(target.pathname,'/uye');assert.equal(target.searchParams.get('next'),'/sepet');
+ });
+
+test('personal panel retains available history and adopts only an unowned guest cart',async()=>{
+ const response=await customerRequest(customerDB(),'/benim-okyanusum'),html=await response.text();
+ const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes("const history=document.getElementById('customerHistory')"));assert.ok(script);
+ const node=()=>({children:[],textContent:'',append(x){this.children.push(x)},set onclick(value){this.handler=value}}),elements=new Map();
+ const document={getElementById(id){if(!elements.has(id))elements.set(id,node());return elements.get(id)},createElement:node,addEventListener(){}};
+ const entries=new Map([['oky-commerce-cart-v2',JSON.stringify([{name:'Guest product',qty:2,unit:'Kg'}])]]),localStorage={getItem:k=>entries.get(k)||null,setItem:(k,v)=>entries.set(k,v)};
+ const fetch=async url=>url==='/api/commerce/account'?{ok:false,json:async()=>({ok:false})}:{ok:true,json:async()=>({ok:true,quotes:[{quoteNo:'Q-123',created_at:'2026-10-01',status:'Talep alındı'}],visits:[]})};
+ new Function('document','localStorage','fetch',script)(document,localStorage,fetch);await new Promise(resolve=>setImmediate(resolve));
+ assert.ok(elements.get('customerHistory').children.some(x=>x.children.some(y=>y.textContent.includes('Q-123'))));
+ assert.ok(elements.get('customerCart').children.some(x=>x.children.some(y=>y.textContent.includes('Guest product'))));
+ assert.ok(entries.get('oky-commerce-cart-owner-v1'));
+});
+
+test('opening campaign works immediately, closes safely and stays dismissed in-session; installation lifecycle works',async()=>{
+ const response=await commerceRoute(new Request('https://www.okyonusedt.com/'),{}),html=await response.text();
+ const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes("const popup=document.getElementById('campaignPopup')"));assert.ok(script);
+ const popupMarkup=html.match(/<dialog id="campaignPopup"[\s\S]*?<\/dialog>/)[0];
+ const image=popupMarkup.match(/<img src="(data:image\/[^;]+;base64,[^"]+)"/);assert.ok(image,'opening image is embedded by default');assert.ok(Buffer.from(image[1].split(',')[1],'base64').length>10000);
+ const storage=new Map(),sessionStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};
+ function run(path){
+  const listeners=new Map(),events=new Map(),install={hidden:false},close={},popup={dataset:{enabled:popupMarkup.match(/data-enabled="([^"]*)"/)[1],campaignKey:popupMarkup.match(/data-campaign-key="([^"]*)"/)[1]},open:false,showModal(){this.open=true},close(){this.open=false;listeners.get('close')?.()},addEventListener(k,v){listeners.set(k,v)}};
+  const document={getElementById(id){return {commerceInstall:install,campaignPopup:popup,campaignClose:close}[id]||null},addEventListener(){},dispatchEvent(){},querySelectorAll(){return[]}};
+  const window={addEventListener(k,v){events.set(k,v)}},requests=[];
+  const fetch=async path=>{requests.push(path);return{ok:false,json:async()=>({ok:false,campaigns:[]})}};
+  new Function('document','window','navigator','matchMedia','localStorage','sessionStorage','location','fetch','alert',script)(document,window,{userAgent:'Test'},()=>({matches:false}),{getItem(){return null},setItem(){}},sessionStorage,{pathname:path},fetch,()=>{});
+  return {popup,close,install,events,listeners,requests};
+ }
+ const first=run('/');assert.equal(first.popup.open,true,'homepage popup opens synchronously without managed campaign fetch');assert.deepEqual(first.requests,['/api/member/me']);
+ first.close.onclick();assert.equal(first.popup.open,false);assert.equal(run('/').popup.open,false,'same-session dismissal persists');
+ storage.clear();const backdrop=run('/');backdrop.listeners.get('click')({target:{}});assert.equal(backdrop.popup.open,true,'content click preserves popup');backdrop.listeners.get('click')({target:backdrop.popup});assert.equal(backdrop.popup.open,false);
+ storage.clear();assert.equal(run('/urunler').popup.open,false,'catalog route never opens homepage campaign');
+ let prevented=false,prompted=false;first.events.get('beforeinstallprompt')({preventDefault(){prevented=true},async prompt(){prompted=true},userChoice:Promise.resolve({outcome:'accepted'})});assert.equal(prevented,true);assert.equal(first.install.hidden,false);await first.install.onclick();assert.equal(prompted,true);first.events.get('appinstalled')();assert.equal(first.install.hidden,true);
+});
+
+test('opening advert settings persist partial edits and explicit image removal without reseeding',async()=>{
+ const db=sqliteD1(),env={DB:db,ADMIN_DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const call=(method,body)=>commerceAdminApi(new Request('https://admin.example/api/commerce/settings',{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,auth,{});
+ try{
+  const initial={siteTitle:'Keep site title',openingCampaignEnabled:'false',openingCampaignImage:'https://example.com/poster.webp',openingCampaignTitle:'Yeni reklam',openingCampaignDescription:'Açılış açıklaması',openingCampaignCtaText:'Ürünlere git',openingCampaignCtaUrl:'/urunler',openingCampaignPhotoCtaText:'Fotoğraf gönder',openingCampaignPhotoCtaUrl:'/fotografla-teklif'};
+  assert.equal((await call('POST',initial)).status,200);let result=await (await call('GET')).json();for(const [k,v] of Object.entries(initial))assert.equal(result.data[k],v,k);
+  assert.equal((await call('POST',{openingCampaignEnabled:'true',openingCampaignImage:''})).status,200);
+  result=await (await call('GET')).json();assert.equal(result.data.openingCampaignImage,'');assert.equal(result.data.openingCampaignEnabled,'true');assert.equal(result.data.siteTitle,'Keep site title');assert.equal(result.data.openingCampaignTitle,'Yeni reklam');
+  const pageHtml=await (await commerceAdminPage()).text();parseScripts(pageHtml,'opening admin');assert.equal(pageHtml.match(/<button data-r="([^"]+)"/)[1],'opening');assert.ok(pageHtml.includes("let current='opening'"));
+  const uiSource=[...pageHtml.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes('function openingUI'));
+  const ui=new Function('esc',uiSource.slice(uiSource.indexOf('function openingUI'),uiSource.indexOf('function bindOpening'))+';return openingUI;')(x=>String(x??''));
+  assert.ok(ui({}).includes('opening-post-2026-10-01.jpeg'),'unset image previews default');assert.ok(!ui({openingCampaignImage:''}).includes('opening-post-2026-10-01.jpeg'),'removed image is not reseeded in editor');
+ }finally{db.sqlite.close()}
+});
+
+test('opening ad admin changes render on the homepage and removal never restores the supplied poster',async()=>{
+ const db=sqliteD1(),env={DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const save=async body=>commerceAdminApi(new Request('https://admin.example/api/commerce/settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),env,auth,{});
+ const opening=async()=>{const r=await commerceRoute(new Request('https://www.okyonusedt.com/'),env);assert.equal(r.status,200);const html=await r.text();return html.match(/<dialog id="campaignPopup"[\s\S]*?<\/dialog>/)[0]};
+ try{
+  assert.equal((await save({openingCampaignEnabled:'true',openingCampaignImage:'https://example.com/changed.webp',openingCampaignTitle:'Yeni Açılış',openingCampaignDescription:'Yeni açıklama',openingCampaignCtaText:'Ürünler',openingCampaignCtaUrl:'/urunler?category=deniz-urunleri',openingCampaignPhotoCtaText:'Fotoğrafla Gönder',openingCampaignPhotoCtaUrl:'/fotografla-teklif'})).status,200);
+  const edited=await opening();assert.match(edited,/data-enabled="true"/);assert.match(edited,/<h2>Yeni Açılış<\/h2>/);assert.match(edited,/Yeni açıklama/);assert.match(edited,/src="https:\/\/example.com\/changed.webp"/);assert.match(edited,/href="\/urunler\?category=deniz-urunleri"/);assert.ok(!edited.includes('data:image/jpeg;base64,'));
+  await save({openingCampaignImage:''});const removed=await opening();assert.ok(!removed.includes('<img'),'removed image returned');assert.ok(!removed.includes('data:image'));assert.match(removed,/Yeni Açılış/);assert.notEqual(removed.match(/data-campaign-key="([^"]*)"/)[1],edited.match(/data-campaign-key="([^"]*)"/)[1]);
+  await save({openingCampaignEnabled:'false'});assert.match(await opening(),/data-enabled="false"/);
+  await save({openingCampaignEnabled:'true',openingCampaignImage:'javascript:alert(1)',openingCampaignCtaUrl:'javascript:alert(1)',openingCampaignTitle:'<img onerror=alert(1)>'});const safe=await opening();assert.ok(!safe.includes('javascript:'));assert.ok(!safe.includes('<img'));assert.match(safe,/href="\/urunler"/);assert.match(safe,/&lt;img onerror=alert\(1\)&gt;/);
+ } finally {db.sqlite.close()}
+});

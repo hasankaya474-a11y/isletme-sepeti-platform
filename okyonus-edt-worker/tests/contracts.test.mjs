@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
+// Match the exact escaped delivery token; do not unescape arbitrary source.
+const asciiToken=s=>s.replace(/[^\x00-\x7f]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
+
 const deniz=fs.readFileSync(new URL('../src/deniz-worker.js',import.meta.url),'utf8');
 const denizBase=fs.readFileSync(new URL('../baseline/deniz-worker.js',import.meta.url),'utf8');
 const admin=fs.readFileSync(new URL('../src/zaman-admin-worker.js',import.meta.url),'utf8');
@@ -39,7 +42,7 @@ test('critical ZAMAN message/photo engines remain byte-preserved',()=>{
 });
 
 test('current commerce public face is wired',()=>{
-  assert.match(commerce,/function home\(\)/);
+  assert.match(commerce,/function home\(opening=\{\}\)/);
   assert.match(commerce,/Ürün Seç • Teklif Al/);
   assert.match(commerce,/Listeni Fotoğrafla Gönder/);
   assert.match(commerce,/secondWhatsapp:"905358813264"/);
@@ -604,8 +607,8 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','heroVisualSlide','mobileTop']) assert.match(denizSingle,new RegExp(token));
-  for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','heroVisualSlide','mobileTop']) assert.ok(denizSingle.includes(asciiToken(token)),token);
+  for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.ok(zamanSingle.includes(asciiToken(token)),token);
 });
 
 
@@ -643,7 +646,7 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V24 laye
     'Orhan Güngör',
     '905358813264',
     'p==="/yonetici"'
-  ]) assert.ok(full.includes(token),token);
+  ]) assert.ok(full.includes(asciiToken(token)),token);
   assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"|commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
 });
 
@@ -741,8 +744,8 @@ test('final mobile and tablet cards stay three-column compact and dated export i
   const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt',import.meta.url),'utf8');
   assert.equal(single,dated);
   assert.match(single,/cat-deniz-ai\.webp/);
-  assert.match(single,/Orhan Güngör/);
-  assert.match(single,/Listeni Fotoğrafla Gönder/);
+  assert.ok(single.includes(asciiToken("Orhan Güngör")));
+  assert.ok(single.includes(asciiToken("Listeni Fotoğrafla Gönder")));
 });
 
 
@@ -754,4 +757,35 @@ test('approved homepage hero is four external visuals with no duplicate text ove
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   assert.match(single,/hero-01\.webp/);
   assert.match(single,/hero-04\.webp/);
+});
+
+
+test('ASCII delivery preserves exact public and owner-panel HTML and raw browser scripts',async()=>{
+  const source=(await import('../src/deniz-worker.js')).default;
+  const delivered=(await import('../dist/deniz-worker.single.js')).default;
+  for(const file of ['../dist/deniz-worker.single.js','../dist/zaman-admin-worker.single.js'])
+    assert.doesNotMatch(fs.readFileSync(new URL(file,import.meta.url),'utf8'),/[^\x00-\x7f]/,file+' must survive text-editor encoding');
+  for(const path of ['/','/urunler','/sepet','/iletisim','/uye','/kvkk','/cerez-politikasi','/digital-menu-app.js']){
+    const request=()=>new Request('https://www.okyonusedt.com'+path);
+    const a=await source.fetch(request(),{},{}),b=await delivered.fetch(request(),{},{});
+    assert.equal(b.status,a.status,path);
+    assert.equal(b.headers.get('content-type'),a.headers.get('content-type'),path);
+    assert.equal(await b.text(),await a.text(),path+' delivery changed rendered text/scripts');
+  }
+  // Both String.raw functions must retain the exact generated JavaScript, including literal backslashes.
+  const bundle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  for(const name of ['digitalMenuAppJS','customerCommerceRuntime']){
+    const evaluate=text=>new Function(extractFunction(text,name)+';return '+name+'()')();
+    assert.equal(evaluate(bundle),evaluate(deniz),name);
+  }
+  const owner={id:'owner',session_id:'session',role:'owner',status:'active',display_name:'Türkçe Yönetici',expires_at:'2099-01-01T00:00:00Z'};
+  const env={SESSION_PEPPER:'test-only',DB:{prepare(){return {bind(){return this},first:async()=>owner,run:async()=>({success:true})}}}};
+  const zamanSource=(await import('../src/zaman-admin-worker.js')).default;
+  const zamanDelivered=(await import('../dist/zaman-admin-worker.single.js')).default;
+  for(const path of ['/login','/commerce']){
+    const request=()=>new Request('https://admin.example'+path,{headers:{cookie:'__Host-oky_admin=test-only'}});
+    const a=await zamanSource.fetch(request(),env),b=await zamanDelivered.fetch(request(),env);
+    assert.equal(a.status,200,path);assert.equal(b.status,a.status,path);
+    assert.equal(await b.text(),await a.text(),path+' delivery changed admin text/scripts');
+  }
 });

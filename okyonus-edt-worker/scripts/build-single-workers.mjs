@@ -4,7 +4,27 @@ import fs from 'node:fs';
 // V24 regression tests synchronized: final outputs are rebuilt from the three-column mobile/tablet source.
 
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
+// Delivery bundles are ASCII-only: clipboard/text-editor encoding cannot corrupt Turkish text.
+// Preserve String.raw runtime scripts byte-for-byte using cooked Unicode interpolations.
+function asciiBundle(source){
+  const escape=c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0');
+  let result='',cursor=0;
+  for(;;){
+    const tag=source.indexOf('String.raw`',cursor);
+    if(tag<0){result+=source.slice(cursor).replace(/[^\x00-\x7f]/g,escape);break}
+    const start=tag+'String.raw`'.length;
+    result+=source.slice(cursor,start).replace(/[^\x00-\x7f]/g,escape);
+    let end=start;
+    while(end<source.length){if(source[end]==='\\'){end+=2;continue}if(source[end]==='`')break;end++}
+    if(end>=source.length)throw new Error('ASCII_RAW_TEMPLATE_UNTERMINATED');
+    const raw=source.slice(start,end);
+    if(raw.includes('${'))throw new Error('ASCII_RAW_TEMPLATE_INTERPOLATION_REQUIRES_REVIEW');
+    result+=raw.replace(/[^\x00-\x7f]/g,c=>'${"'+escape(c)+'"}')+'`';
+    cursor=end+1;
+  }
+  return result;
+}
+const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s,'utf8');
 const START='/* ===== OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
 const END='/* ===== /OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
 
@@ -90,8 +110,8 @@ for(const p of [
   'exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',
   'exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',
   'exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt'
-]) write(p,deniz);
+]) write(p,asciiBundle(deniz));
 
-write('dist/zaman-admin-worker.single.js',zaman);
-write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt',zaman);
+write('dist/zaman-admin-worker.single.js',asciiBundle(zaman));
+write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt',asciiBundle(zaman));
 console.log('CANONICAL DENIZ SOURCE + SINGLE WORKER + FINAL TXT ALIASES SYNCHRONIZED');
