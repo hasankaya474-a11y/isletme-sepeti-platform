@@ -735,6 +735,8 @@ test('final mobile and tablet cards stay three-column compact and dated export i
   assert.match(commerce,/@media\(max-width:760px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
   assert.match(commerce,/\.product \.img\{width:100%!important;aspect-ratio:4\/3!important;max-height:92px!important/);
   assert.match(commerce,/@media\(max-width:360px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+  assert.doesNotMatch(commerce,/\.products(?:,.seafoodProducts)?\{grid-template-columns:repeat\(2/);
+  assert.doesNotMatch(commerce,/\.products(?:,.seafoodProducts)?\{grid-template-columns:1fr/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt',import.meta.url),'utf8');
   assert.equal(single,dated);
