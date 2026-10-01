@@ -110,8 +110,8 @@ for(const p of [
   'exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',
   'exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',
   'exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt'
-]) write(p,'/* OKYANUS DENIZ RELEASE 2026-10-01 CROSSCHECKED R27 */\n'+asciiBundle(deniz));
+]) write(p,'/* OKYANUS DENIZ RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(deniz));
 
-write('dist/zaman-admin-worker.single.js','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R27 */\n'+asciiBundle(zaman));
-write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R27 */\n'+asciiBundle(zaman));
+write('dist/zaman-admin-worker.single.js','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(zaman));
+write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(zaman));
 console.log('CANONICAL DENIZ SOURCE + SINGLE WORKER + FINAL TXT ALIASES SYNCHRONIZED');

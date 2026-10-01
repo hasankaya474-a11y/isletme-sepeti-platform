@@ -325,3 +325,41 @@ test('executed catalog and informational renderers emit real HTML attributes',as
     if(path==='/kampanyalar')assert.match(markup,/href="\/urunler"/);
   }
 });
+
+test('empty managed catalog permits full legacy fallback while inactive managed catalog stays authoritative',async()=>{
+ const db=sqliteD1(),env={DB:db},auth={user:{id:'owner1',role:'owner'}};
+ try{
+  await commerceAdminApi(new Request('https://admin.example/api/commerce-admin/settings'),env,auth,{});
+  db.sqlite.exec('DELETE FROM b2b_products_v1');
+  const read=async()=> (await(await commerceRoute(new Request('https://www.okyonusedt.com/api/storefront-v2'),env)).json());
+  let store=await read();assert.equal(store.catalogAuthoritative,false);assert.equal(store.homepageAuthoritative,false);assert.ok(store.products.length>0,'empty schema retains default products');
+  const legacy=await(await worker.fetch(new Request('https://www.okyonusedt.com/api/products'),{},{})).json();assert.ok(legacy.products.some(x=>/Et Ürünleri|Tavuk Ürünleri/.test(x.category)),'full legacy contains meat and poultry');assert.ok(legacy.products.length>1000);
+  const created=await commerceAdminApi(new Request('https://admin.example/api/commerce-admin/products',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'Disabled only catalog item',category:'Et Ürünleri',unit:'Kg',active:false})}),env,auth,{});assert.equal(created.status,201);store=await read();assert.equal(store.catalogAuthoritative,true);assert.equal(store.products.length,0,'inactive initialized catalog must not resurrect defaults');
+  db.sqlite.exec('DROP TABLE b2b_prices_v1');store=await read();assert.equal(store.catalogAuthoritative,true,'initialized query failure must not resurrect disabled defaults');assert.equal(store.products.length,0);
+ }finally{db.sqlite.close()}
+});
+
+test('catalog category links retain selection and respect authoritative empty catalogs',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const page=await (await commerceRoute(new Request('https://www.okyonusedt.com/urunler'),{})).text();
+ const script=[...page.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(x=>x[1]).find(x=>x.includes('catalogGrid')&&x.includes('normalizeLegacy'));
+ async function render(managed,legacy,category){
+  const nodes=new Map(),node=id=>{if(!nodes.has(id))nodes.set(id,{innerHTML:'',value:'',textContent:''});return nodes.get(id)};
+  const document={getElementById:node,addEventListener(){},dispatchEvent(){}};
+  const context={document,fetch:async url=>({json:async()=>url==='/api/storefront-v2'?managed:{products:legacy}}),localStorage:{getItem:()=>null,setItem(){}},location:{search:'?category='+encodeURIComponent(category)},URLSearchParams,Event,Intl,console};
+  for(const id of ['cq','cc','catalogGrid','catalogCount'])context[id]=node(id);
+  runInNewContext(script,context);for(let i=0;i<12;i++)await Promise.resolve();
+  return {markup:node('catalogGrid').innerHTML,count:node('catalogCount').textContent,category:node('cc').value,options:node('cc').innerHTML};
+ }
+ const meat={id:'meat',name:'Dana Köfte',category:'Et & Şarküteri',price:20};
+ let result=await render({products:[meat],catalogAuthoritative:true},[],'et-sarkuteri');
+ assert.equal(result.count,'1 ürün');assert.match(result.markup,/Dana Köfte/);assert.equal(result.category,'et-sarkuteri');
+ result=await render({products:[],catalogAuthoritative:false},[{id:'legacy',name:'Dana Köfte',category:'Et'}],'et-sarkuteri');
+ assert.equal(result.count,'1 ürün');assert.match(result.markup,/Dana Köfte/);
+ result=await render({products:[],catalogAuthoritative:true},[{id:'disabled',name:'Dana Köfte',category:'Et'}],'et-sarkuteri');
+ assert.equal(result.count,'0 ürün');assert.doesNotMatch(result.markup,/Dana Köfte/);assert.match(result.options,/value="et-sarkuteri"/);assert.equal(result.category,'et-sarkuteri');
+ result=await render({products:[],catalogAuthoritative:false},[{id:'sauce',name:'Ketçap',category:'Soslar'}],'soslar');
+ assert.equal(result.count,'1 ürün');assert.match(result.markup,/Ketçap/);
+ result=await render({products:[],catalogAuthoritative:true},[],'ozel-grup');
+ assert.match(result.options,/value="ozel-grup"/);assert.equal(result.category,'ozel-grup');
+});
