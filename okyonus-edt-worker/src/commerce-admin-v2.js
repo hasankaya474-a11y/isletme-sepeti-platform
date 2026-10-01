@@ -180,7 +180,12 @@ export async function commerceAdminApi(request,env,auth,headers){
   if(request.method!=="POST")return j({ok:false,error:"METHOD_NOT_ALLOWED"},405,headers);
   if(!canWrite(auth))return j({ok:false,error:"READ_ONLY_ROLE"},403,headers);
   const b=await read(request),allowed=["siteTitle","logoUrl","contactName","phone","whatsapp","secondContactName","secondPhone","secondWhatsapp","email","adminUrl","announcement","heroTitle","heroSubtitle","address","footerText","openingCampaignEnabled","openingCampaignImage","openingCampaignTitle","openingCampaignDescription","openingCampaignCtaText","openingCampaignCtaUrl","openingCampaignPhotoCtaText","openingCampaignPhotoCtaUrl"];
-  for(const key of allowed)if(Object.prototype.hasOwnProperty.call(b,key))await env.DB.prepare("INSERT INTO oky_storefront_settings_v1(key,value,updated_by,updated_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=datetime('now')").bind(key,clean(b[key],key==="heroSubtitle"||key==="footerText"||key==="openingCampaignDescription"?1000:500),auth.user.id).run();
+  if(Object.prototype.hasOwnProperty.call(b,'openingCampaignImage')){
+   const image=String(b.openingCampaignImage??'').trim();
+   if(image.length>8192)return j({ok:false,error:'IMAGE_URL_TOO_LONG'},400,headers);
+   if(image&&!/^https:\/\//i.test(image)&&!/^\/(?!\/)/.test(image))return j({ok:false,error:'INVALID_IMAGE_URL'},400,headers);
+  }
+  for(const key of allowed)if(Object.prototype.hasOwnProperty.call(b,key))await env.DB.prepare("INSERT INTO oky_storefront_settings_v1(key,value,updated_by,updated_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_by=excluded.updated_by,updated_at=datetime('now')").bind(key,clean(b[key],key==="openingCampaignImage"?8192:key==="heroSubtitle"||key==="footerText"||key==="openingCampaignDescription"?1000:500),auth.user.id).run();
   return j({ok:true},200,headers);
  }
  if(resource==="legacy-catalog-sync"){

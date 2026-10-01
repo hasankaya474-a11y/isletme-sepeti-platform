@@ -236,6 +236,33 @@ test('opening ad admin changes render on the homepage and removal never restores
   const edited=await opening();assert.match(edited,/data-enabled="true"/);assert.match(edited,/<h2>Yeni Açılış<\/h2>/);assert.match(edited,/Yeni açıklama/);assert.match(edited,/src="https:\/\/example.com\/changed.webp"/);assert.match(edited,/href="\/urunler\?category=deniz-urunleri"/);assert.ok(!edited.includes('data:image/jpeg;base64,'));
   await save({openingCampaignImage:''});const removed=await opening();assert.ok(!removed.includes('<img'),'removed image returned');assert.ok(!removed.includes('data:image'));assert.match(removed,/Yeni Açılış/);assert.notEqual(removed.match(/data-campaign-key="([^"]*)"/)[1],edited.match(/data-campaign-key="([^"]*)"/)[1]);
   await save({openingCampaignEnabled:'false'});assert.match(await opening(),/data-enabled="false"/);
-  await save({openingCampaignEnabled:'true',openingCampaignImage:'javascript:alert(1)',openingCampaignCtaUrl:'javascript:alert(1)',openingCampaignTitle:'<img onerror=alert(1)>'});const safe=await opening();assert.ok(!safe.includes('javascript:'));assert.ok(!safe.includes('<img'));assert.match(safe,/href="\/urunler"/);assert.match(safe,/&lt;img onerror=alert\(1\)&gt;/);
+  assert.equal((await save({openingCampaignImage:'javascript:alert(1)'})).status,400);assert.equal((await save({openingCampaignEnabled:'true',openingCampaignCtaUrl:'javascript:alert(1)',openingCampaignTitle:'<img onerror=alert(1)>'})).status,200);const safe=await opening();assert.ok(!safe.includes('javascript:'));assert.ok(!safe.includes('<img'));assert.match(safe,/href="\/urunler"/);assert.match(safe,/&lt;img onerror=alert\(1\)&gt;/);
  } finally {db.sqlite.close()}
+});
+
+test('opening advert preserves long signed image URLs and rejects invalid images before any settings write',async()=>{
+ const db=sqliteD1(),env={DB:db,ADMIN_DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const call=(method,body)=>commerceAdminApi(new Request('https://admin.example/api/commerce-admin/settings',{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,auth,{});
+ try{
+  const signed='https://images.example.com/poster.webp?signature='+ 'abc123'.repeat(220);
+  assert.equal((await call('POST',{openingCampaignImage:signed})).status,200);assert.equal((await(await call('GET')).json()).data.openingCampaignImage,signed);
+  assert.equal((await call('POST',{openingCampaignTitle:'Must not write',openingCampaignImage:'javascript:alert(1)'})).status,400);
+  assert.equal((await(await call('GET')).json()).data.openingCampaignTitle,undefined);
+  assert.equal((await call('POST',{openingCampaignImage:'https://images.example.com/'+ 'x'.repeat(8193)})).status,400);
+ }finally{db.sqlite.close()}
+});
+
+test('opening editor text-only save preserves default image and explicit clear persists removal',async()=>{
+ const html=await commerceAdminPage({}).text(),script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
+ const code=script.slice(script.indexOf('function bindOpening'),script.indexOf('function settingsUI'));
+ async function submit(clear){
+  const events={},image={value:'https://example.com/default.webp',addEventListener(k,v){events[k]=v}},clearButton={addEventListener(k,v){events.clear=v}},button={},out={},saved=[];
+  const form={elements:{openingCampaignImage:image},querySelector(selector){return selector==='[data-clear-image]'?clearButton:button}};
+  const document={getElementById:id=>id==='openingForm'?form:out};
+  const FormData=class{constructor(){return [['openingCampaignTitle','Edited title'],['openingCampaignImage',image.value]][Symbol.iterator]()}};
+  const bind=new Function('document','bindImageEditors','FormData','api','summary',code+';return bindOpening;')(document,()=>{},FormData,async(_,options)=>saved.push(JSON.parse(options.body)),async()=>{});
+  bind({});if(clear){image.value='';events.clear()};await form.onsubmit({preventDefault(){}});return saved[0];
+ }
+ assert.equal(Object.prototype.hasOwnProperty.call(await submit(false),'openingCampaignImage'),false);
+ assert.equal((await submit(true)).openingCampaignImage,'');
 });
