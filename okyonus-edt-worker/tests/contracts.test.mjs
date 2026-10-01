@@ -604,7 +604,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-09-30-responsive-seafood-admin-v19','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v22','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
@@ -703,4 +703,27 @@ test('Commerce management is owner-only',()=>{
 test('staging preflight keeps newsletter and quote checks as separate entries',()=>{
   const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
   assert.match(pre,/Newsletter explicit-consent signup',\s*\n\s*'POST \/api\/quote creates request'/);
+});
+
+
+test('V22 mobile storefront follows controlled compact flow',()=>{
+  for(const token of [
+    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'class="mobileTop"',
+    'class="mobileDrawer"',
+    'class="mobileSearchPanel"',
+    'defaultHeroMedia',
+    'homeBest',
+    'homeCategories',
+    'grid-template-columns:repeat(2,minmax(0,1fr))!important',
+    '.sideNav{display:none!important}',
+    '.mobile{display:none!important}'
+  ]) assert.ok(commerce.includes(token),token);
+});
+
+test('single-worker builder embeds the approved hero and V22 storefront',()=>{
+  const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
+  assert.ok(build.includes('hero-inline/hero-'));
+  assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
+  assert.ok(build.includes('data:image/webp;base64,'));
 });
