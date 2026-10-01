@@ -1,30 +1,56 @@
-// Current-final generator: keeps Cloudflare single-file deploy bundles and final TXT exports in sync.
+// Current-final generator: keeps canonical DENIZ source, single-file deploy bundles and TXT exports byte-synchronized.
 import fs from 'node:fs';
 
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
+const START='/* ===== OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
+const END='/* ===== /OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
+
+function commerceBody({inlineHero=null}={}){
+  let commerce=read('src/commerce-v2.js')
+    .replace('export async function commerceRoute','async function commerceRoute')
+    .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
+  if(inlineHero){
+    commerce=commerce.replace(
+      'const MOBILE_HERO_INLINE=DEFAULT_LOGO_URL; // __OKYANUS_MOBILE_HERO_INLINE__',
+      'const MOBILE_HERO_INLINE='+JSON.stringify(inlineHero)+';'
+    );
+  }
+  return commerce;
+}
+
+function replaceCommerceBlock(base,commerce){
+  const a=base.indexOf(START),b=base.indexOf(END,a);
+  if(a<0||b<0) throw new Error('DENIZ_COMMERCE_BLOCK_NOT_FOUND');
+  const wrapped=START+'\nconst { commerceRoute, OKY_COMMERCE_V2_BUILD } = (() => {\n'+commerce+'\nreturn { commerceRoute, OKY_COMMERCE_V2_BUILD };\n})();\n'+END;
+  return base.slice(0,a)+wrapped+base.slice(b+END.length);
+}
+
+function syncDenizSource(){
+  const base=read('src/deniz-worker.js');
+  const synced=replaceCommerceBlock(base,commerceBody());
+  if(synced!==base) write('src/deniz-worker.js',synced);
+  return synced;
+}
 
 function inlineDeniz(){
-  const base=read('src/deniz-worker.js');
+  const base=syncDenizSource();
   const hero64=['00','01','02','03','04','05'].map(n=>read('assets/storefront/hero-inline/hero-'+n+'.b64').trim()).join('');
   if(hero64.length<200000) throw new Error('DENIZ_MOBILE_HERO_INCOMPLETE');
 
-  let commerce=read('src/commerce-v2.js')
-    .replace('const MOBILE_HERO_INLINE=DEFAULT_LOGO_URL; // __OKYANUS_MOBILE_HERO_INLINE__','const MOBILE_HERO_INLINE='+JSON.stringify('data:image/webp;base64,'+hero64)+';')
-    .replace('export async function commerceRoute','async function commerceRoute')
-    .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
+  const full=replaceCommerceBlock(base,commerceBody({inlineHero:'data:image/webp;base64,'+hero64}));
+  for(const token of [
+    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px',
+    'aspect-ratio:4/3;max-height:112px',
+    'cat-deniz-ai.webp','cat-donuk-ai.webp','cat-et-ai.webp','cat-kuru-ai.webp',
+    'cat-yag-ai.webp','cat-sut-ai.webp','cat-sos-ai.webp','cat-baharat-ai.webp',
+    'Hasan Kaya','Orhan Güngör','905323469925','905358813264',
+    'Listeni Fotoğrafla Gönder','Ürün Seç • Teklif Al',
+    'defaultHeroMedia','data:image/webp;base64,',
+    'async function quoteAPI','async function photoInquiryAPI','async function okyContactMessageAPI'
+  ]) if(!full.includes(token)) throw new Error('DENIZ_FINAL_CONTRACT_MISSING:'+token);
 
-  const start='/* ===== OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
-  const end='/* ===== /OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
-  const a=base.indexOf(start),b=base.indexOf(end,a);
-  if(a<0||b<0) throw new Error('DENIZ_COMMERCE_BLOCK_NOT_FOUND');
-
-  const wrapped=start+'\nconst { commerceRoute, OKY_COMMERCE_V2_BUILD } = (() => {\n'+commerce+'\nreturn { commerceRoute, OKY_COMMERCE_V2_BUILD };\n})();\n'+end;
-  const full=base.slice(0,a)+wrapped+base.slice(b+end.length);
-
-  if(!full.includes('mobile-storefront-v22')) throw new Error('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED');
-  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
-  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('data:image/webp;base64,')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
@@ -47,11 +73,16 @@ ${zaman}`;
 
 const deniz=inlineDeniz();
 const zaman=inlineZaman();
-write('dist/deniz-worker.monolithic.final.js',deniz);
-write('dist/deniz-worker.single.js',deniz);
+
+for(const p of [
+  'dist/deniz-worker.monolithic.final.js',
+  'dist/deniz-worker.single.js',
+  'exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',
+  'exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',
+  'exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',
+  'exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt'
+]) write(p,deniz);
+
 write('dist/zaman-admin-worker.single.js',zaman);
-write('exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',deniz);
-write('exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',deniz);
-write('exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',deniz);
 write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt',zaman);
-console.log('MONOLITH + SINGLE WORKER BUNDLES + ALL FINAL EXPORT ALIASES BUILT');
+console.log('CANONICAL DENIZ SOURCE + SINGLE WORKER + FINAL TXT ALIASES SYNCHRONIZED');
