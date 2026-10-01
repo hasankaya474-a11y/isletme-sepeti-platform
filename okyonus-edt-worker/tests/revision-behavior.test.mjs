@@ -363,3 +363,39 @@ test('catalog category links retain selection and respect authoritative empty ca
  result=await render({products:[],catalogAuthoritative:true},[],'ozel-grup');
  assert.match(result.options,/value="ozel-grup"/);assert.equal(result.category,'ozel-grup');
 });
+
+test('managed product image removal is explicit and survives edits imports and schema initialization',async()=>{
+ const db=sqliteD1(),env={DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const call=(path,method='GET',body)=>commerceAdminApi(new Request('https://admin.example/api/commerce-admin/'+path,{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,auth,{});
+ const image=id=>db.sqlite.prepare('SELECT image_url FROM b2b_products_v1 WHERE id=?').get(id).image_url;
+ try{
+  let response=await call('products','POST',{name:'Clear Image Test',category:'Deniz Ürünleri',unit:'Kg'});const {id}=await response.json();assert.equal(image(id),null,'unset new product image permits verified default');
+  await call('products/'+id,'POST',{description:'Edit without image'});assert.equal(image(id),null);
+  await call('products/'+id,'POST',{imageUrl:'https://example.com/manual.webp'});assert.equal(image(id),'https://example.com/manual.webp');await call('products/'+id,'POST',{description:'Preserve image'});assert.equal(image(id),'https://example.com/manual.webp');
+  await call('products/'+id,'POST',{imageUrl:''});assert.equal(image(id),'');await call('products/'+id,'POST',{description:'Still removed'});assert.equal(image(id),'');
+  await call('catalog-import','POST',{items:[{name:'Clear Image Test',category:'Deniz Ürünleri'}]});assert.equal(image(id),'');
+  await call('catalog-import','POST',{items:[{name:'Clear Image Test',category:'Deniz Ürünleri',imageUrl:'https://example.com/new.webp'}]});assert.equal(image(id),'https://example.com/new.webp');
+  await call('catalog-import','POST',{items:[{name:'Clear Image Test',category:'Deniz Ürünleri'}]});assert.equal(image(id),'https://example.com/new.webp');
+  await call('catalog-import','POST',{items:[{name:'Clear Image Test',category:'Deniz Ürünleri',imageUrl:''}]});assert.equal(image(id),'');
+  await call('bulk-products','POST',{items:[{id,name:'Clear Image Test',price:'',imageUrl:'',description:'',active:'1',featured:'0'}]});assert.equal(image(id),'');
+  const seed=db.sqlite.prepare('SELECT id FROM b2b_products_v1 WHERE source_product_id IS NOT NULL LIMIT 1').get();assert.ok(seed);await call('products/'+seed.id,'POST',{imageUrl:''});db.sqlite.exec("DELETE FROM oky_schema_meta_v1 WHERE key LIKE 'commerce-admin-%'");await call('products');assert.equal(image(seed.id),'','initialization must never reattach a removed seafood image');
+  await call('catalog-import','POST',{items:[{name:'Initially Unset',category:'Et Ürünleri'}]});assert.equal(db.sqlite.prepare("SELECT image_url FROM b2b_products_v1 WHERE name='Initially Unset'").get().image_url,null);
+ }finally{db.sqlite.close()}
+});
+
+test('admin verified-image preview requires source identity name brand and package and respects removal',async()=>{
+ const source=fs.readFileSync(new URL('../src/commerce-admin-v2.js',import.meta.url),'utf8');
+ const images={'verified-test':{name:'Exact product',brand:'Exact brand',amount:'2.5 kg',package:'5',image:'https://official.example/exact.webp'}};
+ const injected=source.replace(/^const VERIFIED_PRODUCT_IMAGES=.*?; \/\/ __VERIFIED_PRODUCT_IMAGES__$/m,'const VERIFIED_PRODUCT_IMAGES=Object.freeze('+JSON.stringify(images)+'); // __VERIFIED_PRODUCT_IMAGES__');assert.notEqual(injected,source);
+ const api=(await import('data:text/javascript;base64,'+Buffer.from(injected).toString('base64'))).commerceAdminApi;
+ const helper=new Function('VERIFIED_PRODUCT_IMAGES',source.slice(source.indexOf('function adminProductImage'),source.indexOf('function j('))+';return adminProductImage;')(images);
+ const fixture={source_product_id:'verified-test',name:'Exact product',brand_name:'Exact brand',package_text:'2.5 kg • 5',image_url:null};
+ assert.equal(helper(fixture),images['verified-test'].image);assert.equal(helper({...fixture,name:'Different product'}),'');assert.equal(helper({...fixture,brand_name:'Wrong brand'}),'');assert.equal(helper({...fixture,package_text:'2.5 kg • 6'}),'');assert.equal(helper({...fixture,image_url:''}),'');assert.equal(helper({...fixture,image_url:'https://manual.example/own.webp'}),'https://manual.example/own.webp');
+ const db=sqliteD1(),env={DB:db},auth={user:{id:'owner1',role:'owner'}};
+ const call=(path,method='GET',body)=>api(new Request('https://admin.example/api/commerce-admin/'+path,{method,headers:{'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env,auth,{});
+ try{
+  await call('catalog-import','POST',{items:[{sourceProductId:'verified-test',name:'Exact product',category:'Test',packageText:'2.5 kg • 5'}]});
+  let row=(await(await call('products')).json()).data.find(x=>x.source_product_id==='verified-test');assert.equal(row.image_url,images['verified-test'].image,'GET preview resolves verified default');assert.equal(db.sqlite.prepare('SELECT image_url FROM b2b_products_v1 WHERE id=?').get(row.id).image_url,null,'preview must never persist defaults');
+  await call('products/'+row.id,'POST',{imageUrl:''});row=(await(await call('products')).json()).data.find(x=>x.source_product_id==='verified-test');assert.equal(row.image_url,'','GET preview preserves explicit removal');
+ }finally{db.sqlite.close()}
+});

@@ -1709,11 +1709,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/pirinc-baldo-5-kg-mutlu-edt-istanbul-2e6d48.png",
     "source": "https://www.edtistanbul.com/pirinc-baldo-5-kg-mutlu-1068",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0327.png",
     "sha256": "2003f6d28c1032f2f3ef165e90ad3a09b28d780be1902e22b5f535c3120de0a0",
     "width": 582,
     "height": 640,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "5 kg ürünün fotoğraf etiketi 2500 g"
   },
   "EDT-0325": {
     "name": "PİRİNÇ OSMANCIK 5 KG GÜVEN",
@@ -1737,11 +1737,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/tat-asurelik-bugday-5kg-edt-istanbul-507f-4.png",
     "source": "https://www.edtistanbul.com/tat-asurelik-bugday-5kg",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0316.png",
     "sha256": "1f2d2bbd7a38beb9c58a243f1757b5b92dbac68d91c7fa9cb748e17de92df866",
     "width": 1080,
     "height": 1080,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0314": {
     "name": "BARBUNYA 9 MM 5 KG TAT",
@@ -1751,11 +1751,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/tat-barbunya-9mm-5kg-edt-istanbul-933c50.png",
     "source": "https://www.edtistanbul.com/tat-barbunya-9mm-5kg",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0314.png",
     "sha256": "abaf2daded1057b34185f7ffaf2fb4d5aa0a5eb6ecdc345e728e1f6b0f8add1f",
     "width": 1200,
     "height": 1200,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0313": {
     "name": "NOHUT 25 KG 9 MM TAT",
@@ -1779,11 +1779,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/tat-dermason-fasulye-8mm-25kg-edt-ista-7a-b00.png",
     "source": "https://www.edtistanbul.com/tat-dermason-fasulye-8mm-25kg",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0315.png",
     "sha256": "2173f4e904453543c015e703754f35c4bddc8db60f5fa34c4d096947c03b3ead",
     "width": 800,
     "height": 800,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0319": {
     "name": "BULGUR PİLAVLIK 5 KG TAT",
@@ -1807,11 +1807,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/tat-pilavlik-bulgur-25kg-edt-istanbul-fe-444.png",
     "source": "https://www.edtistanbul.com/tat-pilavlik-bulgur-25kg",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0312.png",
     "sha256": "8f1eea62dd12a705b750b892f3e92bbbedb206733aba8f3b0e0dacae76520b6d",
     "width": 800,
     "height": 800,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0321": {
     "name": "NOHUT 5 KG 8,5 MM TAT",
@@ -1821,11 +1821,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/tat-nohut-8-a67b-6.png",
     "source": "https://www.edtistanbul.com/tat-nohut-8.5mm-5kg",
     "evidence": "Exact brand, product, unit size confirmed on supplier product page and product image link",
-    "asset": "assets/storefront/verified-products/EDT-0321.png",
     "sha256": "6f04acdf8716fc8d170e61c773709b7b77682aaf6ad4a95991229646671f0d4b",
     "width": 1080,
     "height": 1080,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0317": {
     "name": "FASÜLYE 5 KG 8 MM DERMASON TAT",
@@ -1835,11 +1835,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D100%2Cquality%3D85/77858/uploads/urunresimleri/buyuk/tat-dermason-fasulye-8mm-5kg-edt-istan-f541-4.png",
     "source": "https://www.edtistanbul.com/tat-dermason-fasulye-8mm-5kg1",
     "evidence": "Exact TAT Dermason Fasulye8mm5KG product and thumbnail load verified",
-    "asset": "assets/storefront/verified-products/EDT-0317.png",
     "sha256": "a1e6e9b9c6265af610ca75389aa13199a76001eb2370794e6ffc8d4827dbf30a",
     "width": 100,
     "height": 100,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0527": {
     "name": "BİNOT ZENCEFİL TOZ 1 KG",
@@ -2465,11 +2465,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/sutas-yogurt-suzme-3-kg-edt-istanbul-6c9c-e.png",
     "source": "https://www.edtistanbul.com/sutas-yogurt-suzme-3-kg-1194",
     "evidence": "SÜTAŞ YOĞURT SÜZME 3 KG Toptan Fiyatı & Sipariş | EDTİstanbul (https://www.edtistanbul.com/sutas-yogurt-suzme-3-kg-1194)",
-    "asset": "assets/storefront/verified-products/EDT-0434.png",
     "sha256": "9d9092e2b81ff74493fd5c9f21e70357e77a10eaf3a099bffbc0127522e3ee50",
     "width": 550,
     "height": 550,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "Tam ambalaj gramajı fotoğraftan doğrulanamadı"
   },
   "EDT-0406": {
     "name": "AYÇA LOR PEYNİRİ 1000 GR",
@@ -2535,11 +2535,11 @@
     "image": "https://static.ticimax.cloud/cdn-cgi/image/width%3D0%2Cquality%3D85%2Cformat%3Dwebp/77858/uploads/urunresimleri/buyuk/millac-cooking-krema-1-kg-yesil-edt-is-fe-8dd.png",
     "source": "https://www.edtistanbul.com/millac-cooking-krema-1-kg-yesil-923",
     "evidence": "MİLLAC COOKİNG KREMA 1 KG - YEŞİL",
-    "asset": "assets/storefront/verified-products/EDT-0443.png",
     "sha256": "adf765e3aafc169a824e35b7a29b75a2357150bcc28dbf94db1a465e812aa8d5",
     "width": 1080,
     "height": 1080,
-    "status": "downloaded-and-decoded"
+    "status": "rejected-after-visual-review",
+    "reason": "1 kg ürünün fotoğraf etiketi 1 litre"
   },
   "EDT-0026": {
     "name": "SÜPERFRESH PATATES CATERING 9*9 (2,5 KG*5)",

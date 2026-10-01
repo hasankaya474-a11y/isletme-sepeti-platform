@@ -44,7 +44,7 @@ function commerceBody({inlineHero=null}={}){
 function replaceCommerceBlock(base,commerce){
   const a=base.indexOf(START),b=base.indexOf(END,a);
   if(a<0||b<0) throw new Error('DENIZ_COMMERCE_BLOCK_NOT_FOUND');
-  const wrapped=START+'\nconst { commerceRoute, OKY_COMMERCE_V2_BUILD } = (() => {\n'+commerce+'\nreturn { commerceRoute, OKY_COMMERCE_V2_BUILD };\n})();\n'+END;
+  const wrapped=START+'\nconst { commerceRoute, OKY_COMMERCE_V2_BUILD, commerceProductImage } = (() => {\n'+commerce+'\nreturn { commerceRoute, OKY_COMMERCE_V2_BUILD, commerceProductImage };\n})();\n'+END;
   return base.slice(0,a)+wrapped+base.slice(b+END.length);
 }
 
@@ -110,8 +110,8 @@ for(const p of [
   'exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',
   'exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',
   'exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt'
-]) write(p,'/* OKYANUS DENIZ RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(deniz));
+]) write(p,'/* OKYANUS DENIZ RELEASE 2026-10-01 CROSSCHECKED R29 */\n'+asciiBundle(deniz));
 
-write('dist/zaman-admin-worker.single.js','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(zaman));
-write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R28 */\n'+asciiBundle(zaman));
+write('dist/zaman-admin-worker.single.js','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R29 */\n'+asciiBundle(zaman));
+write('exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt','/* OKYANUS ZAMAN RELEASE 2026-10-01 CROSSCHECKED R29 */\n'+asciiBundle(zaman));
 console.log('CANONICAL DENIZ SOURCE + SINGLE WORKER + FINAL TXT ALIASES SYNCHRONIZED');
