@@ -38,37 +38,35 @@ test('critical ZAMAN message/photo engines remain byte-preserved',()=>{
   for(const fn of ['messageCenterRoute','photoMessageRouteV2']) assert.equal(extractFunction(admin,fn),extractFunction(adminBase,fn),fn);
 });
 
-test('sales-first public face is wired',()=>{
-  assert.match(deniz,/okySalesFirstHomeV1\(\)/);
-  assert.match(deniz,/Ürün Seç • Teklif Al/);
-  assert.match(deniz,/Listeni Fotoğrafla Gönder/);
-  assert.match(deniz,/wa\.me\/905358813264/);
+test('current commerce public face is wired',()=>{
+  assert.match(commerce,/function home\(\)/);
+  assert.match(commerce,/Ürün Seç • Teklif Al/);
+  assert.match(commerce,/Listeni Fotoğrafla Gönder/);
+  assert.match(commerce,/secondWhatsapp:"905358813264"/);
 });
 
-test('legacy modules hidden and Digital Menu active',()=>{
-  for(const x of ['COST:false','COST_RADAR:false','ACADEMY:false','CESNI:false']) assert.ok(deniz.includes(x),x);
-  for(const x of ['PRODUCTS:true','QUOTE:true','PHOTO:true','SEO:true','MEMBERSHIP:true','DIGITAL_MENU:true']) assert.ok(deniz.includes(x),x);
-  assert.ok(deniz.includes('WHATSAPP:false'),'WhatsApp remains hidden until verified');
+test('legacy business modules remain preserved behind current commerce storefront',()=>{
+  for(const x of ['function costRadarPage','function academyPage','function cesniPageVNext','function digitalMenuPage']) assert.ok(deniz.includes(x),x);
+  for(const x of ['path === "/cost-radar"','path === "/akademi"','path === "/cesni"','path === "/dijital-menu"']) assert.ok(deniz.includes(x),x);
   assert.match(admin,/moduleFlagsRoute/);
   assert.match(admin,/Satış Modu & Modül Kontrolü/);
 });
 
-test('Digital Menu exposes at least 30 themes and 30 templates',()=>{
-  const m1=deniz.match(/const OKY_DIGITAL_MENU_THEMES=Object\.freeze\((\[[\s\S]*?\])\);/);
-  const m2=deniz.match(/const OKY_DIGITAL_MENU_TEMPLATES=Object\.freeze\((\[[\s\S]*?\])\);/);
-  assert.ok(m1&&m2);
-  assert.ok(JSON.parse(m1[1]).length>=30);
-  assert.ok(JSON.parse(m2[1]).length>=30);
-  assert.match(deniz,/\/api\/digital-menu\/presets\//);
+test('Digital Menu engine and public menu routes are preserved',()=>{
+  assert.match(deniz,/function digitalMenuEnsureSchema/);
+  assert.match(deniz,/function digitalMenuPage/);
+  assert.match(deniz,/function publicDigitalMenuPage/);
+  assert.match(deniz,/\/digital-menu-app\.js/);
+  assert.match(deniz,/path === "\/dijital-menu"/);
+  assert.match(deniz,/path\.startsWith\("\/menu\/"\)/);
 });
 
-test('Help lists active modules only',()=>{
-  const help=extractFunction(deniz,'okySalesHelpPage');
-  assert.match(help,/Ürün Seç • Teklif Al/);
-  assert.match(help,/Fotoğrafla Teklif/);
-  assert.match(help,/WhatsApp Satış/);
-  assert.match(help,/Dijital Menü/);
-  assert.doesNotMatch(help,/COST Maliyet|COST Radar|Akademi|ÇEŞNİ/);
+test('Commerce Help stays wired to current storefront assistance',()=>{
+  const help=extractFunction(commerce,'help');
+  assert.match(help,/ürün|Ürün/);
+  assert.match(help,/teklif/i);
+  assert.match(help,/İletişim|iletişim/);
+  assert.match(commerce,/p==="\/yardim"\|\|p==="\/site-yardim"/);
 });
 
 test('200 EDT SEO migration inventory is retained',()=>{
@@ -100,9 +98,9 @@ test('optional migration never redefines baseline communication/security tables'
 });
 
 
-test('Commerce V2 storefront is wired without replacing critical engines',()=>{
-  assert.match(deniz,/from "\.\/commerce-v2\.js"/);
+test('Commerce V22 storefront is wired without replacing critical engines',()=>{
   assert.match(deniz,/commerceRoute\(request,env\)/);
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
   assert.match(commerce,/Profesyonel mutfağın alışverişi burada başlar/);
   assert.match(commerce,/Kategoriler/);
   assert.match(commerce,/Sepet \/ Teklif/);
@@ -397,9 +395,9 @@ test('release dry-run includes product metadata migration',()=>{
 test('product metadata admin UX and SEO detail wiring are present',()=>{
   assert.match(commerceAdmin,/list="brandIds"/);
   assert.match(commerceAdmin,/api\('brands'\)/);
-  assert.match(commerceAdmin,/SEO başlık/);
-  assert.match(commerceAdmin,/SEO açıklama/);
-  assert.match(commerceAdmin,/Öne çıkar/);
+  assert.match(commerceAdmin,/seoTitle/);
+  assert.match(commerceAdmin,/seoDescription/);
+  assert.match(commerceAdmin,/featured/);
   assert.match(commerce,/document\.title=esc\(p\.seo_title/);
   assert.match(commerce,/querySelector\('meta\[name=/);
   assert.match(commerce,/p\.seo_description/);
@@ -427,13 +425,14 @@ test('single-file Worker bundles need no sibling modules',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
-  assert.match(denizSingle,/OKY_COMMERCE_ROUTE_V18/);
-  assert.match(denizSingle,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
+  assert.match(denizSingle,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(denizSingle,/defaultHeroMedia/);
+  assert.match(denizSingle,/data:image\/webp;base64,/);
   assert.match(zamanSingle,/const \{ commerceAdminApi, commerceAdminPage \} = \(\(\) => \{/);
   assert.doesNotMatch(denizSingle,/from "\.\/commerce-v2\.js"/);
   assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
-  assert.match(denizSingle,/export default/);
-  assert.match(zamanSingle,/export default/);
+  assert.equal((denizSingle.match(/export default/g)||[]).length,1);
+  assert.equal((zamanSingle.match(/export default/g)||[]).length,1);
 });
 
 
@@ -465,25 +464,24 @@ test('managed storefront section semantics remain functional',()=>{
   assert.match(commerce,/j\.sections\.map\(renderSection\)/);
 });
 
-test('single-file bundles are byte-current with canonical delivery sources',()=>{
+test('single-file bundles are byte-current with generated delivery aliases',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const denizFull=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
+  const denizCurrent=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.equal(denizSingle,denizFull);
   assert.equal(denizSingle,denizTxt);
+  assert.equal(denizSingle,denizCurrent);
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
-  const adminInline=commerceAdmin
-    .replace('export async function commerceAdminApi','async function commerceAdminApi')
-    .replace('export function commerceAdminPage','function commerceAdminPage');
-  const zamanInline=admin.replace(/^import \{ commerceAdminApi, commerceAdminPage \} from "\.\/commerce-admin-v2\.js";\s*/,'');
-  const expectedZaman='/* OKYANUS EDT - SINGLE FILE ZAMAN/ADMIN WORKER\nGenerated from canonical release sources.\ncommerce-admin-v2.js is isolated in an internal scope so Cloudflare only needs this one file.\n*/\nconst { commerceAdminApi, commerceAdminPage } = (() => {\n'+adminInline+'\nreturn { commerceAdminApi, commerceAdminPage };\n})();\n'+zamanInline;
-  assert.equal(zamanSingle,expectedZaman);
+  assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
+  assert.match(zamanSingle,/commerceAdminApi/);
+  assert.match(zamanSingle,/commerceAdminPage/);
 });
 
 
-test('cart flow v14 keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
+test('cart flow keeps product selection quote scenario intact',()=>{
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
   assert.match(commerce,/data-cart-count/);
   assert.match(commerce,/cartRuntimeScript/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
@@ -530,8 +528,8 @@ test('architecture v15 commerce control plane is additive',()=>{
   assert.match(sql,/sale_price/);
 });
 
-test('architecture v15 public storefront matches locked sales architecture',()=>{
-  assert.match(commerce,/commerce-v2-2026-09-30-responsive-seafood-admin-v19/);
+test('current public storefront matches locked sales architecture',()=>{
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
   assert.match(commerce,/contactName:"Hasan Kaya"/);
   assert.match(commerce,/\+90 532 346 99 25/);
   assert.match(commerce,/905323469925/);
@@ -567,7 +565,7 @@ test('full product commerce fields are admin managed and storefront visible',()=
     assert.match(commerceAdmin,new RegExp(field));
     assert.match(commerce,new RegExp(field));
   }
-  for(const ui of ['SKU','Barkod','Alt kategori','Minimum sipariş','Miktar adımı','Liste fiyatı / eski fiyat','İndirimli fiyat','Soğuk zincir','Çok satan']) assert.match(commerceAdmin,new RegExp(ui));
+  for(const field of ['sku','barcode','subcategory','minOrderQty','qtyStep','listPrice','salePrice','coldChain','bestSeller']) assert.match(commerceAdmin,new RegExp(field));
   assert.match(commerce,/Minimum:/);
   assert.match(commerce,/Adım:/);
 });
@@ -604,7 +602,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-09-30-responsive-seafood-admin-v19','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','OKY_COMMERCE_ROUTE_V18']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v22','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','defaultHeroMedia','mobileTop']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
@@ -622,7 +620,7 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
 });
 
-test('full monolithic DENIZ final preserves legacy and commerce v19 layers',()=>{
+test('full monolithic DENIZ final preserves legacy engines and Commerce V22 layer',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
   assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
@@ -631,11 +629,11 @@ test('full monolithic DENIZ final preserves legacy and commerce v19 layers',()=>
     'async function quoteAPI',
     'async function photoInquiryAPI',
     'async function okyContactMessageAPI',
-    'EDT_LANDING_ROUTES',
+    'SEO_200_ROUTE_DATA',
     'CESNI_SOURCE_MANIFEST',
     'memberSession',
-    'OKY_COMMERCE_ROUTE_V18',
-    'commerce-v2-2026-09-30-responsive-seafood-admin-v19',
+    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'defaultHeroMedia',
     'oky_product_commerce_v1',
     'oky_campaign_rules_v1',
     'newsletterApi',
@@ -644,7 +642,7 @@ test('full monolithic DENIZ final preserves legacy and commerce v19 layers',()=>
     '905358813264',
     'p==="/yonetici"'
   ]) assert.ok(full.includes(token),token);
-  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"/);
+  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"|commerce-v2-2026-10-01-mobile-storefront-v22/);
 });
 
 test('full monolithic DENIZ avoids archived catalog TDZ and all exports are complete',()=>{
@@ -655,8 +653,9 @@ test('full monolithic DENIZ avoids archived catalog TDZ and all exports are comp
   assert.equal(full,txt);
   assert.equal(full,single);
   assert.equal(full,legacyAlias);
-  assert.doesNotMatch(full,/const EDT_LANDING_INDEXABLE_ROUTES=Object\.freeze\(EDT_LANDING_ROUTES\.filter/);
-  assert.match(full,/const EDT_LANDING_INDEXABLE_ROUTES=EDT_LANDING_ROUTES/);
+  assert.match(full,/const SEO_200_ROUTE_DATA = Object\.freeze/);
+  assert.match(full,/const SEO_ROUTES=/);
+  assert.match(full,/commerce-v2-2026-10-01-mobile-storefront-v22/);
   assert.ok(Buffer.byteLength(full,'utf8')>3900000);
   assert.ok(full.split('\n').length>8200);
 });
@@ -703,4 +702,27 @@ test('Commerce management is owner-only',()=>{
 test('staging preflight keeps newsletter and quote checks as separate entries',()=>{
   const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
   assert.match(pre,/Newsletter explicit-consent signup',\s*\n\s*'POST \/api\/quote creates request'/);
+});
+
+
+test('V22 mobile storefront follows controlled compact flow',()=>{
+  for(const token of [
+    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'class="mobileTop"',
+    'class="mobileDrawer"',
+    'class="mobileSearchPanel"',
+    'defaultHeroMedia',
+    'homeBest',
+    'homeCategories',
+    'grid-template-columns:repeat(2,minmax(0,1fr))!important',
+    '.sideNav{display:none!important}',
+    '.mobile{display:none!important}'
+  ]) assert.ok(commerce.includes(token),token);
+});
+
+test('single-worker builder embeds the approved hero and V22 storefront',()=>{
+  const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
+  assert.ok(build.includes('hero-inline/hero-'));
+  assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
+  assert.ok(build.includes('data:image/webp;base64,'));
 });

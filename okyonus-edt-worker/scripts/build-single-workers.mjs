@@ -5,9 +5,26 @@ const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
 
 function inlineDeniz(){
-  const full=read('src/deniz-worker.js');
-  if(!full.includes('controlled-storefront-v20')) throw new Error('DENIZ_V20_REQUIRED');
-  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')) throw new Error('DENIZ_V20_CONTRACT_MISSING');
+  const base=read('src/deniz-worker.js');
+  const hero64=['00','01','02','03','04','05'].map(n=>read('assets/storefront/hero-inline/hero-'+n+'.b64').trim()).join('');
+  if(hero64.length<200000) throw new Error('DENIZ_MOBILE_HERO_INCOMPLETE');
+
+  let commerce=read('src/commerce-v2.js')
+    .replace('const MOBILE_HERO_INLINE=DEFAULT_LOGO_URL; // __OKYANUS_MOBILE_HERO_INLINE__','const MOBILE_HERO_INLINE='+JSON.stringify('data:image/webp;base64,'+hero64)+';')
+    .replace('export async function commerceRoute','async function commerceRoute')
+    .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
+
+  const start='/* ===== OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
+  const end='/* ===== /OKYANUS COMMERCE V20 CONTROLLED LAYER ===== */';
+  const a=base.indexOf(start),b=base.indexOf(end,a);
+  if(a<0||b<0) throw new Error('DENIZ_COMMERCE_BLOCK_NOT_FOUND');
+
+  const wrapped=start+'\nconst { commerceRoute, OKY_COMMERCE_V2_BUILD } = (() => {\n'+commerce+'\nreturn { commerceRoute, OKY_COMMERCE_V2_BUILD };\n})();\n'+end;
+  const full=base.slice(0,a)+wrapped+base.slice(b+end.length);
+
+  if(!full.includes('mobile-storefront-v22')) throw new Error('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED');
+  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
+  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('data:image/webp;base64,')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }

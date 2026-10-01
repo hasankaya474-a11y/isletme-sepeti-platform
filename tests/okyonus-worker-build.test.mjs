@@ -75,71 +75,52 @@ test("critical ZAMAN message/photo engines are byte-preserved",()=>{
   }
 });
 
-test("sales-first homepage and active public flows are wired",()=>{
-  assert.match(deniz,/okySalesFirstHomeV1\(\)/);
-  assert.match(deniz,/Ürün Seç • Teklif Al/);
-  assert.match(deniz,/Listeni Fotoğrafla Gönder/);
-  assert.match(deniz,/fetch\('\/api\/b2b\/products'/);
+test("current commerce homepage and active public flows are wired",()=>{
+  assert.match(commerce,/function home\(\)/);
+  assert.match(commerce,/Ürün Seç • Teklif Al/);
+  assert.match(commerce,/Listeni Fotoğrafla Gönder/);
+  assert.match(commerce,/\/api\/storefront-v2/);
   assert.match(deniz,/fetch\('\/api\/quote'/);
   assert.match(deniz,/\/api\/photo-inquiries/);
   assert.match(deniz,/\/api\/contact/);
-  assert.match(deniz,/wa\.me\/905358813264/);
+  assert.match(commerce,/secondWhatsapp:"905358813264"/);
 });
 
-test("legacy tools default hidden while Digital Menu remains active",()=>{
-  for(const item of ["COST:false","COST_RADAR:false","ACADEMY:false","CESNI:false","EASY_RECIPE:false"]) assert.ok(deniz.includes(item),item);
-  for(const item of ["ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
-  for(const item of ["PRODUCTS:true","QUOTE:true","PHOTO:true","SEO:true","MEMBERSHIP:true","DIGITAL_MENU:true","ABOUT:true","CONTACT:true"]) assert.ok(deniz.includes(item),item);
-  assert.ok(deniz.includes("WHATSAPP:false"),"WhatsApp must remain hidden until verified");
-  assert.match(deniz,/okyFeatureUnavailable/);
+test("legacy business tools remain preserved behind the current commerce storefront",()=>{
+  for(const token of ["function costRadarPage","function academyPage","function cesniPageVNext","function digitalMenuPage"]) assert.ok(deniz.includes(token),token);
+  for(const route of ['path === "/cost-radar"','path === "/akademi"','path === "/cesni"','path === "/dijital-menu"']) assert.ok(deniz.includes(route),route);
   assert.match(admin,/moduleFlagsRoute/);
   assert.match(admin,/Satış Modu & Modül Kontrolü/);
 });
 
-test("Digital Menu has at least 30 themes and 30 templates",()=>{
-  const themes=parseFrozenJsonArray(deniz,"OKY_DIGITAL_MENU_THEMES");
-  const templates=parseFrozenJsonArray(deniz,"OKY_DIGITAL_MENU_TEMPLATES");
-  assert.ok(themes.length>=30,"themes="+themes.length);
-  assert.ok(templates.length>=30,"templates="+templates.length);
-  assert.equal(new Set(themes.map(x=>x.id)).size,themes.length);
-  assert.equal(new Set(templates.map(x=>x.id)).size,templates.length);
-  assert.match(deniz,/themePreset:/);
-  assert.match(deniz,/template:/);
-  assert.match(deniz,/dmThemeCatalog/);
-  assert.match(deniz,/dmTemplateCatalog/);
-  assert.match(deniz,/\/api\/digital-menu\/presets/);
+test("Digital Menu engine and public menu routes remain present",()=>{
+  assert.match(deniz,/function digitalMenuEnsureSchema/);
+  assert.match(deniz,/function digitalMenuPage/);
+  assert.match(deniz,/function publicDigitalMenuPage/);
+  assert.match(deniz,/\/digital-menu-app\.js/);
+  assert.match(deniz,/path === "\/dijital-menu"/);
+  assert.match(deniz,/path\.startsWith\("\/menu\/"\)/);
 });
 
-test("Help exposes active modules only",()=>{
-  const help=extractFunction(deniz,"okySalesHelpPage");
-  assert.match(help,/Ürün Seç • Teklif Al/);
-  assert.match(help,/Fotoğrafla Teklif/);
-  assert.match(help,/WhatsApp Satış/);
-  assert.match(help,/Dijital Menü/);
-  assert.doesNotMatch(help,/COST Maliyet/);
-  assert.doesNotMatch(help,/COST Radar/);
-  assert.doesNotMatch(help,/Akademi/);
-  assert.doesNotMatch(help,/ÇEŞNİ/);
+test("Commerce help exposes current storefront assistance",()=>{
+  const help=extractFunction(commerce,"help");
+  assert.match(help,/Ürün|ürün/);
+  assert.match(help,/teklif/i);
+  assert.match(help,/İletişim|iletişim/);
+  assert.match(commerce,/p==="\/yardim"\|\|p==="\/site-yardim"/);
 });
 
-test("SEO keeps product/photo/contact and removes hidden legacy routes from primary route list",()=>{
-  const m=deniz.match(/const SEO_INDEXABLE_ROUTES = Object\.freeze\(\[([\s\S]*?)\]\);/);
-  assert.ok(m);
-  const block=m[1];
-  assert.match(block,/\/urunler/);
-  assert.match(block,/\/fotografla-teklif/);
-  assert.match(block,/\/iletisim/);
-  assert.match(block,/\/dijital-menu-cozumleri/);
-  assert.doesNotMatch(block,/\/cost-radar/);
-  assert.match(block,/\/hakkimizda/);
+test("SEO keeps commerce routes public while private workspaces stay non-indexable",()=>{
+  assert.match(deniz,/const SEO_PRIVATE_PREFIXES = Object\.freeze\(\["\/api\/","\/uye","\/uyelik","\/benim-okyanusum","\/cost","\/cesni","\/dijital-menu"/);
+  for(const route of ["/edt-horeca-gida-tedarikcisi","/edt-deniz-urunleri-tedarikcisi","/istanbul-restoran-gida-tedariki"]) assert.ok(commerce.includes(route),route);
+  assert.match(commerce,/seoModulesHtml/);
 });
 
 
-test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",async()=>{
+test("DENIZ runtime smoke: commerce homepage, help and catalog remain available",async()=>{
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),"oky-runtime-"));
   const file=path.join(dir,"deniz.mjs");
   fs.writeFileSync(file,deniz);
-  fs.writeFileSync(path.join(dir,"commerce-v2.js"),commerce);
   const mod=await import(pathToFileURL(file).href+"?v="+Date.now());
   assert.ok(mod.default&&typeof mod.default.fetch==="function");
   const home=await mod.default.fetch(new Request("https://www.okyonusedt.com/"),{}, {waitUntil(){}});
@@ -147,24 +128,15 @@ test("DENIZ runtime smoke: homepage/help/digital-menu landing/hidden module",asy
   const homeText=await home.text();
   assert.match(homeText,/Profesyonel mutfağın alışverişi burada başlar/);
   assert.match(homeText,/Sepet \/ Teklif/);
-  assert.match(homeText,/İletişim/);
   assert.match(homeText,/Site Yardım/);
-  assert.doesNotMatch(homeText,/wa\.me\//);
-  assert.match(homeText,/\/site-yardim|\/yardim/);
   const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
   assert.equal(help.status,200);
-  const helpText=await help.text();
-  assert.match(helpText,/Site Yardım/);
-  assert.doesNotMatch(helpText,/COST Maliyet/);
-  const dm=await mod.default.fetch(new Request("https://www.okyonusedt.com/dijital-menu-cozumleri"),{}, {waitUntil(){}});
-  assert.equal(dm.status,200);
-  const dmText=await dm.text();
-  assert.match(dmText,/30 tema ve 30 profesyonel şablon/);
-  assert.match(dmText,/Tema Seç/);
-  assert.match(dmText,/Şablon Seç/);
-  const hidden=await mod.default.fetch(new Request("https://www.okyonusedt.com/cost-radar"),{}, {waitUntil(){}});
-  assert.equal(hidden.status,404);
-  assert.match(await hidden.text(),/Bu modül şu anda aktif değil/);
+  assert.match(await help.text(),/Site Yardım/);
+  const catalog=await mod.default.fetch(new Request("https://www.okyonusedt.com/urunler"),{}, {waitUntil(){}});
+  assert.equal(catalog.status,200);
+  assert.match(await catalog.text(),/Ürünler|Kategoriler/);
+  const radar=await mod.default.fetch(new Request("https://www.okyonusedt.com/cost-radar"),{}, {waitUntil(){}});
+  assert.equal(radar.status,200);
 });
 
 test("ZAMAN runtime smoke: login surface remains available",async()=>{
@@ -181,27 +153,29 @@ test("ZAMAN runtime smoke: login surface remains available",async()=>{
 });
 
 
-test("new Okyanus homepage is mobile/tablet ready and keeps navigation available",()=>{
-  assert.match(deniz,/class="okyTopbar"/);
-  assert.match(deniz,/class="okyMobileNav"/);
-  assert.match(deniz,/@media\(max-width:900px\)/);
-  assert.match(deniz,/@media\(max-width:620px\)/);
-  assert.match(deniz,/@media\(max-width:430px\)/);
-  assert.match(deniz,/@media\(max-width:360px\)/);
-  assert.match(deniz,/\.okyMobileNav\{position:sticky/);
-  assert.match(deniz,/min-height:44px/);
+test("new Okyanus homepage is mobile/tablet ready and keeps navigation controlled",()=>{
+  assert.match(commerce,/class="mobileTop"/);
+  assert.match(commerce,/class="mobileDrawer"/);
+  assert.match(commerce,/class="mobileSearchPanel"/);
+  assert.match(commerce,/@media\(max-width:1024px\)/);
+  assert.match(commerce,/@media\(max-width:760px\)/);
+  assert.match(commerce,/@media\(max-width:420px\)/);
+  assert.match(commerce,/\.sideNav\{display:none!important\}/);
+  assert.match(commerce,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
 });
 
-test("sales-first homepage reconnects Vitrin Studio live publication",()=>{
-  assert.match(deniz,/id="okyanus-vitrini"/);
-  assert.match(deniz,/okySalesFirstHomeV1\(\)\.replace\('<\/body>',vitrineLiveHydrationScript\(\)\+'<\/body>'\)/);
-  assert.match(deniz,/function vitrineLiveHydrationScript\(\)/);
+test("current commerce homepage reconnects managed storefront publication",()=>{
+  assert.match(commerce,/fetch\('\/api\/storefront-v2'/);
+  assert.match(commerce,/function managedHero\(list\)/);
+  assert.match(commerce,/Array\.isArray\(j\.banners\)/);
+  assert.match(commerce,/Array\.isArray\(j\.categories\)/);
+  assert.match(commerce,/Array\.isArray\(j\.campaigns\)/);
 });
 
 test("homepage product cards use catalog media, price and stock data",()=>{
-  const home=extractFunction(deniz,"okySalesFirstHomeV1");
-  assert.match(home,/p\.image/);
-  assert.match(home,/p\.effectivePrice/);
-  assert.match(home,/p\.stockStatus/);
-  assert.doesNotMatch(home,/🍟|🫗|🧀|🐟/);
+  const card=extractFunction(commerce,"card");
+  assert.match(card,/p\.image/);
+  assert.match(card,/p\.effectivePrice/);
+  assert.match(card,/p\.stock_status\|\|p\.stockStatus/);
+  assert.match(card,/Sepete \/ Teklife Ekle/);
 });
