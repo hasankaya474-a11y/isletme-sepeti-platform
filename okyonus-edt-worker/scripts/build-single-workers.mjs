@@ -44,13 +44,13 @@ function inlineDeniz(){
     'cat-yag-ai.webp','cat-sut-ai.webp','cat-sos-ai.webp','cat-baharat-ai.webp',
     'Hasan Kaya','Orhan Güngör','905323469925','905358813264',
     'Listeni Fotoğrafla Gönder','Ürün Seç • Teklif Al',
-    'defaultHeroMedia','okyanus-main-hero.svg',
+    'hero-01.webp','hero-02.webp','hero-03.webp','hero-04.webp',
     'async function quoteAPI','async function photoInquiryAPI','async function okyContactMessageAPI'
   ]) if(!full.includes(token)) throw new Error('DENIZ_FINAL_CONTRACT_MISSING:'+token);
 
   if(!full.includes('mobile-storefront-v22')) throw new Error('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED');
   if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
-  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('okyanus-main-hero.svg')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
+  if(!full.includes('hero-01.webp')||!full.includes('hero-04.webp')||!full.includes('mobileTop')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
