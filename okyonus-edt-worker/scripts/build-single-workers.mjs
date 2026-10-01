@@ -6,8 +6,8 @@ const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
 
 function inlineDeniz(){
   const full=read('src/deniz-worker.js');
-  if(!full.includes('controlled-storefront-v21-ai-categories')) throw new Error('DENIZ_V21_AI_CATEGORIES_REQUIRED');
-  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V21_CONTRACT_MISSING');
+  if(!full.includes('mobile-reference-v22-ai-categories')) throw new Error('DENIZ_V22_MOBILE_REFERENCE_REQUIRED');
+  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')||!full.includes('MOBILE_REFERENCE_FLOW_V22')||!full.includes('DEFAULT_HERO_VISUAL')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
