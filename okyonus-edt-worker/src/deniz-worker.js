@@ -1,6 +1,6 @@
 /* OKYANUS EDT GENERATED SINGLE-FILE WORKER
    Source: bundled DENIZ single-file worker; shared layer already inlined
-   Build: 2026-10-01 category-visuals embedded v2
+   Build: 2026-10-01 mobile/tablet 3-col final v3
    Do not edit dist directly. */
 
 const BUILD = "2026.10.01-mobile-3col-v3";
