@@ -704,3 +704,20 @@ test('staging preflight keeps newsletter and quote checks as separate entries',(
   const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
   assert.match(pre,/Newsletter explicit-consent signup',\s*\n\s*'POST \/api\/quote creates request'/);
 });
+
+
+test('mobile storefront v22 follows controlled shop flow',()=>{
+  for(const token of [
+    'commerce-v2-2026-10-01-mobile-shopflow-v22',
+    'class="mobileShopbar"',
+    'class="mobileMenuPanel"',
+    'class="heroDefault"',
+    'DEFAULT_HERO_VISUAL',
+    'bestSellerSection',
+    'grid-template-columns:repeat(2,minmax(0,1fr))',
+    '.sideNav{display:none!important}',
+    '.mobile,.float{display:none!important}'
+  ]) assert.ok(commerce.includes(token),token);
+  assert.ok(deniz.includes('commerce-v2-2026-10-01-mobile-shopflow-v22'));
+  assert.ok(deniz.includes('DEFAULT_HERO_VISUAL'));
+});
