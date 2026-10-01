@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="920" viewBox="0 0 900 920">
+<defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#051b2f"/><stop offset=".55" stop-color="#075f94"/><stop offset="1" stop-color="#0a2538"/></linearGradient><linearGradient id="gold" x1="0" x2="1"><stop stop-color="#f8d66f"/><stop offset="1" stop-color="#dda936"/></linearGradient></defs>
+<rect width="900" height="920" fill="url(#bg)"/><circle cx="700" cy="210" r="300" fill="#ffffff0c"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/okyanus-logo.webp" x="55" y="45" width="120" height="120"/>
+<text x="195" y="100" font-family="Arial,sans-serif" font-size="52" font-weight="850" fill="white">Okyanus EDT</text>
+<text x="196" y="140" font-family="Arial,sans-serif" font-size="21" letter-spacing="2" fill="#d9edf7">HORECA GIDA TEDARİKÇİSİ</text>
+<text x="55" y="275" font-family="Arial,sans-serif" font-size="64" font-weight="900" fill="white">Profesyonel mutfağın</text>
+<text x="55" y="342" font-family="Arial,sans-serif" font-size="64" font-weight="900" fill="url(#gold)">güvenilir tedarikçisi</text>
+<text x="58" y="395" font-family="Arial,sans-serif" font-size="22" fill="#eef9ff">Kaliteli ürün • Hızlı tedarik • Doğru fiyat</text>
+<g transform="translate(50 470)">
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-et-ai.webp" x="0" y="0" width="190" height="190"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-deniz-ai.webp" x="170" y="10" width="190" height="190"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-sut-ai.webp" x="340" y="0" width="190" height="190"/>
+<image href="https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-donuk-ai.webp" x="510" y="10" width="190" height="190"/>
+</g>
+<g transform="translate(55 725)">
+<rect width="365" height="90" rx="22" fill="white"/><text x="34" y="57" font-family="Arial,sans-serif" font-size="29" font-weight="850" fill="#07345e">Ürün Seç • Teklif Al</text>
+<rect x="390" width="400" height="90" rx="22" fill="#082f50" stroke="#f0c458" stroke-width="2"/><text x="425" y="55" font-family="Arial,sans-serif" font-size="25" font-weight="850" fill="white">Listeni Fotoğrafla Gönder</text>
+</g></svg>
