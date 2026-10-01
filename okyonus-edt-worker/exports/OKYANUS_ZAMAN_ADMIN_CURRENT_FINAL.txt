@@ -43,7 +43,7 @@ async function upsertProductCommerce(env,productId,b){
 async function ensure(env){
  if(!env?.DB) throw new Error("D1_DB_BINDING_MISSING");
  await env.DB.prepare("CREATE TABLE IF NOT EXISTS oky_schema_meta_v1(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
- const schemaKey="commerce-admin-v23-2026-09-30";
+ const schemaKey="commerce-admin-v24-ai-category-visuals-2026-09-30";
  const ready=await env.DB.prepare("SELECT value FROM oky_schema_meta_v1 WHERE key=?").bind(schemaKey).first();
  if(ready?.value==="ready") return;
  const q=[
@@ -79,18 +79,18 @@ async function ensure(env){
  await ensureColumn("oky_storefront_sections_v1","image_url","TEXT");
  await ensureColumn("oky_campaigns_v1","image_url","TEXT");
  const cats=[
- ["deniz-urunleri","Deniz Ürünleri","🐟","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-deniz.svg"],
- ["donuk-urunler","Donuk Ürünler","❄","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-donuk.svg"],
- ["et-kanatli","Et & Kanatlı","🥩","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-et.svg"],
- ["sut-sarkuteri","Süt & Şarküteri","🧀","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-sut.svg"],
- ["yaglar","Yağlar","🫗","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-yag.svg"],
- ["soslar","Soslar","🥫","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-sos.svg"],
- ["kuru-gida","Kuru Gıda","🌾","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-kuru.svg"],
- ["baharat","Baharat","✦","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/main/okyonus-edt-worker/assets/storefront/cat-baharat.svg"]
+ ["deniz-urunleri","Deniz Ürünleri","🐟","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-deniz-ai.webp"],
+ ["donuk-urunler","Donuk Ürünler","❄","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-donuk-ai.webp"],
+ ["et-kanatli","Et & Kanatlı","🥩","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-et-ai.webp"],
+ ["sut-sarkuteri","Süt & Şarküteri","🧀","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-sut-ai.webp"],
+ ["yaglar","Yağlar","🫗","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-yag-ai.webp"],
+ ["soslar","Soslar","🥫","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-sos-ai.webp"],
+ ["kuru-gida","Kuru Gıda","🌾","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-kuru-ai.webp"],
+ ["baharat","Baharat","✦","https://raw.githubusercontent.com/hasankaya474-a11y/isletme-sepeti-platform/aa44f1cddbfe31ac67a37c8766b2fd4f92b89510/okyonus-edt-worker/assets/storefront/cat-baharat-ai.webp"]
  ];
  for(let i=0;i<cats.length;i++){
   await env.DB.prepare("INSERT OR IGNORE INTO oky_storefront_categories_v1(id,name,slug,image_url,icon,sort_order,active) VALUES(?,?,?,?,?,?,1)").bind(crypto.randomUUID(),cats[i][1],cats[i][0],cats[i][3],cats[i][2],i).run();
-  await env.DB.prepare("UPDATE oky_storefront_categories_v1 SET image_url=? WHERE slug=? AND (image_url IS NULL OR trim(image_url)='')").bind(cats[i][3],cats[i][0]).run();
+  await env.DB.prepare("UPDATE oky_storefront_categories_v1 SET image_url=? WHERE slug=? AND (image_url IS NULL OR trim(image_url)='' OR image_url LIKE '%/assets/storefront/cat-%.svg')").bind(cats[i][3],cats[i][0]).run();
  }
  const hasProducts=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='b2b_products_v1'").first();
  const hasPrices=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='b2b_prices_v1'").first();
