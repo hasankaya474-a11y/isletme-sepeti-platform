@@ -51,6 +51,9 @@ function inlineDeniz(){
     'async function quoteAPI','async function photoInquiryAPI','async function okyContactMessageAPI'
   ]) if(!full.includes(token)) throw new Error('DENIZ_FINAL_CONTRACT_MISSING:'+token);
 
+  if(!full.includes('mobile-storefront-v22')) throw new Error('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED');
+  if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V22_CONTRACT_MISSING');
+  if(!full.includes('defaultHeroMedia')||!full.includes('mobileTop')||!full.includes('data:image/webp;base64,')) throw new Error('DENIZ_V22_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
   return full;
 }
