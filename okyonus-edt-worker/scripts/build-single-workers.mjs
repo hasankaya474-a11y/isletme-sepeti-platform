@@ -1,6 +1,7 @@
 // Current-final generator: keeps canonical DENIZ source, single-file deploy bundles and TXT exports byte-synchronized.
 // FOUR_SLIDE_HERO_EXTERNAL_ASSETS_LOCK: hero-01.webp..hero-04.webp stay external and are never base64-inlined.
 import fs from 'node:fs';
+// V24 regression tests synchronized: final outputs are rebuilt from the three-column mobile/tablet source.
 
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const write=(p,s)=>fs.writeFileSync(new URL('../'+p,import.meta.url),s);
