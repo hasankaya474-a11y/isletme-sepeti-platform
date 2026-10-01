@@ -7827,29 +7827,29 @@ function css(){return `
  .dots button{width:14px!important;height:14px!important;background:#d5d7d9!important;border:3px solid #fff!important;box-shadow:0 0 0 1px #e3e5e7}
  .dots button.active{background:#e92828!important;transform:none!important}
  .hero + .section{margin-top:64px!important}
- .homeCategories,.homePromos,.homeSeafood,.homeNew,#commerce-managed-sections,#commerce-seo-guide{display:none!important}
+ .homePromos,.homeSeafood,.homeNew,#commerce-managed-sections,#commerce-seo-guide{display:none!important}.homeCategories{display:block!important;margin:34px 12px 0!important}.homeCategories .cats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.homeCategories .cat{min-height:92px!important;padding:7px!important}.homeCategories .cat img{height:60px!important;object-fit:cover!important;border-radius:9px!important}.homeCategories .cat b{font-size:10px!important}
  .homeBestSellers{margin:64px 12px 0!important}
  .homeBestSellers .sectionhead{display:block!important;text-align:center;margin-bottom:22px!important}
  .homeBestSellers .sectionhead h2{font-size:34px!important;line-height:1!important;text-transform:uppercase;letter-spacing:.01em;color:#555!important}
  .homeBestSellers .sectionhead h2:after{content:"";display:block;width:72%;height:5px;background:#139a45;margin:14px auto 0;border-radius:999px}
  .homeBestSellers .sectionhead p,.homeBestSellers .sectionhead>a{display:none!important}
- .products,.seafoodProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
- .product{padding:7px!important;border-radius:13px!important;box-shadow:0 3px 10px rgba(8,42,64,.06)!important}
- .product .img{aspect-ratio:1/1!important;max-height:none!important;border-radius:9px!important}
- .fav{width:31px!important;height:31px!important;right:11px!important;top:11px!important;font-size:17px!important}
- .badges{min-height:17px!important;margin-top:5px!important;gap:3px!important}
- .badge{font-size:8px!important;padding:3px 5px!important}
- .product h3{font-size:11.5px!important;line-height:1.22!important;margin:5px 0 2px!important;min-height:28px!important}
- .meta{font-size:9.5px!important;line-height:1.25!important;min-height:24px!important}
+ .products,.seafoodProducts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ .product{padding:5px!important;border-radius:10px!important;box-shadow:0 2px 8px rgba(8,42,64,.05)!important}
+ .product .img{aspect-ratio:4/3!important;max-height:112px!important;border-radius:8px!important}
+ .fav{width:27px!important;height:27px!important;right:8px!important;top:8px!important;font-size:15px!important}
+ .badges{min-height:14px!important;margin-top:4px!important;gap:2px!important}
+ .badge{font-size:7.5px!important;padding:2px 4px!important}
+ .product h3{font-size:10.5px!important;line-height:1.18!important;margin:4px 0 2px!important;min-height:25px!important}
+ .meta{font-size:8.8px!important;line-height:1.18!important;min-height:20px!important}
  .desc{display:none!important}
- .price{min-height:42px!important;padding:5px 6px!important;margin-top:5px!important;gap:2px 4px!important}
- .priceLabel{font-size:8px!important}
- .price strong{font-size:13px!important}
- .price del{font-size:9px!important}
- .stock{font-size:9px!important;margin:4px 0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .qty{grid-template-columns:28px 1fr 28px!important;gap:3px!important}
- .qty button,.qty input{height:34px!important;border-radius:7px!important}
- .add{height:34px!important;font-size:10.5px!important;margin-top:5px!important;border-radius:7px!important}
+ .price{min-height:36px!important;padding:4px 5px!important;margin-top:4px!important;gap:1px 3px!important}
+ .priceLabel{font-size:7.5px!important}
+ .price strong{font-size:12px!important}
+ .price del{font-size:8px!important}
+ .stock{font-size:8px!important;margin:3px 0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .qty{grid-template-columns:25px 1fr 25px!important;gap:3px!important}
+ .qty button,.qty input{height:30px!important;border-radius:6px!important;font-size:11px!important}
+ .add{height:30px!important;font-size:9.5px!important;margin-top:4px!important;border-radius:6px!important;padding:0 3px!important}
  .section{margin-left:12px;margin-right:12px}
  .footer{display:none}
  .mobile{display:grid!important}
