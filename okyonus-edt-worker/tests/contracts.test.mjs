@@ -98,9 +98,9 @@ test('optional migration never redefines baseline communication/security tables'
 });
 
 
-test('Commerce V22 storefront is wired without replacing critical engines',()=>{
+test('Commerce V24 storefront is wired without replacing critical engines',()=>{
   assert.match(deniz,/commerceRoute\(request,env\)/);
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.match(commerce,/Profesyonel mutfağın alışverişi burada başlar/);
   assert.match(commerce,/Kategoriler/);
   assert.match(commerce,/Sepet \/ Teklif/);
@@ -425,7 +425,7 @@ test('single-file Worker bundles need no sibling modules',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
-  assert.match(denizSingle,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(denizSingle,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.match(denizSingle,/heroVisualSlide/);
   assert.match(denizSingle,/hero-01\.webp/);
   assert.match(denizSingle,/hero-04\.webp/);
@@ -483,7 +483,7 @@ test('single-file bundles are byte-current with generated delivery aliases',()=>
 
 
 test('cart flow keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.match(commerce,/data-cart-count/);
   assert.match(commerce,/cartRuntimeScript/);
   assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
@@ -531,7 +531,7 @@ test('architecture v15 commerce control plane is additive',()=>{
 });
 
 test('current public storefront matches locked sales architecture',()=>{
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.match(commerce,/contactName:"Hasan Kaya"/);
   assert.match(commerce,/\+90 532 346 99 25/);
   assert.match(commerce,/905323469925/);
@@ -604,7 +604,7 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v22','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','defaultHeroMedia','mobileTop']) assert.match(denizSingle,new RegExp(token));
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','defaultHeroMedia','mobileTop']) assert.match(denizSingle,new RegExp(token));
   for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.match(zamanSingle,new RegExp(token));
 });
 
@@ -622,7 +622,7 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
 });
 
-test('full monolithic DENIZ final preserves legacy engines and Commerce V22 layer',()=>{
+test('full monolithic DENIZ final preserves legacy engines and Commerce V24 layer',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
   assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
@@ -634,7 +634,7 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V22 laye
     'SEO_200_ROUTE_DATA',
     'CESNI_SOURCE_MANIFEST',
     'memberSession',
-    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col',
     'defaultHeroMedia',
     'oky_product_commerce_v1',
     'oky_campaign_rules_v1',
@@ -644,7 +644,7 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V22 laye
     '905358813264',
     'p==="/yonetici"'
   ]) assert.ok(full.includes(token),token);
-  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"|commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(full,/buildId: "v1\.53-contact-admin-products-monolithic"|commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
 });
 
 test('full monolithic DENIZ avoids archived catalog TDZ and all exports are complete',()=>{
@@ -657,7 +657,7 @@ test('full monolithic DENIZ avoids archived catalog TDZ and all exports are comp
   assert.equal(full,legacyAlias);
   assert.match(full,/const SEO_200_ROUTE_DATA = Object\.freeze/);
   assert.match(full,/const SEO_ROUTES=/);
-  assert.match(full,/commerce-v2-2026-10-01-mobile-storefront-v22/);
+  assert.match(full,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.ok(Buffer.byteLength(full,'utf8')>3900000);
   assert.ok(full.split('\n').length>8200);
 });
@@ -707,33 +707,34 @@ test('staging preflight keeps newsletter and quote checks as separate entries',(
 });
 
 
-test('V22 mobile storefront follows controlled compact flow',()=>{
+test('V24 mobile storefront follows controlled compact flow',()=>{
   for(const token of [
-    'commerce-v2-2026-10-01-mobile-storefront-v22',
+    'commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col',
     'class="mobileTop"',
     'class="mobileDrawer"',
     'class="mobileSearchPanel"',
     'defaultHeroMedia',
     'homeBest',
     'homeCategories',
-    'grid-template-columns:repeat(2,minmax(0,1fr))!important',
+    'grid-template-columns:repeat(3,minmax(0,1fr))!important',
     '.sideNav{display:none!important}',
     '.mobile{display:none!important}'
   ]) assert.ok(commerce.includes(token),token);
 });
 
-test('single-worker builder keeps the approved four-slide hero and V22 storefront',()=>{
+test('single-worker builder keeps the approved four-slide hero and V24 storefront',()=>{
   const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
-  assert.ok(build.includes('DENIZ_V22_MOBILE_STOREFRONT_REQUIRED'));
+  assert.ok(build.includes('DENIZ_V24_MOBILE_STOREFRONT_REQUIRED'));
   assert.ok(build.includes('hero-01.webp'));
   assert.ok(build.includes('hero-04.webp'));
 });
 
 
-test('final mobile cards stay two-column compact and dated export is canonical',()=>{
-  assert.match(commerce,/\.products,\.seafoodProducts\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important;gap:6px\}/);
-  assert.match(commerce,/\.product \.img\{aspect-ratio:4\/3;max-height:112px/);
-  assert.match(commerce,/@media\(max-width:420px\)[\s\S]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important;gap:5px/);
+test('final mobile and tablet cards stay three-column compact and dated export is canonical',()=>{
+  assert.match(commerce,/V24 FINAL RESPONSIVE CASCADE LOCK/);
+  assert.match(commerce,/@media\(max-width:760px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+  assert.match(commerce,/\.product \.img\{width:100%!important;aspect-ratio:4\/3!important;max-height:92px!important/);
+  assert.match(commerce,/@media\(max-width:360px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt',import.meta.url),'utf8');
   assert.equal(single,dated);
