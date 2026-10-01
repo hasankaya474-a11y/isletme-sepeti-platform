@@ -426,8 +426,10 @@ test('single-file Worker bundles need no sibling modules',()=>{
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
   assert.match(denizSingle,/commerce-v2-2026-10-01-mobile-storefront-v22/);
-  assert.match(denizSingle,/defaultHeroMedia/);
-  assert.match(denizSingle,/data:image\/webp;base64,/);
+  assert.match(denizSingle,/heroVisualSlide/);
+  assert.match(denizSingle,/hero-01\.webp/);
+  assert.match(denizSingle,/hero-04\.webp/);
+  assert.doesNotMatch(denizSingle,/data:image\/webp;base64,/);
   assert.match(zamanSingle,/const \{ commerceAdminApi, commerceAdminPage \} = \(\(\) => \{/);
   assert.doesNotMatch(denizSingle,/from "\.\/commerce-v2\.js"/);
   assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
@@ -742,7 +744,7 @@ test('final mobile cards stay two-column compact and dated export is canonical',
 
 
 test('approved homepage hero is four external visuals with no duplicate text overlay',()=>{
-  for(const n of ['01','02','03','04']) assert.match(commerce,new RegExp('hero-'+n+'\\\\.webp'));
+  for(const n of ['01','02','03','04']) assert.ok(commerce.includes('hero-'+n+'.webp'));
   assert.match(commerce,/HERO_VISUALS\.map/);
   assert.match(commerce,/heroVisualSlide/);
   assert.doesNotMatch(commerce,/const hero='[^']*Profesyonel mutfağın alışverişi burada başlar/);
