@@ -704,3 +704,35 @@ test('staging preflight keeps newsletter and quote checks as separate entries',(
   const pre=fs.readFileSync(new URL('../scripts/staging-preflight.mjs',import.meta.url),'utf8');
   assert.match(pre,/Newsletter explicit-consent signup',\s*\n\s*'POST \/api\/quote creates request'/);
 });
+
+test('mobile reference v22 keeps controlled GidaSehri-style flow with Okyanus branding',()=>{
+  for(const token of [
+    'MOBILE_REFERENCE_FLOW_V22',
+    'mobileHeadLead',
+    'data-mobile-menu',
+    'sideNav.mobileOpen',
+    'homeBestSellers',
+    'grid-template-columns:repeat(2,minmax(0,1fr))',
+    'Çok Satanlar',
+    'DEFAULT_HERO_VISUAL',
+    'commerce-v2-2026-10-01-mobile-reference-v22-ai-categories'
+  ]) assert.ok(commerce.includes(token),token);
+  assert.ok(commerce.includes('homeCategories'));
+  assert.ok(commerce.includes('homePromos'));
+  assert.ok(commerce.includes('homeSeafood'));
+  assert.ok(commerce.includes('homeNew'));
+});
+
+test('DENIZ V22 aliases remain identical after mobile rebuild',()=>{
+  const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
+  const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
+  const current=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',import.meta.url),'utf8');
+  const r4=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',import.meta.url),'utf8');
+  assert.equal(full,single);
+  assert.equal(full,current);
+  assert.equal(full,r4);
+  assert.ok(full.includes('MOBILE_REFERENCE_FLOW_V22'));
+  assert.ok(full.includes('DEFAULT_HERO_VISUAL'));
+  assert.ok(full.split('\n').length>=8400);
+});
+
