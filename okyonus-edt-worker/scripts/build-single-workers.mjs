@@ -1,4 +1,5 @@
 // Current-final generator: keeps canonical DENIZ source, single-file deploy bundles and TXT exports byte-synchronized.
+// FOUR_SLIDE_HERO_EXTERNAL_ASSETS_LOCK: hero-01.webp..hero-04.webp stay external and are never base64-inlined.
 import fs from 'node:fs';
 
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
