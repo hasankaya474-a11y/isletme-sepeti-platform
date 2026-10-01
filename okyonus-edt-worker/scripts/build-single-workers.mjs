@@ -12,7 +12,7 @@ function commerceBody({inlineHero=null}={}){
     .replace('export const OKY_COMMERCE_V2_BUILD=BUILD;','const OKY_COMMERCE_V2_BUILD=BUILD;');
   if(inlineHero){
     commerce=commerce.replace(
-      'const MOBILE_HERO_INLINE=DEFAULT_LOGO_URL; // __OKYANUS_MOBILE_HERO_INLINE__',
+      'const MOBILE_HERO_INLINE=DEFAULT_HERO_URL; // __OKYANUS_MOBILE_HERO_INLINE__',
       'const MOBILE_HERO_INLINE='+JSON.stringify(inlineHero)+';'
     );
   }
