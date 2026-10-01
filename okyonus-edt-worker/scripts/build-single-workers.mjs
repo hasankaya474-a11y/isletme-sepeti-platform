@@ -51,6 +51,12 @@ function inlineDeniz(){
   ]) if(!full.includes(token)) throw new Error('DENIZ_FINAL_CONTRACT_MISSING:'+token);
 
   if(!full.includes('mobile-storefront-v24-fluid-3col')) throw new Error('DENIZ_V24_MOBILE_STOREFRONT_REQUIRED');
+  for(const forbidden of [
+    '.products{grid-template-columns:repeat(2',
+    '.products,.seafoodProducts{grid-template-columns:repeat(2',
+    '.products{grid-template-columns:1fr',
+    '.products,.seafoodProducts{grid-template-columns:1fr'
+  ]) if(full.includes(forbidden)) throw new Error('DENIZ_MOBILE_PRODUCT_GRID_REGRESSION:'+forbidden);
   if(!full.includes('SEAFOOD_PRODUCTS')||!full.includes('seoCompact')||!full.includes('CATEGORY_ASSET_ROOT')) throw new Error('DENIZ_V24_CONTRACT_MISSING');
   if(!full.includes('hero-01.webp')||!full.includes('hero-04.webp')||!full.includes('mobileTop')) throw new Error('DENIZ_V24_MOBILE_ASSETS_MISSING');
   if((full.match(/export default/g)||[]).length!==1) throw new Error('DENIZ_SINGLE_EXPORT_REQUIRED');
