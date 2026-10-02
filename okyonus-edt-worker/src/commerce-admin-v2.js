@@ -203,8 +203,8 @@ export async function commerceAdminApi(request,env,auth,headers){
    const byId=new Map(published.map(p=>[String(p.id),p])),mismatched=[];
    const text=v=>String(v??''),number=v=>v==null||v===''?null:Number(v);
    for(const row of rows){const product=byId.get(String(row.id));if(!product||text(product.name)!==text(row.name)||text(product.image??product.image_url)!==text(row.image_url)||text(product.description)!==text(row.description)||['basePrice','sale_price','list_price'].some(k=>number(product[k])!==number(row[k])))mismatched.push(row.id)}
-   result.match=body.build==='commerce-v2-2026-10-02-admin-sync-r32'&&rows.length===published.length&&mismatched.length===0;result.mismatchedIds=mismatched.slice(0,20);
-   if(!result.match)result.error=body.build!=='commerce-v2-2026-10-02-admin-sync-r32'?'PUBLIC_STOREFRONT_VERSION_MISMATCH':'PUBLIC_STOREFRONT_VALUES_DIFFER';
+   result.match=body.build==='commerce-v2-2026-10-02-admin-sync-r33'&&rows.length===published.length&&mismatched.length===0;result.mismatchedIds=mismatched.slice(0,20);
+   if(!result.match)result.error=body.build!=='commerce-v2-2026-10-02-admin-sync-r33'?'PUBLIC_STOREFRONT_VERSION_MISMATCH':'PUBLIC_STOREFRONT_VALUES_DIFFER';
    return j(result,200,headers);
   }catch{return j({...result,error:'PUBLIC_STOREFRONT_UNREACHABLE'},200,headers)}
  }

@@ -29,6 +29,11 @@ test('actual category client rendering retains canonical eight across missing, p
 
 test('served final CSS bounds mobile hero artwork and locks categories before products',()=>{
  const html=homepage(),css=html.match(/<style>([\s\S]*?)<\/style>/)[1];
+ const compact=css.slice(css.indexOf('/* R33 compact'));
+ assert.match(compact,/height:clamp\(140px,33\.3vw,230px\)!important;min-height:0!important/);
+ assert.match(compact,/\.commerceMain>\.homeCategories\{order:1!important/);
+ assert.match(compact,/\.commerceMain>\.homeBest\{order:2!important/);
+
  assert.match(css,/\.commerceMain>\.hero\{order:0\}/);
  assert.match(css,/\.homeCategories\{[^}]*order:1/);
  assert.match(css,/\.hero \.heroVisualSlide \.heroMedia img\{[^}]*object-fit:contain!important[^}]*animation:none!important[^}]*transform:none!important/);

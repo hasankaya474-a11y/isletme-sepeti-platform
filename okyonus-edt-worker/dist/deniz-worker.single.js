@@ -7776,7 +7776,7 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
 const { commerceRoute, OKY_COMMERCE_V2_BUILD, commerceProductImage } = (() => {
 
 // Compatibility baseline: commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col
-const BUILD="commerce-v2-2026-10-02-admin-sync-r32";
+const BUILD="commerce-v2-2026-10-02-admin-sync-r33";
 function commerceProductImage(product){
  if(!product)return "";
  // A saved empty/null image is authoritative; never restore a catalogue fallback.
@@ -7977,6 +7977,21 @@ function css(){return `
 @media(max-width:360px){.products,.seafoodProducts{gap:4px!important;padding-left:4px;padding-right:4px}.product{padding:4px!important}.product .qty{grid-template-columns:22px minmax(0,1fr) 22px!important}}
 @media(hover:hover) and (prefers-reduced-motion:no-preference){.product{transition:box-shadow .2s ease,border-color .2s ease}.product:hover{border-color:#8cbad6;box-shadow:0 7px 18px rgba(7,52,94,.12)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+/* R33 compact mobile hero and permanent category placement */
+@media(max-width:1024px){
+ .commerceMain{display:flex;flex-direction:column}
+ .commerceMain>.hero{order:0!important;height:clamp(140px,33.3vw,230px)!important;min-height:0!important;max-height:230px;aspect-ratio:auto!important;margin:0 0 8px!important;overflow:hidden}
+ .commerceMain>.hero .slide{height:100%!important;min-height:0!important;padding:0!important}
+ .commerceMain>.homeCategories{order:1!important;position:static!important;margin:0!important;padding:8px 10px 10px}
+ .homeCategories .sectionhead{margin-bottom:6px}
+ .homeCategories .sectionhead h2{font-size:17px;margin:0}
+ .homeCategories .cats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px}
+ .homeCategories .cat{min-width:0;min-height:68px;padding:4px}
+ .homeCategories .cat img{height:42px;object-fit:contain}
+ .homeCategories .cat b{font-size:10px;line-height:1.2}
+ .commerceMain>.homeBest{order:2!important}
+}
+
 `}
 
 function header(){return `<div class="ann" id="siteAnnouncement">${esc(DEFAULT_SETTINGS.announcement)}</div><header class="head"><div class="mobileTop"><details class="mobileMenu"><summary class="mobileTopIcon" aria-label="Men\u00fc">\u2630</summary><div class="mobileDrawer"><a href="/">Ana Sayfa</a><a href="/urunler">\u00dcr\u00fcnler</a><a href="/urunler?category=deniz-urunleri">Deniz \u00dcr\u00fcnleri</a><a href="/urunler?category=donuk-urunler">Donuk \u00dcr\u00fcnler</a><a href="/kampanyalar">Kampanyalar</a><a href="/fotografla-teklif">Foto\u011frafla Teklif</a><a href="/iletisim">\u0130leti\u015fim</a><a href="/yardim">Site Yard\u0131m</a></div></details><details class="mobileSearchMenu"><summary class="mobileTopIcon" aria-label="Ara">\u2315</summary><form class="mobileSearchPanel" action="/urunler" method="get"><input name="q" type="search" placeholder="\u00dcr\u00fcn ara..." aria-label="\u00dcr\u00fcn ara"><button aria-label="Ara">\u2315</button></form></details><a class="mobileBrand" href="/"><img src="${esc(DEFAULT_SETTINGS.logoUrl)}" alt="Okyanus EDT"><span>Okyanus EDT</span></a><a class="mobileTopIcon" data-account-link href="/uye" aria-label="Giri\u015f yap">Giri\u015f</a><a class="mobileTopIcon" href="/uye?mode=register" aria-label="Yeni \u00fcye">\u00dcye Ol</a><a class="mobileTopIcon" href="/sepet" aria-label="Sepet">\ud83d\uded2<span class="cartBadge" data-cart-count>0</span></a></div><div class="headtop"><a class="logo" href="/"><img id="siteLogo" src="${esc(DEFAULT_SETTINGS.logoUrl)}" alt="Okyanus EDT logo"><span id="siteTitle">${esc(DEFAULT_SETTINGS.siteTitle)}</span></a><form class="search" action="/urunler" method="get" role="search"><input name="q" type="search" placeholder="\u00dcr\u00fcn, kategori, marka veya paket ara..." aria-label="\u00dcr\u00fcn ara"><button aria-label="Ara">\u2315</button></form><div class="actions"><a href="/">Ana Sayfa</a><a href="/urunler">\u00dcr\u00fcnler</a><a href="/fotografla-teklif">Foto\u011frafla Teklif</a><a href="/iletisim">\u0130leti\u015fim</a><a href="/yardim">Site Yard\u0131m</a><a class="adminLink" data-admin-link href="/yonetici">Y\u00f6netici</a><a data-account-link href="/uye">Giri\u015f Yap</a><a href="/uye?mode=register">\u00dcye Ol</a><a class="primary" href="/sepet">Sepet / Teklif <span class="cartBadge" data-cart-count>0</span></a></div></div><nav class="nav" aria-label="Ana men\u00fc"><div class="navin"><a href="/">\u2302 Ana Sayfa</a><a href="/urunler">\u2630 Kategoriler</a><a href="/kampanyalar">Kampanyalar</a><a href="/urunler?filter=discount">\u0130ndirimli \u00dcr\u00fcnler</a><a href="/urunler?filter=new">Yeni \u00dcr\u00fcnler</a><a href="/markalar">Markalar</a><a href="/urunler?category=deniz-urunleri">Deniz \u00dcr\u00fcnleri</a><a href="/urunler?category=donuk-urunler">Donuk \u00dcr\u00fcnler</a><a href="/icerik-studyo">\u0130\u00e7erik St\u00fcdyo</a></div></nav></header>`}

@@ -56,3 +56,7 @@ GitHub kaydı canlı Cloudflare dağıtımı değildir. Canlı D1/KV binding kim
 ### R32 mobil vitrin ve kategoriler
 
 Mobil/tablette ana vitrin → sekiz kategori → seçili ürünler sırası sabittir. Kategoriler dört sütun, iki satırdır; sayfayla birlikte kayar. Eksik/fazla API kategorileri bu sekiz alanı değiştirmez; yönetimde kaydedilen eşleşen ad/görseller korunur. Geniş vitrin görselleri kırpılmadan gösterilir; mobil büyütme kapalıdır. Canlı dağıtım yapılmadı. Sürüm ve dosya SHA değerleri: `docs/RELEASE_R32_2026-10-02.json`.
+
+### R33 mobil vitrin
+
+Mobil/tablette vitrin yüksekliği 140–230px aralığına indirildi. Sekiz kategori hemen altında dört sütun ve iki satır; ardından seçili ürünler. Son CSS sıralama kuralı öncelikli. 111 Worker testi geçti. Canlı dağıtım yapılmadı. `docs/RELEASE_R33_2026-10-02.json`.

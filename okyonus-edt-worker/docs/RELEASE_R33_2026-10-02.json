@@ -1,0 +1,43 @@
+{
+  "build": "commerce-v2-2026-10-02-admin-sync-r33",
+  "baseline": "user-upload-2026-10-02",
+  "architecture": "DENIZ_PUBLIC_ZAMAN_ADMIN_SHARED_COMMERCE_D1",
+  "code": {
+    "DENIZ": {
+      "path": "dist/deniz-worker.single.js",
+      "bytes": 4081160,
+      "lines": 8783,
+      "sha256": "69612b7d1cf4b574e0cc8d0ff50b93771ecb1d50929a3ce918660c71e4efb100",
+      "gzipBytes": 1978110
+    },
+    "ZAMAN": {
+      "path": "dist/zaman-admin-worker.single.js",
+      "bytes": 780068,
+      "lines": 1823,
+      "sha256": "554360bfd5aff1444ba56180d70c7805c9a7c1c7bd4bdefd7c34e1586f1c340d",
+      "gzipBytes": 101950
+    }
+  },
+  "deployment": "not-deployed",
+  "testing": {
+    "root": {
+      "pass": 278,
+      "skip": 4,
+      "fail": 0
+    },
+    "worker": {
+      "pass": 111,
+      "skip": 0,
+      "fail": 0
+    },
+    "atomicSaveScenarios": 7,
+    "selectedProductScenarios": "0/1/28/all plus conflicting DB bindings"
+  },
+  "visualQA": "Actual served HTML, client scripts and final CSS tested. No mobile pixel render. Production not deployed.",
+  "liveObservation": "2026-10-02: live login labels YÃ¶netici GiriÅŸi; R31 not deployed.",
+  "changes": [
+    "Compact mobile/tablet hero height clamp(140px,33.3vw,230px)",
+    "Final important ordering: hero, eight categories, selected products",
+    "Categories remain 4 columns and 2 rows below hero"
+  ]
+}
