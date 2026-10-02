@@ -52,3 +52,7 @@ GitHub kaydı canlı Cloudflare dağıtımı değildir. Canlı D1/KV binding kim
 ### R31 doğrulama sonucu
 
 108 Worker ve 278 platform testi geçti; 4 mevcut test atlandı. Canlı ZAMAN girişinde bozuk Türkçe doğrulandı; kaynak ve üretilen UTF-8 yanıt temiz. Canlı dağıtım yapılmadı. Ayrıntılar: `docs/RELEASE_R31_2026-10-02.json`. Geçerli sıfır fiyat gösterilir; boş fiyat teklif talebidir.
+
+### R32 mobil vitrin ve kategoriler
+
+Mobil/tablette ana vitrin → sekiz kategori → seçili ürünler sırası sabittir. Kategoriler dört sütun, iki satırdır; sayfayla birlikte kayar. Eksik/fazla API kategorileri bu sekiz alanı değiştirmez; yönetimde kaydedilen eşleşen ad/görseller korunur. Geniş vitrin görselleri kırpılmadan gösterilir; mobil büyütme kapalıdır. Canlı dağıtım yapılmadı. Sürüm ve dosya SHA değerleri: `docs/RELEASE_R32_2026-10-02.json`.

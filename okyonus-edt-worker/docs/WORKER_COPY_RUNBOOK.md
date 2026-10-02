@@ -1,4 +1,4 @@
-# R31 — İki Worker Tam Kod Teslimi
+# R32 — İki Worker Tam Kod Teslimi
 
 1. DENİZ için `dist/deniz-worker.single.js` / `exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt`.
 2. ZAMAN için `dist/zaman-admin-worker.single.js` / `exports/OKYANUS_ZAMAN_FINAL_2026-10-02.txt`.
@@ -21,3 +21,7 @@ Production DENİZ/ZAMAN Workers: NOT DEPLOYED
 Production D1: NOT MODIFIED
 
 Ayrı WhatsApp modül bayrağı: hidden flags: WHATSAPP. Ana sayfadaki satış/iletişim WhatsApp bağlantıları ve yeşil WhatsApp simgesi korunur.
+
+### R32 mobil vitrin ve kategoriler
+
+Mobil/tablette ana vitrin → sekiz kategori → seçili ürünler sırası sabittir. Kategoriler dört sütun, iki satırdır; sayfayla birlikte kayar. Eksik/fazla API kategorileri bu sekiz alanı değiştirmez; yönetimde kaydedilen eşleşen ad/görseller korunur. Geniş vitrin görselleri kırpılmadan gösterilir; mobil büyütme kapalıdır. Canlı dağıtım yapılmadı. Sürüm ve dosya SHA değerleri: `docs/RELEASE_R32_2026-10-02.json`.

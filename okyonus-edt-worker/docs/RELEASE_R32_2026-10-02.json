@@ -1,0 +1,43 @@
+{
+  "build": "commerce-v2-2026-10-02-admin-sync-r32",
+  "baseline": "user-upload-2026-10-02",
+  "architecture": "DENIZ_PUBLIC_ZAMAN_ADMIN_SHARED_COMMERCE_D1",
+  "code": {
+    "DENIZ": {
+      "path": "dist/deniz-worker.single.js",
+      "bytes": 4080175,
+      "lines": 8768,
+      "sha256": "990f10f793b06dceafc608a1fa03a23357f5df1495089b5d33b1245c732f84ab",
+      "gzipBytes": 1977951
+    },
+    "ZAMAN": {
+      "path": "dist/zaman-admin-worker.single.js",
+      "bytes": 780068,
+      "lines": 1823,
+      "sha256": "77c69471100f3e8ea8de64f216f49aa304570657fe38113b37038287775ceddf",
+      "gzipBytes": 101950
+    }
+  },
+  "deployment": "not-deployed",
+  "testing": {
+    "root": {
+      "pass": 278,
+      "skip": 4,
+      "fail": 0
+    },
+    "worker": {
+      "pass": 111,
+      "skip": 0,
+      "fail": 0
+    },
+    "atomicSaveScenarios": 7,
+    "selectedProductScenarios": "0/1/28/all plus conflicting DB bindings"
+  },
+  "visualQA": "Actual served HTML, client scripts and final CSS tested. No mobile pixel render. Production not deployed.",
+  "liveObservation": "2026-10-02: live login labels YÃ¶netici GiriÅŸi; R31 not deployed.",
+  "changes": [
+    "Mobile/tablet hero -> canonical eight categories -> selected products",
+    "Four columns/two rows categories; managed saved names/images preserved",
+    "Bounded full hero artwork; mobile zoom disabled"
+  ]
+}
