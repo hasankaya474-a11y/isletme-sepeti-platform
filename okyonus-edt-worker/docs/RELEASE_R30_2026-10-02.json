@@ -1,0 +1,37 @@
+{
+  "build": "commerce-v2-2026-10-02-admin-sync-r30",
+  "baseline": "user-upload-2026-10-02",
+  "architecture": "DENIZ_PUBLIC_ZAMAN_ADMIN_SHARED_COMMERCE_D1",
+  "code": {
+    "DENIZ": {
+      "path": "dist/deniz-worker.single.js",
+      "bytes": 4076877,
+      "lines": 8738,
+      "sha256": "448fae6dfd9e31acebc7c1df9dbca3f562bb5ed0ba6e00acc85d2653f46594b1",
+      "gzipBytes": 1980663
+    },
+    "ZAMAN": {
+      "path": "dist/zaman-admin-worker.single.js",
+      "bytes": 778230,
+      "lines": 1823,
+      "sha256": "4e8c3cc1fdbd1ec0c2a7c7766030e6d6ec32f0db236c14c1cae35b7da2d2a0fb",
+      "gzipBytes": 103077
+    }
+  },
+  "deployment": "not-deployed",
+  "testing": {
+    "root": {
+      "pass": 278,
+      "skip": 4,
+      "fail": 0
+    },
+    "worker": {
+      "pass": 101,
+      "skip": 0,
+      "fail": 0
+    },
+    "atomicSaveScenarios": 7,
+    "selectedProductScenarios": "0/1/28/all plus conflicting DB bindings"
+  },
+  "visualQA": "responsive CSS and rendered scripts verified; screenshot renderer unavailable"
+}

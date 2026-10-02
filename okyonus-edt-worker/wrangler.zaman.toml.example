@@ -1,5 +1,5 @@
 name = "okyanus-edt-admin"
-main = "src/zaman-admin-worker.js"
+main = "dist/zaman-admin-worker.single.js"
 compatibility_date = "2026-09-29"
 
 # Bind the SAME D1 used by DENIZ when deploying the matching environment.
@@ -8,8 +8,8 @@ compatibility_date = "2026-09-29"
 #
 # Expected bindings:
 # DB          -> shared Okyanus D1
-# MEDIA_STORE -> existing/staging media R2 when used by Admin Studio
-# PHOTO_TEMP  -> existing/staging photo R2 when Admin photo workflow needs it
+# MEDIA_STORE -> existing/staging media KV when used by Admin Studio
+# PHOTO_TEMP  -> existing/staging photo KV when Admin photo workflow needs it
 #
 # Required secrets/vars are NOT committed:
 # SESSION_PEPPER

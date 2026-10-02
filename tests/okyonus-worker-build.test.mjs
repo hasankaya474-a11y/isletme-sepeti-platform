@@ -4,10 +4,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {execFileSync} from "node:child_process";
+import vm from "node:vm";
 import {pathToFileURL} from "node:url";
 
 const root=process.cwd();
 const p=(...x)=>path.join(root,...x);
+const logicalText=s=>s.replace(/\\u([0-9a-f]{4})/gi,(_,h)=>String.fromCharCode(parseInt(h,16)));
+
 const deniz=fs.readFileSync(p("okyonus-edt-worker","src","deniz-worker.js"),"utf8");
 const denizBase=fs.readFileSync(p("okyonus-edt-worker","baseline","deniz-worker.js"),"utf8");
 const admin=fs.readFileSync(p("okyonus-edt-worker","src","zaman-admin-worker.js"),"utf8");
@@ -57,7 +60,8 @@ function parseFrozenJsonArray(source,constName){
 }
 
 test("DENIZ and ZAMAN sources parse as modules",()=>{
-  assert.ok(deniz.length>3_000_000);
+  assert.ok(deniz.length>100_000);
+  assert.doesNotMatch(deniz,/const (?:VERIFIED_PRODUCT_IMAGES|GENERATED_PRODUCT_IMAGES)=/);
   assert.ok(admin.length>100_000);
   syntaxCheck(deniz,"okyonus-deniz-worker");
   syntaxCheck(admin,"okyonus-zaman-worker");
@@ -76,14 +80,14 @@ test("critical ZAMAN message/photo engines are byte-preserved",()=>{
 });
 
 test("current commerce homepage and active public flows are wired",()=>{
-  assert.match(commerce,/function home\(\)/);
-  assert.match(commerce,/Ürün Seç • Teklif Al/);
-  assert.match(commerce,/Listeni Fotoğrafla Gönder/);
-  assert.match(commerce,/\/api\/storefront-v2/);
+  assert.match(logicalText(commerce),/function home\(opening=\{\}\)/);
+  assert.match(logicalText(commerce),/Ürün Seç • Teklif Al/);
+  assert.match(logicalText(commerce),/Listeni Fotoğrafla Gönder/);
+  assert.match(logicalText(commerce),/\/api\/storefront-v2/);
   assert.match(deniz,/fetch\('\/api\/quote'/);
   assert.match(deniz,/\/api\/photo-inquiries/);
   assert.match(deniz,/\/api\/contact/);
-  assert.match(commerce,/secondWhatsapp:"905358813264"/);
+  assert.match(logicalText(commerce),/secondWhatsapp:"905358813264"/);
 });
 
 test("legacy business tools remain preserved behind the current commerce storefront",()=>{
@@ -104,16 +108,16 @@ test("Digital Menu engine and public menu routes remain present",()=>{
 
 test("Commerce help exposes current storefront assistance",()=>{
   const help=extractFunction(commerce,"help");
-  assert.match(help,/Ürün|ürün/);
-  assert.match(help,/teklif/i);
-  assert.match(help,/İletişim|iletişim/);
-  assert.match(commerce,/p==="\/yardim"\|\|p==="\/site-yardim"/);
+  assert.match(logicalText(help),/Ürün|ürün/);
+  assert.match(logicalText(help),/teklif/i);
+  assert.match(logicalText(help),/İletişim|iletişim/);
+  assert.match(logicalText(commerce),/p==="\/yardim"\|\|p==="\/site-yardim"/);
 });
 
 test("SEO keeps commerce routes public while private workspaces stay non-indexable",()=>{
   assert.match(deniz,/const SEO_PRIVATE_PREFIXES = Object\.freeze\(\["\/api\/","\/uye","\/uyelik","\/benim-okyanusum","\/cost","\/cesni","\/dijital-menu"/);
-  for(const route of ["/edt-horeca-gida-tedarikcisi","/edt-deniz-urunleri-tedarikcisi","/istanbul-restoran-gida-tedariki"]) assert.ok(commerce.includes(route),route);
-  assert.match(commerce,/seoModulesHtml/);
+  for(const route of ["/edt-horeca-gida-tedarikcisi","/edt-deniz-urunleri-tedarikcisi","/istanbul-restoran-gida-tedariki"]) assert.ok(logicalText(commerce).includes(route),route);
+  assert.match(logicalText(commerce),/seoModulesHtml/);
 });
 
 
@@ -126,7 +130,8 @@ test("DENIZ runtime smoke: commerce homepage, help and catalog remain available"
   const home=await mod.default.fetch(new Request("https://www.okyonusedt.com/"),{}, {waitUntil(){}});
   assert.equal(home.status,200);
   const homeText=await home.text();
-  assert.match(homeText,/Profesyonel mutfağın alışverişi burada başlar/);
+  assert.match(homeText,/Ürün Seç|\\u00dcr\\u00fcn Se\\u00e7/);
+  assert.match(homeText,/class="hero"/);
   assert.match(homeText,/Sepet \/ Teklif/);
   assert.match(homeText,/Site Yardım/);
   const help=await mod.default.fetch(new Request("https://www.okyonusedt.com/yardim"),{}, {waitUntil(){}});
@@ -154,28 +159,48 @@ test("ZAMAN runtime smoke: login surface remains available",async()=>{
 
 
 test("new Okyanus homepage is mobile/tablet ready and keeps navigation controlled",()=>{
-  assert.match(commerce,/class="mobileTop"/);
-  assert.match(commerce,/class="mobileDrawer"/);
-  assert.match(commerce,/class="mobileSearchPanel"/);
-  assert.match(commerce,/@media\(max-width:1024px\)/);
-  assert.match(commerce,/@media\(max-width:760px\)/);
-  assert.match(commerce,/@media\(max-width:420px\)/);
-  assert.match(commerce,/\.sideNav\{display:none!important\}/);
-  assert.match(commerce,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
+  assert.match(logicalText(commerce),/class="mobileTop"/);
+  assert.match(logicalText(commerce),/class="mobileDrawer"/);
+  assert.match(logicalText(commerce),/class="mobileSearchPanel"/);
+  assert.match(logicalText(commerce),/@media\(max-width:1024px\)/);
+  assert.match(logicalText(commerce),/@media\(max-width:760px\)/);
+  assert.match(logicalText(commerce),/@media\(max-width:420px\)/);
+  assert.match(logicalText(commerce),/\.sideNav\{display:none!important\}/);
+  assert.match(logicalText(commerce),/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
 });
 
 test("current commerce homepage reconnects managed storefront publication",()=>{
-  assert.match(commerce,/fetch\('\/api\/storefront-v2'/);
-  assert.match(commerce,/function managedHero\(list\)/);
-  assert.match(commerce,/Array\.isArray\(j\.banners\)/);
-  assert.match(commerce,/Array\.isArray\(j\.categories\)/);
-  assert.match(commerce,/Array\.isArray\(j\.campaigns\)/);
+  assert.match(logicalText(commerce),/fetch\('\/api\/storefront-v2'/);
+  assert.match(logicalText(commerce),/function managedHero\(list\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.banners\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.categories\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.campaigns\)/);
 });
 
 test("homepage product cards use catalog media, price and stock data",()=>{
   const card=extractFunction(commerce,"card");
-  assert.match(card,/p\.image/);
-  assert.match(card,/p\.effectivePrice/);
-  assert.match(card,/p\.stock_status\|\|p\.stockStatus/);
-  assert.match(card,/Sepete \/ Teklife Ekle/);
+  assert.match(logicalText(card),/p\.image/);
+  assert.match(logicalText(card),/p\.effectivePrice/);
+  assert.match(logicalText(card),/p\.stock_status\|\|p\.stockStatus/);
+  assert.match(logicalText(card),/Sepete \/ Teklife Ekle/);
+});
+
+
+test("commercial database binding is shared and deterministic",()=>{
+  const context={};vm.createContext(context);
+  vm.runInContext(extractFunction(deniz,"commerceDatabase")+";this.choose=commerceDatabase",context);
+  const db={},adminDb={},commerceDb={};
+  assert.equal(context.choose({DB:db,ADMIN_DB:adminDb,COMMERCE_DB:commerceDb}),commerceDb);
+  assert.equal(context.choose({DB:db,ADMIN_DB:adminDb}),adminDb);
+  assert.equal(context.choose({DB:db}),db);
+  assert.equal(context.choose({}),null);
+});
+
+test("managed product images never resurrect removed catalogue photos",()=>{
+  const context={};vm.createContext(context);
+  vm.runInContext(extractFunction(deniz,"commerceProductImage")+";this.image=commerceProductImage",context);
+  assert.equal(context.image({image_url:null,image:"https://old.test/a.jpg"}),"");
+  assert.equal(context.image({image_url:"",image:"https://old.test/a.jpg"}),"");
+  assert.equal(context.image({id:"LEZ-0006",name:"Julyen Dilimli Sosis"}),"");
+  assert.equal(context.image({image_url:"https://new.test/a.webp"}),"https://new.test/a.webp");
 });

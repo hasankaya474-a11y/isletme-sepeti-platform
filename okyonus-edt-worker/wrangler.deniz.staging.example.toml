@@ -1,5 +1,5 @@
 name = "deniz-edt-v2-staging"
-main = "src/deniz-worker.js"
+main = "dist/deniz-worker.single.js"
 compatibility_date = "2026-09-29"
 
 # STAGING ONLY. Replace placeholder values before deploy.

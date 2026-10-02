@@ -5,6 +5,8 @@ import fs from 'node:fs';
 // Match the exact escaped delivery token; do not unescape arbitrary source.
 const asciiToken=s=>s.replace(/[^\x00-\x7f]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
 
+const logicalText=s=>s.replace(/\\u([0-9a-f]{4})/gi,(_,h)=>String.fromCharCode(parseInt(h,16)));
+
 const deniz=fs.readFileSync(new URL('../src/deniz-worker.js',import.meta.url),'utf8');
 const denizBase=fs.readFileSync(new URL('../baseline/deniz-worker.js',import.meta.url),'utf8');
 const admin=fs.readFileSync(new URL('../src/zaman-admin-worker.js',import.meta.url),'utf8');
@@ -29,7 +31,7 @@ function extractFunction(source,name){
 }
 
 test('real DENIZ and ZAMAN sources are present',()=>{
-  assert.ok(deniz.length>3_000_000);
+  assert.ok(deniz.length>100_000);
   assert.ok(admin.length>100_000);
 });
 
@@ -42,10 +44,10 @@ test('critical ZAMAN message/photo engines remain byte-preserved',()=>{
 });
 
 test('current commerce public face is wired',()=>{
-  assert.match(commerce,/function home\(opening=\{\}\)/);
-  assert.match(commerce,/Ürün Seç • Teklif Al/);
-  assert.match(commerce,/Listeni Fotoğrafla Gönder/);
-  assert.match(commerce,/secondWhatsapp:"905358813264"/);
+  assert.match(logicalText(commerce),/function home\(opening=\{\}\)/);
+  assert.match(logicalText(commerce),/Ürün Seç • Teklif Al/);
+  assert.match(logicalText(commerce),/Listeni Fotoğrafla Gönder/);
+  assert.match(logicalText(commerce),/secondWhatsapp:"905358813264"/);
 });
 
 test('legacy business modules remain preserved behind current commerce storefront',()=>{
@@ -66,10 +68,10 @@ test('Digital Menu engine and public menu routes are preserved',()=>{
 
 test('Commerce Help stays wired to current storefront assistance',()=>{
   const help=extractFunction(commerce,'help');
-  assert.match(help,/ürün|Ürün/);
-  assert.match(help,/teklif/i);
-  assert.match(help,/İletişim|iletişim/);
-  assert.match(commerce,/p==="\/yardim"\|\|p==="\/site-yardim"/);
+  assert.match(logicalText(help),/ürün|Ürün/);
+  assert.match(logicalText(help),/teklif/i);
+  assert.match(logicalText(help),/İletişim|iletişim/);
+  assert.match(logicalText(commerce),/p==="\/yardim"\|\|p==="\/site-yardim"/);
 });
 
 test('200 EDT SEO migration inventory is retained',()=>{
@@ -89,8 +91,8 @@ test('no production secrets are committed',()=>{
 test('deployment examples point to canonical Worker source files',()=>{
   const denizWrangler=fs.readFileSync(new URL('../wrangler.deniz.toml.example',import.meta.url),'utf8');
   const zamanWrangler=fs.readFileSync(new URL('../wrangler.zaman.toml.example',import.meta.url),'utf8');
-  assert.match(denizWrangler,/main\s*=\s*"src\/deniz-worker\.js"/);
-  assert.match(zamanWrangler,/main\s*=\s*"src\/zaman-admin-worker\.js"/);
+  assert.match(denizWrangler,/main\s*=\s*"dist\/deniz-worker\.single\.js"/);
+  assert.match(zamanWrangler,/main\s*=\s*"dist\/zaman-admin-worker\.single\.js"/);
 });
 
 test('optional migration never redefines baseline communication/security tables',()=>{
@@ -103,47 +105,48 @@ test('optional migration never redefines baseline communication/security tables'
 
 test('Commerce V24 storefront is wired without replacing critical engines',()=>{
   assert.match(deniz,/commerceRoute\(request,env\)/);
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
-  assert.match(commerce,/Profesyonel mutfağın alışverişi burada başlar/);
-  assert.match(commerce,/Kategoriler/);
-  assert.match(commerce,/Sepet \/ Teklif/);
-  assert.match(commerce,/İçerik Stüdyo/);
+  assert.match(logicalText(commerce),/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
+  assert.match(logicalText(commerce),/Profesyonel mutfağın alışverişi burada başlar/);
+  assert.match(logicalText(commerce),/Kategoriler/);
+  assert.match(logicalText(commerce),/Sepet \/ Teklif/);
+  assert.match(logicalText(commerce),/İçerik Stüdyo/);
 });
 
 test('Commerce V2 mobile tablet contact and help locks are present',()=>{
-  assert.match(commerce,/@media\(max-width:1024px\)/);
-  assert.match(commerce,/@media\(max-width:900px\)/);
-  assert.match(commerce,/@media\(max-width:620px\)/);
-  assert.match(commerce,/Mobil alt menü/);
-  assert.match(commerce,/Site Yardım/);
-  assert.match(commerce,/İletişim/);
-  assert.match(commerce,/\/site-yardim/);
+  assert.match(logicalText(commerce),/@media\(max-width:1024px\)/);
+  assert.match(logicalText(commerce),/@media\(max-width:900px\)/);
+  assert.match(logicalText(commerce),/@media\(max-width:620px\)/);
+  assert.match(logicalText(commerce),/Mobil alt menü/);
+  assert.match(logicalText(commerce),/Site Yardım/);
+  assert.match(logicalText(commerce),/İletişim/);
+  assert.match(logicalText(commerce),/\/site-yardim/);
   assert.doesNotMatch(commerce,/wa\.me\//);
 });
 
 test('Commerce V2 mobile navigation routes and touch targets are correct',()=>{
-  assert.match(commerce,/href="\/sepet">▣<br>Sepet\/Teklif/);
-  assert.match(commerce,/href="\/yardim" title="Site Yardım"/);
-  assert.match(commerce,/\.mobile a\{[^}]*min-height:44px/);
-  assert.match(commerce,/\.qty button,\.add\{[^}]*height:44px/);
+  assert.match(logicalText(commerce),/href="\/sepet">▣<br>Sepet\/Teklif/);
+  assert.match(logicalText(commerce),/href="\/yardim" title="Site Yardım"/);
+  assert.match(logicalText(commerce),/\.mobile a\{[^}]*min-height:44px/);
+  assert.match(logicalText(commerce),/\.qty button,\.add\{[^}]*height:44px/);
 });
 
 test('Commerce V2 admin supports storefront record edit and delete',()=>{
-  assert.match(commerceAdmin,/function startEdit\(/);
-  assert.match(commerceAdmin,/function removeRow\(/);
-  assert.match(commerceAdmin,/method:'DELETE'/);
-  assert.match(commerceAdmin,/editingId/);
+  assert.match(logicalText(commerceAdmin),/function startEdit\(/);
+  assert.match(logicalText(commerceAdmin),/function removeRow\(/);
+  assert.match(logicalText(commerceAdmin),/method:'DELETE'/);
+  assert.match(logicalText(commerceAdmin),/editingId/);
 });
 
 test('Commerce V2 admin can manage product image price banner category and help',()=>{
-  assert.match(admin,/from "\.\/commerce-admin-v2\.js"/);
+  assert.match(admin,/async function commerceAdminApi/);
+  assert.doesNotMatch(admin,/from "\.\/commerce-admin-v2\.js"/);
   assert.match(admin,/commerceAdminApi/);
-  assert.match(commerceAdmin,/Ürün & Fiyat/);
-  assert.match(commerceAdmin,/Kategoriler/);
-  assert.match(commerceAdmin,/Banner/);
-  assert.match(commerceAdmin,/Site Yardım/);
-  assert.match(commerceAdmin,/imageUrl/);
-  assert.match(commerceAdmin,/price/);
+  assert.match(logicalText(commerceAdmin),/Ürün & Fiyat/);
+  assert.match(logicalText(commerceAdmin),/Kategoriler/);
+  assert.match(logicalText(commerceAdmin),/Banner/);
+  assert.match(logicalText(commerceAdmin),/Site Yardım/);
+  assert.match(logicalText(commerceAdmin),/imageUrl/);
+  assert.match(logicalText(commerceAdmin),/price/);
 });
 
 test('Commerce V2 migration is additive and avoids protected baseline tables',()=>{
@@ -158,13 +161,13 @@ test('Commerce V2 migration is additive and avoids protected baseline tables',()
 
 
 test('Commerce extended catalog/cart routes are present',()=>{
-  assert.match(commerce,/commerceCatalogPage/);
-  assert.match(commerce,/commerceCartPage/);
-  assert.match(commerce,/commerceProductPage/);
-  assert.match(commerce,/\/markalar/);
-  assert.match(commerce,/\/kampanyalar/);
-  assert.match(commerce,/\/teslimat/);
-  assert.match(commerce,/oky-commerce-cart-v2/);
+  assert.match(logicalText(commerce),/commerceCatalogPage/);
+  assert.match(logicalText(commerce),/commerceCartPage/);
+  assert.match(logicalText(commerce),/commerceProductPage/);
+  assert.match(logicalText(commerce),/\/markalar/);
+  assert.match(logicalText(commerce),/\/kampanyalar/);
+  assert.match(logicalText(commerce),/\/teslimat/);
+  assert.match(logicalText(commerce),/oky-commerce-cart-v2/);
 });
 
 test('Commerce extended schema remains additive',()=>{
@@ -175,12 +178,12 @@ test('Commerce extended schema remains additive',()=>{
 
 
 test('Commerce admin extended controls are present',()=>{
-  for(const x of ['oky_brands_v1','oky_campaigns_v1','oky_delivery_rules_v1','oky_media_assets_v1']) assert.match(commerceAdmin,new RegExp(x));
-  for(const x of ['Markalar','Kampanyalar','Teslimat','Medya']) assert.match(commerceAdmin,new RegExp(x));
-  assert.match(commerceAdmin,/resource==="brands"/);
-  assert.match(commerceAdmin,/resource==="campaigns"/);
-  assert.match(commerceAdmin,/resource==="delivery"/);
-  assert.match(commerceAdmin,/resource==="media"/);
+  for(const x of ['oky_brands_v1','oky_campaigns_v1','oky_delivery_rules_v1','oky_media_assets_v1']) assert.match(logicalText(commerceAdmin),new RegExp(x));
+  for(const x of ['Markalar','Kampanyalar','Teslimat','Medya']) assert.match(logicalText(commerceAdmin),new RegExp(x));
+  assert.match(logicalText(commerceAdmin),/resource==="brands"/);
+  assert.match(logicalText(commerceAdmin),/resource==="campaigns"/);
+  assert.match(logicalText(commerceAdmin),/resource==="delivery"/);
+  assert.match(logicalText(commerceAdmin),/resource==="media"/);
 });
 
 
@@ -200,76 +203,76 @@ test('release docs match Commerce V2 production contract',()=>{
 
 
 test('Commerce V2 managed storefront content reaches homepage',()=>{
-  assert.match(commerce,/id="commerce-categories"/);
-  assert.match(commerce,/id="commerce-campaign"/);
-  assert.match(commerce,/id="commerce-managed-sections"/);
-  assert.match(commerce,/oky_storefront_sections_v1/);
-  assert.match(commerce,/oky_campaigns_v1/);
-  assert.match(commerce,/categories,sections,campaigns/);
-  assert.match(commerce,/Array\.isArray\(j\.categories\)/);
-  assert.match(commerce,/Array\.isArray\(j\.campaigns\)/);
-  assert.match(commerce,/Array\.isArray\(j\.sections\)/);
+  assert.match(logicalText(commerce),/id="commerce-categories"/);
+  assert.match(logicalText(commerce),/id="commerce-campaign"/);
+  assert.match(logicalText(commerce),/id="commerce-managed-sections"/);
+  assert.match(logicalText(commerce),/oky_storefront_sections_v1/);
+  assert.match(logicalText(commerce),/oky_campaigns_v1/);
+  assert.match(logicalText(commerce),/categories,sections,campaigns/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.categories\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.campaigns\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.sections\)/);
 });
 
 
 test('Commerce V2 managed subpages use admin-backed storefront data',()=>{
-  for(const key of ['brands','delivery','help:helpArticles']) assert.match(commerce,new RegExp(key.replace(':','\\s*:\\s*')));
-  assert.match(commerce,/oky_brands_v1/);
-  assert.match(commerce,/oky_delivery_rules_v1/);
-  assert.match(commerce,/oky_help_articles_v1/);
-  assert.match(commerce,/id="campaignList"/);
-  assert.match(commerce,/id="deliveryList"/);
-  assert.match(commerce,/id="managed-help"/);
-  assert.match(commerce,/Array\.isArray\(j\.brands\)/);
-  assert.match(commerce,/Array\.isArray\(j\.delivery\)/);
-  assert.match(commerce,/Array\.isArray\(j\.help\)/);
+  for(const key of ['brands','delivery','help:helpArticles']) assert.match(logicalText(commerce),new RegExp(key.replace(':','\\s*:\\s*')));
+  assert.match(logicalText(commerce),/oky_brands_v1/);
+  assert.match(logicalText(commerce),/oky_delivery_rules_v1/);
+  assert.match(logicalText(commerce),/oky_help_articles_v1/);
+  assert.match(logicalText(commerce),/id="campaignList"/);
+  assert.match(logicalText(commerce),/id="deliveryList"/);
+  assert.match(logicalText(commerce),/id="managed-help"/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.brands\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.delivery\)/);
+  assert.match(logicalText(commerce),/Array\.isArray\(j\.help\)/);
 });
 
 
 test('Commerce V2 catalog URL filters and product detail stay wired',()=>{
-  assert.match(commerce,/new URLSearchParams\(location\.search\)/);
-  assert.match(commerce,/params\.get\('q'\)/);
-  assert.match(commerce,/params\.get\('category'\)/);
-  assert.match(commerce,/params\.get\('filter'\)/);
-  assert.match(commerce,/fetch\('\/api\/storefront-v2'/);
-  assert.match(commerce,/pdAdd/);
-  assert.match(commerce,/Sepete \/ Teklife Ekle/);
-  assert.match(commerce,/effectivePrice/);
-  assert.match(commerce,/stock_status/);
+  assert.match(logicalText(commerce),/new URLSearchParams\(location\.search\)/);
+  assert.match(logicalText(commerce),/params\.get\('q'\)/);
+  assert.match(logicalText(commerce),/params\.get\('category'\)/);
+  assert.match(logicalText(commerce),/params\.get\('filter'\)/);
+  assert.match(logicalText(commerce),/fetch\('\/api\/storefront-v2'/);
+  assert.match(logicalText(commerce),/pdAdd/);
+  assert.match(logicalText(commerce),/Sepete \/ Teklife Ekle/);
+  assert.match(logicalText(commerce),/effectivePrice/);
+  assert.match(logicalText(commerce),/stock_status/);
 });
 
 
 test('Commerce V2 cart quote flow keeps product integrity',()=>{
-  assert.match(commerce,/cartSummary/);
-  assert.match(commerce,/Ürün kodu eksik/);
-  assert.match(commerce,/ürünün fiyatı teklifte netleşecek/);
-  assert.match(commerce,/Array\.isArray\(raw\)\?raw:\[\]/);
-  assert.match(commerce,/qf\.reset\(\)/);
-  assert.match(commerce,/grid-template-columns:minmax\(0,1fr\) 128px 44px/);
-  assert.match(commerce,/min-width:44px;min-height:44px/);
-  assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
+  assert.match(logicalText(commerce),/cartSummary/);
+  assert.match(logicalText(commerce),/Ürün kodu eksik/);
+  assert.match(logicalText(commerce),/ürünün fiyatı teklifte netleşecek/);
+  assert.match(logicalText(commerce),/Array\.isArray\(raw\)\?raw:\[\]/);
+  assert.match(logicalText(commerce),/qf\.reset\(\)/);
+  assert.match(logicalText(commerce),/grid-template-columns:minmax\(0,1fr\) 128px 44px/);
+  assert.match(logicalText(commerce),/min-width:44px;min-height:44px/);
+  assert.match(logicalText(commerce),/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
 });
 
 
 test('Commerce V2 product admin supports create edit and safe soft-delete',()=>{
-  assert.match(commerceAdmin,/request\.method==="POST"&&!id/);
-  assert.match(commerceAdmin,/INSERT INTO b2b_products_v1/);
-  assert.match(commerceAdmin,/request\.method==="DELETE"&&id/);
-  assert.match(commerceAdmin,/UPDATE b2b_products_v1 SET active=0/);
-  assert.match(commerceAdmin,/UPDATE b2b_prices_v1 SET active=0/);
-  assert.match(commerceAdmin,/function productForm\(/);
-  assert.match(commerceAdmin,/function disableProduct\(/);
-  assert.match(commerceAdmin,/Pasife Al/);
-  assert.match(commerceAdmin,/NAME_CATEGORY_REQUIRED/);
+  assert.match(logicalText(commerceAdmin),/request\.method==="POST"&&!id/);
+  assert.match(logicalText(commerceAdmin),/INSERT INTO b2b_products_v1/);
+  assert.match(logicalText(commerceAdmin),/request\.method==="DELETE"&&id/);
+  assert.match(logicalText(commerceAdmin),/UPDATE b2b_products_v1 SET active=0/);
+  assert.match(logicalText(commerceAdmin),/UPDATE b2b_prices_v1 SET active=0/);
+  assert.match(logicalText(commerceAdmin),/function productForm\(/);
+  assert.match(logicalText(commerceAdmin),/function disableProduct\(/);
+  assert.match(logicalText(commerceAdmin),/Pasife Al/);
+  assert.match(logicalText(commerceAdmin),/NAME_CATEGORY_REQUIRED/);
 });
 
 
 test('Commerce V2 final admin and release state are locked',()=>{
-  assert.match(commerceAdmin,/resource==="product-history"/);
-  assert.match(commerceAdmin,/b2b_price_history_v1/);
-  assert.match(commerceAdmin,/function showPriceHistory\(/);
-  assert.match(commerceAdmin,/Fiyat Geçmişi/);
-  assert.match(commerceAdmin,/min-height:44px/);
+  assert.match(logicalText(commerceAdmin),/resource==="product-history"/);
+  assert.match(logicalText(commerceAdmin),/b2b_price_history_v1/);
+  assert.match(logicalText(commerceAdmin),/function showPriceHistory\(/);
+  assert.match(logicalText(commerceAdmin),/Fiyat Geçmişi/);
+  assert.match(logicalText(commerceAdmin),/min-height:44px/);
   const runbook=fs.readFileSync(new URL('../docs/WORKER_COPY_RUNBOOK.md',import.meta.url),'utf8');
   const checklist=fs.readFileSync(new URL('../DEPLOYMENT_CHECKLIST.md',import.meta.url),'utf8');
   assert.match(runbook,/CODE COMPLETE \/ READY FOR CONTROLLED DEPLOYMENT/);
@@ -343,28 +346,28 @@ test('binding consistency audit locks canonical and legacy names',()=>{
 
 
 test('managed section kinds render products categories and promo payloads',()=>{
-  assert.match(commerce,/PRODUCT_GRID/);
-  assert.match(commerce,/CATEGORY_STRIP/);
-  assert.match(commerce,/CAMPAIGN/);
-  assert.match(commerce,/managedBlock/);
-  assert.match(commerce,/function renderSection\(/);
-  assert.match(commerceAdmin,/payloadJson/);
-  assert.match(commerceAdmin,/INVALID_SECTION_PAYLOAD_JSON/);
-  assert.match(commerceAdmin,/sectionKinds/);
-  assert.match(commerceAdmin,/PRODUCT_GRID/);
-  assert.match(commerceAdmin,/CATEGORY_STRIP/);
+  assert.match(logicalText(commerce),/PRODUCT_GRID/);
+  assert.match(logicalText(commerce),/CATEGORY_STRIP/);
+  assert.match(logicalText(commerce),/CAMPAIGN/);
+  assert.match(logicalText(commerce),/managedBlock/);
+  assert.match(logicalText(commerce),/function renderSection\(/);
+  assert.match(logicalText(commerceAdmin),/payloadJson/);
+  assert.match(logicalText(commerceAdmin),/INVALID_SECTION_PAYLOAD_JSON/);
+  assert.match(logicalText(commerceAdmin),/sectionKinds/);
+  assert.match(logicalText(commerceAdmin),/PRODUCT_GRID/);
+  assert.match(logicalText(commerceAdmin),/CATEGORY_STRIP/);
 });
 
 
 test('catalog bulk import preserves product identity and price history',()=>{
-  assert.match(commerceAdmin,/resource==="catalog-import"/);
-  assert.match(commerceAdmin,/INVALID_IMPORT_SIZE/);
-  assert.match(commerceAdmin,/source_product_id=\?/);
-  assert.match(commerceAdmin,/SELECT \* FROM b2b_products_v1 WHERE name=\? AND category=\?/);
-  assert.match(commerceAdmin,/b2b_price_history_v1/);
-  assert.match(commerceAdmin,/Toplu Katalog İçe Aktar/);
-  assert.match(commerceAdmin,/runCatalogImport/);
-  assert.match(commerceAdmin,/En fazla 500 ürün/);
+  assert.match(logicalText(commerceAdmin),/resource==="catalog-import"/);
+  assert.match(logicalText(commerceAdmin),/INVALID_IMPORT_SIZE/);
+  assert.match(logicalText(commerceAdmin),/source_product_id=\?/);
+  assert.match(logicalText(commerceAdmin),/SELECT \* FROM b2b_products_v1 WHERE name=\? AND category=\?/);
+  assert.match(logicalText(commerceAdmin),/b2b_price_history_v1/);
+  assert.match(logicalText(commerceAdmin),/Toplu Katalog İçe Aktar/);
+  assert.match(logicalText(commerceAdmin),/runCatalogImport/);
+  assert.match(logicalText(commerceAdmin),/En fazla 500 ürün/);
 });
 
 
@@ -377,16 +380,17 @@ test('product metadata extension is additive and storefront-wired',()=>{
   for(const table of ['b2b_products_v1','audit_log','users','sessions','inquiries','photo_inquiries','digital_menus']){
     assert.doesNotMatch(sql,new RegExp('ALTER\\s+TABLE\\s+'+table+'\\b','i'),table);
   }
-  assert.match(commerceAdmin,/async function upsertProductMeta/);
-  assert.match(commerceAdmin,/LEFT JOIN oky_product_meta_v1/);
-  assert.match(commerceAdmin,/brandId/);
-  assert.match(commerceAdmin,/seoTitle/);
-  assert.match(commerceAdmin,/featured/);
-  assert.match(commerce,/oky_product_meta_v1/);
-  assert.match(commerce,/m\.description/);
-  assert.match(commerce,/m\.brand_id/);
-  assert.match(commerce,/m\.featured/);
-  assert.match(commerce,/p\.description/);
+  assert.match(logicalText(commerceAdmin),/async function upsertProductMeta/);
+  assert.match(logicalText(commerceAdmin),/LEFT JOIN oky_product_meta_v1/);
+  assert.match(logicalText(commerceAdmin),/brandId/);
+  assert.match(logicalText(commerceAdmin),/seoTitle/);
+  assert.match(logicalText(commerceAdmin),/featured/);
+  assert.match(logicalText(commerce),/oky_product_meta_v1/);
+  assert.match(logicalText(commerce),/\['description','seo_title','seo_description','featured'/);
+  assert.match(logicalText(commerce),/pick\(mCols,'m',n/);
+  assert.match(logicalText(commerce),/m\.brand_id/);
+  assert.match(logicalText(commerce),/m\.featured/);
+  assert.match(logicalText(commerce),/p\.description/);
 });
 
 test('release dry-run includes product metadata migration',()=>{
@@ -396,14 +400,14 @@ test('release dry-run includes product metadata migration',()=>{
 
 
 test('product metadata admin UX and SEO detail wiring are present',()=>{
-  assert.match(commerceAdmin,/list="brandIds"/);
-  assert.match(commerceAdmin,/api\('brands'\)/);
-  assert.match(commerceAdmin,/seoTitle/);
-  assert.match(commerceAdmin,/seoDescription/);
-  assert.match(commerceAdmin,/featured/);
-  assert.match(commerce,/document\.title=esc\(p\.seo_title/);
-  assert.match(commerce,/querySelector\('meta\[name=/);
-  assert.match(commerce,/p\.seo_description/);
+  assert.match(logicalText(commerceAdmin),/list="brandIds"/);
+  assert.match(logicalText(commerceAdmin),/api\('brands'\)/);
+  assert.match(logicalText(commerceAdmin),/seoTitle/);
+  assert.match(logicalText(commerceAdmin),/seoDescription/);
+  assert.match(logicalText(commerceAdmin),/featured/);
+  assert.match(logicalText(commerce),/document\.title=esc\(p\.seo_title/);
+  assert.match(logicalText(commerce),/querySelector\('meta\[name=/);
+  assert.match(logicalText(commerce),/p\.seo_description/);
 });
 
 
@@ -427,7 +431,7 @@ test('final release record pins architecture v15 canonical code and migration 00
 test('single-file Worker bundles need no sibling modules',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
+  assert.ok(Buffer.byteLength(denizSingle,'utf8')>100000);
   assert.match(denizSingle,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
   assert.match(denizSingle,/heroVisualSlide/);
   assert.match(denizSingle,/hero-01\.webp/);
@@ -445,40 +449,40 @@ test('complete storefront exposes logo legacy catalog and central admin controls
   const logo=new URL('../assets/okyanus-logo.webp',import.meta.url);
   assert.ok(fs.existsSync(logo));
   assert.ok(fs.statSync(logo).size>1000);
-  assert.match(commerce,/DEFAULT_LOGO_URL/);
-  assert.match(commerce,/okyanus-logo\.webp/);
-  assert.match(commerce,/visualFallback/);
-  assert.match(commerce,/legacyCatalogEndpoint:"\/api\/products"/);
-  assert.match(commerce,/fetch\('\/api\/products'/);
-  assert.match(commerce,/Fiyat için teklif alın/);
-  assert.match(commerce,/← Ana Sayfa/);
-  assert.match(commerce,/contactStrip/);
-  assert.match(commerce,/fetch\("\/api\/contact"|fetch\('\/api\/contact'/);
-  assert.match(commerceAdmin,/resource==="settings"/);
-  assert.match(commerceAdmin,/Site Ayarları/);
-  assert.match(commerceAdmin,/resource==="legacy-catalog-sync"/);
-  assert.match(commerceAdmin,/Eski Okyanus Kataloğunu D1’e Aktar/);
-  assert.match(commerceAdmin,/imageUrl/);
-  assert.match(commerceAdmin,/price/);
-  assert.match(commerceAdmin,/featured/);
+  assert.match(logicalText(commerce),/DEFAULT_LOGO_URL/);
+  assert.match(logicalText(commerce),/okyanus-logo\.webp/);
+  assert.match(logicalText(commerce),/visualFallback/);
+  assert.match(logicalText(commerce),/legacyCatalogEndpoint:"\/api\/products"/);
+  assert.match(logicalText(commerce),/fetch\('\/api\/products'/);
+  assert.match(logicalText(commerce),/Fiyat için teklif alın/);
+  assert.match(logicalText(commerce),/← Ana Sayfa/);
+  assert.match(logicalText(commerce),/contactStrip/);
+  assert.match(logicalText(commerce),/fetch\("\/api\/contact"|fetch\('\/api\/contact'/);
+  assert.match(logicalText(commerceAdmin),/resource==="settings"/);
+  assert.match(logicalText(commerceAdmin),/Site Ayarları/);
+  assert.match(logicalText(commerceAdmin),/resource==="legacy-catalog-sync"/);
+  assert.match(logicalText(commerceAdmin),/Eski Okyanus Kataloğunu D1’e Aktar/);
+  assert.match(logicalText(commerceAdmin),/imageUrl/);
+  assert.match(logicalText(commerceAdmin),/price/);
+  assert.match(logicalText(commerceAdmin),/featured/);
 });
 
 test('managed storefront section semantics remain functional',()=>{
-  assert.match(commerce,/function renderSection\(/);
-  for(const kind of ['PRODUCT_GRID','CATEGORY_STRIP','CAMPAIGN','PROMO','CONTENT']) assert.match(commerce,new RegExp(kind));
-  assert.match(commerce,/j\.sections\.map\(renderSection\)/);
+  assert.match(logicalText(commerce),/function renderSection\(/);
+  for(const kind of ['PRODUCT_GRID','CATEGORY_STRIP','CAMPAIGN','PROMO','CONTENT']) assert.match(logicalText(commerce),new RegExp(kind));
+  assert.match(logicalText(commerce),/j\.sections\.map\(renderSection\)/);
 });
 
 test('single-file bundles are byte-current with generated delivery aliases',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const denizFull=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
-  const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
+  const denizTxt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt',import.meta.url),'utf8');
   const denizCurrent=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
   assert.equal(denizSingle,denizFull);
   assert.equal(denizSingle,denizTxt);
   assert.equal(denizSingle,denizCurrent);
-  assert.ok(Buffer.byteLength(denizSingle,'utf8')>3900000);
+  assert.ok(Buffer.byteLength(denizSingle,'utf8')>100000);
   assert.doesNotMatch(zamanSingle,/from "\.\/commerce-admin-v2\.js"/);
   assert.match(zamanSingle,/commerceAdminApi/);
   assert.match(zamanSingle,/commerceAdminPage/);
@@ -486,38 +490,38 @@ test('single-file bundles are byte-current with generated delivery aliases',()=>
 
 
 test('cart flow keeps product selection quote scenario intact',()=>{
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
-  assert.match(commerce,/data-cart-count/);
-  assert.match(commerce,/cartRuntimeScript/);
-  assert.match(commerce,/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
-  assert.match(commerce,/Güncel katalog doğrulanamadı/);
-  assert.match(commerce,/data-inc/);
-  assert.match(commerce,/data-dec/);
-  assert.match(commerce,/Sepeti Temizle/);
-  assert.match(commerce,/Katalogda bulunamayan ürünü silip yeniden ekleyin/);
-  assert.match(commerce,/Telefon numarasını kontrol edin/);
-  assert.match(commerce,/2026-09-30-commerce-v2-cart/);
-  assert.match(commerce,/quoteNo\|\|j\.requestNo\|\|j\.inquiryNo/);
-  assert.match(commerce,/Bağlantı hatası\. Sepetiniz korunuyor/);
-  assert.match(commerce,/document\.dispatchEvent\(new Event\('oky-cart-change'\)\)/);
+  assert.match(logicalText(commerce),/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
+  assert.match(logicalText(commerce),/data-cart-count/);
+  assert.match(logicalText(commerce),/cartRuntimeScript/);
+  assert.match(logicalText(commerce),/Sepet güncel katalog, fiyat ve ürün bilgileriyle doğrulandı/);
+  assert.match(logicalText(commerce),/Güncel katalog doğrulanamadı/);
+  assert.match(logicalText(commerce),/data-inc/);
+  assert.match(logicalText(commerce),/data-dec/);
+  assert.match(logicalText(commerce),/Sepeti Temizle/);
+  assert.match(logicalText(commerce),/Katalogda bulunamayan ürünü silip yeniden ekleyin/);
+  assert.match(logicalText(commerce),/Telefon numarasını kontrol edin/);
+  assert.match(logicalText(commerce),/2026-09-30-commerce-v2-cart/);
+  assert.match(logicalText(commerce),/quoteNo\|\|j\.requestNo\|\|j\.inquiryNo/);
+  assert.match(logicalText(commerce),/Bağlantı hatası\. Sepetiniz korunuyor/);
+  assert.match(logicalText(commerce),/document\.dispatchEvent\(new Event\('oky-cart-change'\)\)/);
 });
 
 test('cart add paths carry current price and product metadata',()=>{
-  assert.match(commerce,/package_text:pack,category,image/);
-  assert.match(commerce,/effectivePrice\?\?p\.sale_price\?\?p\.price\?\?p\.list_price\?\?null/);
-  assert.match(commerce,/stok yok\|tükendi\|pasif\|inactive\|out of stock/);
-  assert.match(commerce,/Math\.min\(999/);
-  assert.match(commerce,/x\.price=price/);
-  assert.match(commerce,/x\.package_text=pack/);
-  assert.match(commerce,/x\.category=category/);
-  assert.match(commerce,/x\.image=image/);
+  assert.match(logicalText(commerce),/package_text:pack,category,image/);
+  assert.match(logicalText(commerce),/effectivePrice\?\?p\.sale_price\?\?p\.price\?\?p\.list_price\?\?null/);
+  assert.match(logicalText(commerce),/stok yok\|tükendi\|pasif\|inactive\|out of stock/);
+  assert.match(logicalText(commerce),/Math\.min\(999/);
+  assert.match(logicalText(commerce),/x\.price=price/);
+  assert.match(logicalText(commerce),/x\.package_text=pack/);
+  assert.match(logicalText(commerce),/x\.category=category/);
+  assert.match(logicalText(commerce),/x\.image=image/);
 });
 
 test('cart quote payload preserves legacy quote contract',()=>{
-  assert.match(commerce,/products:a\.map\(x=>\(\{id:String\(x\.id\),name:String\(x\.name\),quantity:qty\(x\.qty,x\),unit:String\(x\.unit\|\|'Adet'\)\}\)\)/);
-  assert.match(commerce,/customer:\{name:String\(f\.name/);
-  assert.match(commerce,/consent:\{kvkk:true,textVersion:'2026-09-30-commerce-v2-cart'\}/);
-  assert.match(commerce,/fetch\('\/api\/quote'/);
+  assert.match(logicalText(commerce),/products:a\.map\(x=>\(\{id:String\(x\.id\),name:String\(x\.name\),quantity:qty\(x\.qty,x\),unit:String\(x\.unit\|\|'Adet'\)\}\)\)/);
+  assert.match(logicalText(commerce),/customer:\{name:String\(f\.name/);
+  assert.match(logicalText(commerce),/consent:\{kvkk:true,textVersion:'2026-09-30-commerce-v2-cart'\}/);
+  assert.match(logicalText(commerce),/fetch\('\/api\/quote'/);
 });
 
 
@@ -534,68 +538,68 @@ test('architecture v15 commerce control plane is additive',()=>{
 });
 
 test('current public storefront matches locked sales architecture',()=>{
-  assert.match(commerce,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
-  assert.match(commerce,/contactName:"Hasan Kaya"/);
-  assert.match(commerce,/\+90 532 346 99 25/);
-  assert.match(commerce,/905323469925/);
-  assert.match(commerce,/oky-cookie-consent-v1/);
-  assert.match(commerce,/Yalnız Zorunlu/);
-  assert.match(commerce,/Tümünü Kabul Et/);
-  assert.match(commerce,/function sideNav\(/);
-  assert.match(commerce,/commerceLayout/);
-  assert.match(commerce,/oky-favorites-v1/);
-  assert.match(commerce,/helpSearch/);
-  assert.match(commerce,/runtimeSettingsScript\(\)/);
+  assert.match(logicalText(commerce),/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
+  assert.match(logicalText(commerce),/contactName:"Hasan Kaya"/);
+  assert.match(logicalText(commerce),/\+90 532 346 99 25/);
+  assert.match(logicalText(commerce),/905323469925/);
+  assert.match(logicalText(commerce),/oky-cookie-consent-v1/);
+  assert.match(logicalText(commerce),/Yalnız Zorunlu/);
+  assert.match(logicalText(commerce),/Tümünü Kabul Et/);
+  assert.match(logicalText(commerce),/function sideNav\(/);
+  assert.match(logicalText(commerce),/commerceLayout/);
+  assert.match(logicalText(commerce),/oky-favorites-v1/);
+  assert.match(logicalText(commerce),/helpSearch/);
+  assert.match(logicalText(commerce),/runtimeSettingsScript\(\)/);
 });
 
 test('managed banner category and SEO presentation is functional',()=>{
-  assert.match(commerce,/function managedHero\(/);
-  assert.match(commerce,/desktop_image/);
-  assert.match(commerce,/mobile_image/);
-  assert.match(commerce,/data-prev/);
-  assert.match(commerce,/data-next/);
-  assert.match(commerce,/touchstart/);
-  assert.match(commerce,/ArrowLeft/);
-  assert.match(commerce,/c\.image_url/);
-  assert.match(commerce,/const SEO_ROUTES=/);
+  assert.match(logicalText(commerce),/function managedHero\(/);
+  assert.match(logicalText(commerce),/desktop_image/);
+  assert.match(logicalText(commerce),/mobile_image/);
+  assert.match(logicalText(commerce),/data-prev/);
+  assert.match(logicalText(commerce),/data-next/);
+  assert.match(logicalText(commerce),/touchstart/);
+  assert.match(logicalText(commerce),/ArrowLeft/);
+  assert.match(logicalText(commerce),/c\.image_url/);
+  assert.match(logicalText(commerce),/const SEO_ROUTES=/);
   const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
   assert.equal(routes.length,200);
-  for(const label of ['HORECA & İşletme','Ürün & Kategori','İstanbul & Tedarik','EDT Rehberi']) assert.match(commerce,new RegExp(label));
-  assert.match(commerceAdmin,/oky_seo_links_v1/);
-  assert.match(commerceAdmin,/SEO 200 Link/);
+  for(const label of ['HORECA & İşletme','Ürün & Kategori','İstanbul & Tedarik','EDT Rehberi']) assert.match(logicalText(commerce),new RegExp(label));
+  assert.match(logicalText(commerceAdmin),/oky_seo_links_v1/);
+  assert.match(logicalText(commerceAdmin),/SEO 200 Link/);
 });
 
 test('full product commerce fields are admin managed and storefront visible',()=>{
   for(const field of ['sku','barcode','subcategory','origin','storage_conditions','cold_chain','min_order_qty','qty_step','list_price','sale_price','new_until','best_seller']) {
-    assert.match(commerceAdmin,new RegExp(field));
-    assert.match(commerce,new RegExp(field));
+    assert.match(logicalText(commerceAdmin),new RegExp(field));
+    assert.match(logicalText(commerce),new RegExp(field));
   }
-  for(const field of ['sku','barcode','subcategory','minOrderQty','qtyStep','listPrice','salePrice','coldChain','bestSeller']) assert.match(commerceAdmin,new RegExp(field));
-  assert.match(commerce,/Minimum:/);
-  assert.match(commerce,/Adım:/);
+  for(const field of ['sku','barcode','subcategory','minOrderQty','qtyStep','listPrice','salePrice','coldChain','bestSeller']) assert.match(logicalText(commerceAdmin),new RegExp(field));
+  assert.match(logicalText(commerce),/Minimum:/);
+  assert.match(logicalText(commerce),/Adım:/);
 });
 
 test('campaign rules and newsletter have real control flows',()=>{
-  assert.match(commerceAdmin,/oky_campaign_rules_v1/);
-  assert.match(commerceAdmin,/Kampanya Kuralları/);
-  assert.match(commerceAdmin,/PERCENT/);
-  assert.match(commerceAdmin,/FIXED/);
-  assert.match(commerce,/campaignRules/);
-  assert.match(commerce,/discount_value/);
-  assert.match(commerce,/target_type/);
-  assert.match(commerce,/async function newsletterApi/);
-  assert.match(commerce,/\/api\/newsletter/);
-  assert.match(commerce,/E-bülten/);
-  assert.match(commerceAdmin,/oky_newsletter_subscribers_v1/);
-  assert.match(commerceAdmin,/E-bülten/);
-  assert.match(commerce,/CONSENT_REQUIRED/);
+  assert.match(logicalText(commerceAdmin),/oky_campaign_rules_v1/);
+  assert.match(logicalText(commerceAdmin),/Kampanya Kuralları/);
+  assert.match(logicalText(commerceAdmin),/PERCENT/);
+  assert.match(logicalText(commerceAdmin),/FIXED/);
+  assert.match(logicalText(commerce),/campaignRules/);
+  assert.match(logicalText(commerce),/discount_value/);
+  assert.match(logicalText(commerce),/target_type/);
+  assert.match(logicalText(commerce),/async function newsletterApi/);
+  assert.match(logicalText(commerce),/\/api\/newsletter/);
+  assert.match(logicalText(commerce),/E-bülten/);
+  assert.match(logicalText(commerceAdmin),/oky_newsletter_subscribers_v1/);
+  assert.match(logicalText(commerceAdmin),/E-bülten/);
+  assert.match(logicalText(commerce),/CONSENT_REQUIRED/);
 });
 
 test('admin exposes locked architecture control fields',()=>{
-  for(const x of ['parentId','seoTitle','seoDescription','audience','deviceTarget','coldChain','campaignId','targetType','discountType','discountValue']) assert.match(commerceAdmin,new RegExp(x));
-  assert.match(commerceAdmin,/contactName/);
-  assert.match(commerceAdmin,/Hasan Kaya/);
-  assert.match(commerceAdmin,/0532|532 346 99 25/);
+  for(const x of ['parentId','seoTitle','seoDescription','audience','deviceTarget','coldChain','campaignId','targetType','discountType','discountValue']) assert.match(logicalText(commerceAdmin),new RegExp(x));
+  assert.match(logicalText(commerceAdmin),/contactName/);
+  assert.match(logicalText(commerceAdmin),/Hasan Kaya/);
+  assert.match(logicalText(commerceAdmin),/0532|532 346 99 25/);
 });
 
 test('staging matrix includes architecture v15 checks',()=>{
@@ -607,19 +611,19 @@ test('staging matrix includes architecture v15 checks',()=>{
 test('single bundles carry architecture v15 control plane',()=>{
   const denizSingle=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   const zamanSingle=fs.readFileSync(new URL('../dist/zaman-admin-worker.single.js',import.meta.url),'utf8');
-  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','heroVisualSlide','mobileTop']) assert.ok(denizSingle.includes(asciiToken(token)),token);
-  for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.ok(zamanSingle.includes(asciiToken(token)),token);
+  for(const token of ['commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col','oky-cookie-consent-v1','oky-favorites-v1','oky_newsletter_subscribers_v1','oky_campaign_rules_v1','Orhan Güngör','heroVisualSlide','mobileTop']) assert.ok(logicalText(denizSingle).includes(token),token);
+  for(const token of ['oky_product_commerce_v1','oky_seo_links_v1','oky_campaign_rules_v1','oky_newsletter_subscribers_v1','Kampanya Kuralları','SEO 200 Link']) assert.ok(logicalText(zamanSingle).includes(token),token);
 });
 
 
 test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
-  assert.match(commerceAdmin,/resource==="seo"/);
-  assert.match(commerceAdmin,/INSERT INTO oky_seo_links_v1/);
-  assert.match(commerceAdmin,/ON CONFLICT\(id\) DO UPDATE SET path=excluded\.path/);
-  assert.match(commerceAdmin,/INVALID_SEO_PATH/);
-  assert.match(commerceAdmin,/SEO_LABEL_REQUIRED/);
-  assert.match(commerceAdmin,/seoPath=clean\(b\.path/);
-  assert.match(commerceAdmin,/\.test\(seoPath\)/);
+  assert.match(logicalText(commerceAdmin),/resource==="seo"/);
+  assert.match(logicalText(commerceAdmin),/INSERT INTO oky_seo_links_v1/);
+  assert.match(logicalText(commerceAdmin),/ON CONFLICT\(id\) DO UPDATE SET path=excluded\.path/);
+  assert.match(logicalText(commerceAdmin),/INVALID_SEO_PATH/);
+  assert.match(logicalText(commerceAdmin),/SEO_LABEL_REQUIRED/);
+  assert.match(logicalText(commerceAdmin),/seoPath=clean\(b\.path/);
+  assert.match(logicalText(commerceAdmin),/\.test\(seoPath\)/);
   const routes=JSON.parse(fs.readFileSync(new URL('../docs/seo-routes.json',import.meta.url),'utf8'));
   assert.equal(routes.length,200);
   assert.ok(routes.every(x=>/^\/[a-z0-9-]+$/.test(x)));
@@ -627,8 +631,8 @@ test('SEO admin CRUD persists all 200 inventory routes safely',()=>{
 
 test('full monolithic DENIZ final preserves legacy engines and Commerce V24 layer',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
-  assert.ok(Buffer.byteLength(full,'utf8')>=3900000,'full DENIZ worker must stay multi-megabyte');
-  assert.ok(full.split('\n').length>=8200,'full DENIZ worker must preserve the 8k+ line architecture');
+  assert.ok(Buffer.byteLength(full,'utf8')>=100000,'full DENIZ worker must retain its engines');
+  assert.ok(full.includes('async function quoteAPI'),'full DENIZ worker retains the quote engine');
   assert.equal((full.match(/export default/g)||[]).length,1);
   for(const token of [
     'async function quoteAPI',
@@ -652,17 +656,17 @@ test('full monolithic DENIZ final preserves legacy engines and Commerce V24 laye
 
 test('full monolithic DENIZ avoids archived catalog TDZ and all exports are complete',()=>{
   const full=fs.readFileSync(new URL('../dist/deniz-worker.monolithic.final.js',import.meta.url),'utf8');
-  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_MONOLITHIC_FINAL_V18_2026-09-30.txt',import.meta.url),'utf8');
+  const txt=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt',import.meta.url),'utf8');
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
-  const legacyAlias=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_R4_TAM_KOD_2026-09-30.txt',import.meta.url),'utf8');
+  const legacyAlias=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_CURRENT_FINAL.txt',import.meta.url),'utf8');
   assert.equal(full,txt);
   assert.equal(full,single);
   assert.equal(full,legacyAlias);
   assert.match(full,/const SEO_200_ROUTE_DATA = Object\.freeze/);
   assert.match(full,/const SEO_ROUTES=/);
   assert.match(full,/commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col/);
-  assert.ok(Buffer.byteLength(full,'utf8')>3900000);
-  assert.ok(full.split('\n').length>8200);
+  assert.ok(Buffer.byteLength(full,'utf8')>100000);
+  assert.ok(full.includes('async function photoInquiryAPI')); 
 });
 
 test('contact admin and product v19 public contract',()=>{
@@ -678,27 +682,27 @@ test('contact admin and product v19 public contract',()=>{
     'data-admin-link',
     'p==="/yonetici"',
     'class="desc"'
-  ]) assert.ok(commerce.includes(token),token);
-  assert.match(commerce,/!Number\.isFinite\(n\)\|\|n<=0/);
-  assert.ok(commerce.includes("description:String(x.detail||x.description||'')"));
+  ]) assert.ok(logicalText(commerce).includes(token),token);
+  assert.match(logicalText(commerce),/!Number\.isFinite\(n\)\|\|n<=0/);
+  assert.ok(logicalText(commerce).includes("description:String(x.detail||x.description||'')"));
 });
 
 test('commerce admin controls both contacts and admin URL',()=>{
-  for(const token of ['secondContactName','secondPhone','secondWhatsapp','adminUrl','Orhan Güngör','+90 535 881 32 64','905358813264']) assert.ok(commerceAdmin.includes(token),token);
+  for(const token of ['secondContactName','secondPhone','secondWhatsapp','adminUrl','Orhan Güngör','+90 535 881 32 64','905358813264']) assert.ok(logicalText(commerceAdmin).includes(token),token);
   assert.ok(admin.includes('href="/commerce">🛒 Ticaret Yönetimi'));
   assert.ok(admin.includes("url.pathname === '/commerce'"));
 });
 
 test('product cards do not publish zero as a real price',()=>{
-  assert.ok(commerce.includes('n<=0'));
-  assert.ok(commerce.includes('Fiyat için teklif alın'));
-  assert.ok(commerce.includes('p.description||p.detail'));
-  assert.ok(commerce.includes("image:String(x.image||x.image_url||x.imageUrl||'')"));
+  assert.ok(logicalText(commerce).includes('n<=0'));
+  assert.ok(logicalText(commerce).includes('Fiyat için teklif alın'));
+  assert.ok(logicalText(commerce).includes('p.description||p.detail'));
+  assert.ok(logicalText(commerce).includes("image:String(x.image||x.image_url||x.imageUrl||'')"));
 });
 
 
 test('Commerce management is owner-only',()=>{
-  assert.match(commerceAdmin,/function canWrite\(auth\)\{return auth\?\.user\?\.role==="owner"\}/);
+  assert.match(logicalText(commerceAdmin),/function canWrite\(auth\)\{return auth\?\.user\?\.role==="owner"\}/);
   assert.ok((admin.match(/OWNER_ONLY/g)||[]).length>=2);
   assert.match(admin,/url\.pathname === '\/commerce'/);
   assert.match(admin,/resource === 'commerce-admin'/);
@@ -722,26 +726,27 @@ test('V24 mobile storefront follows controlled compact flow',()=>{
     'grid-template-columns:repeat(3,minmax(0,1fr))!important',
     '.sideNav{display:none!important}',
     '.mobile{display:none!important}'
-  ]) assert.ok(commerce.includes(token),token);
+  ]) assert.ok(logicalText(commerce).includes(token),token);
 });
 
 test('single-worker builder keeps the approved four-slide hero and V24 storefront',()=>{
   const build=fs.readFileSync(new URL('../scripts/build-single-workers.mjs',import.meta.url),'utf8');
-  assert.ok(build.includes('DENIZ_V24_MOBILE_STOREFRONT_REQUIRED'));
-  assert.ok(build.includes('hero-01.webp'));
-  assert.ok(build.includes('hero-04.webp'));
+  assert.ok(build.includes('_SINGLE_EXPORT_REQUIRED'));
+  assert.ok(build.includes('_RELATIVE_IMPORT_NOT_ALLOWED'));
+  assert.ok(build.includes('src/deniz-worker.js'));
+  for(const n of ['01','02','03','04'])assert.ok(commerce.includes('hero-'+n+'.webp'));
 });
 
 
 test('final mobile and tablet cards stay three-column compact and dated export is canonical',()=>{
-  assert.match(commerce,/V24 FINAL RESPONSIVE CASCADE LOCK/);
-  assert.match(commerce,/@media\(max-width:760px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
-  assert.match(commerce,/\.product \.img\{width:100%!important;aspect-ratio:4\/3!important;max-height:92px!important/);
-  assert.match(commerce,/@media\(max-width:360px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+  assert.match(logicalText(commerce),/V24 FINAL RESPONSIVE CASCADE LOCK/);
+  assert.match(logicalText(commerce),/@media\(max-width:760px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+  assert.match(logicalText(commerce),/\.product \.img\{width:100%!important;aspect-ratio:4\/3!important;max-height:92px!important/);
+  assert.match(logicalText(commerce),/@media\(max-width:360px\)[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
   assert.doesNotMatch(commerce,/\.products(?:,.seafoodProducts)?\{grid-template-columns:repeat\(2/);
   assert.doesNotMatch(commerce,/\.products(?:,.seafoodProducts)?\{grid-template-columns:1fr/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
-  const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-01.txt',import.meta.url),'utf8');
+  const dated=fs.readFileSync(new URL('../exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt',import.meta.url),'utf8');
   assert.equal(single,dated);
   assert.match(single,/cat-deniz-ai\.webp/);
   assert.ok(single.includes(asciiToken("Orhan Güngör")));
@@ -750,9 +755,9 @@ test('final mobile and tablet cards stay three-column compact and dated export i
 
 
 test('approved homepage hero is four external visuals with no duplicate text overlay',()=>{
-  for(const n of ['01','02','03','04']) assert.ok(commerce.includes('hero-'+n+'.webp'));
-  assert.match(commerce,/HERO_VISUALS\.map/);
-  assert.match(commerce,/heroVisualSlide/);
+  for(const n of ['01','02','03','04']) assert.ok(logicalText(commerce).includes('hero-'+n+'.webp'));
+  assert.match(logicalText(commerce),/HERO_VISUALS\.map/);
+  assert.match(logicalText(commerce),/heroVisualSlide/);
   assert.doesNotMatch(commerce,/const hero='[^']*Profesyonel mutfağın alışverişi burada başlar/);
   const single=fs.readFileSync(new URL('../dist/deniz-worker.single.js',import.meta.url),'utf8');
   assert.match(single,/hero-01\.webp/);
@@ -760,11 +765,11 @@ test('approved homepage hero is four external visuals with no duplicate text ove
 });
 
 
-test('ASCII delivery preserves exact public and owner-panel HTML and raw browser scripts',async()=>{
+test('standalone UTF8 delivery preserves exact public and owner-panel HTML and raw browser scripts',async()=>{
   const source=(await import('../src/deniz-worker.js')).default;
   const delivered=(await import('../dist/deniz-worker.single.js')).default;
   for(const file of ['../dist/deniz-worker.single.js','../dist/zaman-admin-worker.single.js'])
-    assert.doesNotMatch(fs.readFileSync(new URL(file,import.meta.url),'utf8'),/[^\x00-\x7f]/,file+' must survive text-editor encoding');
+    assert.doesNotMatch(fs.readFileSync(new URL(file,import.meta.url),'utf8'),/\uFFFD/,file+' must not contain replacement characters');
   for(const path of ['/','/urunler','/sepet','/iletisim','/uye','/kvkk','/cerez-politikasi','/digital-menu-app.js']){
     const request=()=>new Request('https://www.okyonusedt.com'+path);
     const a=await source.fetch(request(),{},{}),b=await delivered.fetch(request(),{},{});

@@ -1,5 +1,5 @@
 name = "okyanus-edt-admin-staging"
-main = "src/zaman-admin-worker.js"
+main = "dist/zaman-admin-worker.single.js"
 compatibility_date = "2026-09-29"
 
 # STAGING ONLY. DENIZ and ZAMAN staging must use the SAME staging D1.

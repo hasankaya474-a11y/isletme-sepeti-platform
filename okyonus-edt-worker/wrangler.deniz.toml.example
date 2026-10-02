@@ -1,5 +1,5 @@
 name = "deniz-edt-v2"
-main = "src/deniz-worker.js"
+main = "dist/deniz-worker.single.js"
 compatibility_date = "2026-09-29"
 
 # Keep existing production bindings and IDs. Do not copy example IDs into production.
