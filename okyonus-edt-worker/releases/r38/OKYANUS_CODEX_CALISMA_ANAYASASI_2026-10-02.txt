@@ -1,0 +1,89 @@
+OKYANUS EDT — CODEX ÇALIŞMA ANAYASASI
+Sabitlenme: 2 Ekim 2026, 21:42 — Europe/Istanbul
+Kullanıcı: Hasan Kaya
+Kapsam: Okyanus EDT DENİZ müşteri yüzü ve ZAMAN ticari yönetim sistemi.
+
+Bu belge, Hasan Kaya'nın onayladığı 12 maddelik çalışma planıdır.
+Sonraki Okyanus çalışmalarında başlangıç referansı ve değişiklik kontrol listesi olarak kullanılacaktır.
+Kullanıcının sonraki açık talimatları bu planı güncelleyebilir. Belge tek başına
+canlı dağıtım yapıldığını, entegrasyonların kurulduğunu veya testlerin geçtiğini ifade etmez.
+
+ANA SABİTLER
+- Kullanıcının beğendiği mevcut görünüm korunacak; tasarım baştan değiştirilmeyecek.
+- Çalışan sistem, mevcut ürün verileri, yetkiler ve DENİZ–ZAMAN bağlantısı korunacak.
+- GitHub kullanılacak. Değişiklikler ayrı çalışma dalı/kopyada hazırlanacak.
+- Geri dönüş sürümü korunacak; canlı geçiş öncesinde değişiklikler doğrulanacak.
+- Kullanıcı günlük işlemlerini yönetim panelinden yapacak; GitHub arka planda kalacak.
+- Görselleri koddan ayırmak hedeflenecek; yeni yükleme akışı doğrulanmadan mevcut görseller kaldırılmayacak.
+- Her Worker ayrı kalacak; her biri için tam, tek parça kod teslim edilecek.
+- Okyanus çalışması, ayrı İşletme Sepeti projesiyle birleştirilmeyecek.
+
+ONAYLANAN İŞ SIRASI
+1. MEVCUT SÜRÜMÜ KORUMAK
+DENİZ–ZAMAN kodlarını GitHub'da sürümlemek, ayrı çalışma dalı oluşturmak ve geri dönüş sürümünü saklamak.
+
+2. HATA VE HIZ KONTROLÜ
+Yenilemedeki 1102 hatasını, gereksiz veri çağrılarını, ağır görselleri ve mobil takılmaları incelemek; ölçerek düzeltmek.
+Hedef: hızlı açılış, akıcı kaydırma ve işlemlerin bekletmeden anlaşılır tepki vermesi.
+Yerel ölçüm ile canlı sonuç açıkça ayrılacak.
+
+3. MÜŞTERİ AKIŞINI DOĞRULAMAK
+Menü, arama, kategori ve butonların doğru hedefe gitmesini kontrol etmek.
+Çalışmayan veya çıkmaz oluşturan yolları onarmak.
+Ürün bul → seç → sepete ekle → teklif gönder → sonucu gör akışı esas alınacak.
+
+4. MOBİL VE TABLET DÜZENİ
+Vitrin → 8 kategori → seçili ürünler sırasını korumak.
+Taşma ve ekran zıplamasını gidermek; ürünleri mobilde 3 sütunda kullanışlı göstermek.
+
+5. ÜRÜN VE SEPET KONTROLÜ
+Görsel–ürün eşleşmesi, ambalaj, fiyat/teklif bilgisi, miktar, silme, sepet sayacı ve yenilemede sepetin korunmasını doğrulamak.
+Doğrulanmamış ürün bilgisi veya uydurma görsel eşleştirmesi yapılmayacak.
+
+6. ÜYELİK VE TEKLİF AKIŞI
+Serbest gezinmeyi korumak. Teklif için giriş zorunluluğunu, giriş sonrası sepete dönüşü,
+başarılı gönderim bilgisini ve çift gönderimin önlenmesini kontrol etmek.
+Başarısız işlem başarılı gösterilmeyecek. Kaydedilen teklifte referans ve durum anlaşılır olacak.
+
+7. TİCARİ YÖNETİMİ SADELEŞTİRMEK
+Kontrol Merkezi, Ürünler ve Fiyatlar, Vitrin, Gelen Kutusu, Teklifler/Müşteriler,
+Kampanyalar ve Ayarlar olarak günlük iş sırasına göre düzenlemek.
+Bölümler gereken veriyi ihtiyaç olduğunda yükleyecek; ortak işlemler tek yerde tutulacak.
+
+8. ÜRÜN YÖNETİMİNİ KOLAYLAŞTIRMAK
+Görsel, fiyat, açıklama, aktiflik ve “Ana sayfada yayınla” seçimini tek yerde toplamak.
+ZAMAN değişikliklerinin DENİZ'e doğru yansımasını doğrulamak.
+Kaydetme başarısı ile müşteri ekranında doğrulama durumu birbirinden ayrılacak.
+Ana sayfada yalnızca seçilen ürünler gösterilecek; keyfi ürün sayısı sınırı konulmayacak.
+
+9. GELEN KUTUSU
+İletişim formu, ürün teklifi ve fotoğrafla teklif taleplerini toplamak.
+Yeni → İşlemde → Yanıtlandı → Tamamlandı durumları ve yanıt bekleyenler filtresi eklemek.
+Kontrol merkezinde yeni taleplerin sayısını göstermek.
+WhatsApp bağlantısı tek başına mesajları panele taşımaz; bunun için ayrı entegrasyon gerekir.
+
+10. GÖRSELLERİ KODDAN AYIRMAK
+Panelden güvenli yükleme akışını kurmak; görselleri ayrı dosyalarda tutmak,
+uygun boyutta ve önbellekle sunmak. Site kodunda görsel adreslerini kullanmak.
+GitHub'a panelden yükleme bağlantısı kurulmuş varsayılmayacak; kurulup doğrulanacak.
+Yeni akış doğrulanmadan mevcut görseller kaldırılmayacak.
+
+11. İLETİŞİM VE SİTE SİMGELERİ
+WhatsApp bağlantıları, iki iletişim kişisi, KVKK/çerezler ve hazırlanan Okyanus
+sekme/telefon simgelerini kontrol etmek. Yönetim yetkisi modeli korunacak.
+
+12. SON ÇAPRAZ KONTROL VE TESLİM
+Masaüstü, tablet ve mobil senaryolarını denemek; bulgu ve test sonuçlarını raporlamak.
+Her Worker için ayrı, tam DENİZ ve ZAMAN kodunu GitHub üzerinden teslim etmek.
+Test edilmeyen alanlar, erişim engelleri ve canlı doğrulama durumu açıkça bildirilecek.
+
+CODEX'İN PROFESYONEL KATKISI
+- Yalnızca kullanıcının bulduğu hatalarla sınırlı kalmadan müşteri senaryoları kurmak.
+- Belirsiz işlem sonuçlarını, boş alanları, yanlış yönlendirmeleri ve gözden kaçan talepleri aramak.
+- İlk kez gelen müşteri, mevcut üye, boş sepet, çok ürünlü sepet ve kesilen bağlantı senaryolarını ele almak.
+- Her bulguyu “sorun → müşteriye etkisi → düzeltme → doğrulama sonucu” şeklinde kaydetmek.
+- Önce satışın önünü kesen hatalar, sonra güveni zedeleyen eksikler, ardından kullanım kolaylığı.
+- Gereksiz tasarım değişikliği ve çalışmayan yeni modül eklememek.
+
+DURUM NOTU
+Bu dosya sabit çalışma planıdır. Uygulama, test ve dağıtım sonuçları ayrı kaydedilecektir.
