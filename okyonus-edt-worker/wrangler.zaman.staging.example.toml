@@ -14,9 +14,9 @@ database_id = "REPLACE_WITH_STAGING_D1_ID"
 binding = "PHOTO_TEMP"
 bucket_name = "REPLACE_WITH_STAGING_PHOTO_BUCKET"
 
-[[r2_buckets]]
+[[kv_namespaces]]
 binding = "MEDIA_STORE"
-bucket_name = "REPLACE_WITH_STAGING_MEDIA_BUCKET"
+id = "REPLACE_WITH_STAGING_MEDIA_KV_ID"
 
 [vars]
 ENVIRONMENT = "staging"

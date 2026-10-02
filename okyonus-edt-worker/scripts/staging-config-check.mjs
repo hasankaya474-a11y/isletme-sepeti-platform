@@ -13,6 +13,14 @@ const requiredBindings = {
 let failed = false;
 for (const [name, url] of Object.entries(files)) {
   const s = fs.readFileSync(url, 'utf8');
+  if (name === 'zaman') {
+    const blocks = s.split(/(?=^\[\[)/m);
+    const media = blocks.filter(block => /binding\s*=\s*"MEDIA_STORE"/.test(block));
+    if (media.length !== 1 || !/^\[\[kv_namespaces\]\]/.test(media[0]) || !/id\s*=\s*"REPLACE_WITH_STAGING_MEDIA_KV_ID"/.test(media[0])) {
+      console.error('MEDIA_STORE must be one staging KV namespace:', name);
+      failed = true;
+    }
+  }
   for (const token of requiredBindings[name]) {
     if (!s.includes(token)) {
       console.error('MISSING', name, token);

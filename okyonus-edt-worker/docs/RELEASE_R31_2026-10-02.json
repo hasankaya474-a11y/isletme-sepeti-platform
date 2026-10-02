@@ -1,0 +1,38 @@
+{
+  "build": "commerce-v2-2026-10-02-admin-sync-r31",
+  "baseline": "user-upload-2026-10-02",
+  "architecture": "DENIZ_PUBLIC_ZAMAN_ADMIN_SHARED_COMMERCE_D1",
+  "code": {
+    "DENIZ": {
+      "path": "dist/deniz-worker.single.js",
+      "bytes": 4079392,
+      "lines": 8763,
+      "sha256": "4a8f2127822dfe616baa626bbd94ab07ce74e898f69927266d460b5c80ef07d2",
+      "gzipBytes": 1977782
+    },
+    "ZAMAN": {
+      "path": "dist/zaman-admin-worker.single.js",
+      "bytes": 780068,
+      "lines": 1823,
+      "sha256": "d1ae733be54f145b8c2beac392bc37edccbcae3618f576f09c43c83a5a0c07de",
+      "gzipBytes": 101949
+    }
+  },
+  "deployment": "not-deployed",
+  "testing": {
+    "root": {
+      "pass": 278,
+      "skip": 4,
+      "fail": 0
+    },
+    "worker": {
+      "pass": 108,
+      "skip": 0,
+      "fail": 0
+    },
+    "atomicSaveScenarios": 7,
+    "selectedProductScenarios": "0/1/28/all plus conflicting DB bindings"
+  },
+  "visualQA": "Served HTML/CSS and browser scripts tested; no mobile pixel render. Live ZAMAN login observed mojibake, canonical response UTF-8 correct.",
+  "liveObservation": "2026-10-02: live login labels YÃ¶netici GiriÅŸi; R31 not deployed."
+}

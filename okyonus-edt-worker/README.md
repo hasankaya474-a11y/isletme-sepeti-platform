@@ -1,6 +1,12 @@
-# Okyanus EDT — R30 / 2 Ekim 2026
+# Okyanus EDT — R31 / 2 Ekim 2026
 
 Bu sürüm, kullanıcı tarafından 2 Ekim’de gönderilen canlı DENİZ ve ZAMAN kodları temel alınarak hazırlanmıştır. İki Worker mimarisi korunur.
+
+## R31 kontrol bulguları
+
+ZAMAN mobil ürün tablosunun 760 px alt sınırı ve uzun sekme şeridi telefon kullanımını zorlaştırıyordu. Mobil yönetim düzeni ayrıca kontrol edilir. Türkçe karakter bozulması kaynaklarda saptanmamıştır; görsel ekler ve çalışan sayfanın davranışı ayrıca değerlendirilir.
+
+ZAMAN staging örneğinde `MEDIA_STORE` yanlışlıkla R2 olarak tanımlanmıştı. Örnek artık KV namespace kullanır; staging kontrolü ve sözleşme testi yalnız bağlama adını değil türünü de doğrular. Üretimde mevcut KV kimliği korunmalıdır.
 
 ## Güncel tam kodlar
 
@@ -42,3 +48,7 @@ npm run verify
 Kontroller; gerçek SQLite ürün kaydı→vitrin okuması, 0/1/28/tümü seçim, farklı DB binding’leri, fiyat null/sıfır/değişiklik, görsel kaldırma, başarısız kayıt, oturum/owner yetkisi, anonim teklif engeli, sepet/teklif, dahili bağlantılar ve tarayıcı JavaScript ayrıştırmasını kapsar.
 
 GitHub kaydı canlı Cloudflare dağıtımı değildir. Canlı D1/KV binding kimlikleri ve canlı görsel yükleme davranışı dağıtım ortamında ayrıca doğrulanmalıdır. Bu çalışma canlı kayıtları değiştirmez.
+
+### R31 doğrulama sonucu
+
+108 Worker ve 278 platform testi geçti; 4 mevcut test atlandı. Canlı ZAMAN girişinde bozuk Türkçe doğrulandı; kaynak ve üretilen UTF-8 yanıt temiz. Canlı dağıtım yapılmadı. Ayrıntılar: `docs/RELEASE_R31_2026-10-02.json`. Geçerli sıfır fiyat gösterilir; boş fiyat teklif talebidir.

@@ -8,4 +8,4 @@ for(const [name,source] of [['DENIZ',deniz],['ZAMAN',zaman]]){
 }
 for(const path of ['dist/deniz-worker.single.js','dist/deniz-worker.monolithic.final.js','exports/OKYANUS_DENIZ_CURRENT_FINAL.txt','exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt'])write(path,deniz);
 for(const path of ['dist/zaman-admin-worker.single.js','exports/OKYANUS_ZAMAN_ADMIN_CURRENT_FINAL.txt','exports/OKYANUS_ZAMAN_FINAL_2026-10-02.txt'])write(path,zaman);
-console.log('R30: canonical standalone sources and current delivery files synchronized');
+console.log('R31: canonical standalone sources and current delivery files synchronized');

@@ -35,7 +35,7 @@ Expected runtime bindings / variables:
 | Name | Type | Required for | Rule |
 |---|---|---|---|
 | `DB` | D1 | admin, messages, product/quote management, module flags | same environment D1 as matching DENİZ |
-| `MEDIA_STORE` | R2 | Studio/media | preserve existing binding if used |
+| `MEDIA_STORE` | KV namespace | Studio/media binary and metadata | preserve existing KV namespace; R2 is incompatible |
 | `PHOTO_TEMP` | R2 | controlled photo request workflow | preserve existing binding |
 | `SESSION_PEPPER` | secret | admin sessions | required |
 | `BOOTSTRAP_TOKEN` | secret | bootstrap only if intentionally used | never commit |
@@ -43,7 +43,7 @@ Expected runtime bindings / variables:
 
 ## Environment isolation
 
-Staging must use staging D1/R2/secret values.
+Staging must use staging D1/KV/R2/secret values.
 Production bindings are never copied into GitHub or exposed in test fixtures.
 
 

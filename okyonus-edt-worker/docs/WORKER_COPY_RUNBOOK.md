@@ -1,4 +1,4 @@
-# R30 — İki Worker Tam Kod Teslimi
+# R31 — İki Worker Tam Kod Teslimi
 
 1. DENİZ için `dist/deniz-worker.single.js` / `exports/OKYANUS_DENIZ_FINAL_2026-10-02.txt`.
 2. ZAMAN için `dist/zaman-admin-worker.single.js` / `exports/OKYANUS_ZAMAN_FINAL_2026-10-02.txt`.
@@ -8,7 +8,9 @@
 6. Boş ürün görseli kaldırma anlamındadır; gömülü katalog görseli geri getirilmez. Hero/kategori/banner/logo korunur.
 7. Yeni kodlar GitHub’a kaydedilmiştir; canlı Cloudflare dağıtımı bu kaydın parçası değildir. Canlı ortamda 0/1/tümü seçimi, fiyat, görsel yükleme/kaldırma, kayıt hatası, mobil/tablet, üyelik ve teklif akışları aynı D1/KV bağlamalarıyla doğrulanır.
 
-Gizli anahtarlar, oturumlar ve gerçek D1/KV kimlikleri dosyalarda bulunmaz. Eski tarihli exports arşivdir; güncel sürüm 2026-10-02/R30’dur.
+Gizli anahtarlar, oturumlar ve gerçek D1/KV kimlikleri dosyalarda bulunmaz. Eski tarihli exports arşivdir; güncel sürüm 2026-10-02/R31’dir. Tarihli dosyaların içindeki sürüm kimliği ve güncel release manifesti birlikte kontrol edilir.
+
+ZAMAN staging şablonunda `MEDIA_STORE`, `[[kv_namespaces]]` altında olmalıdır; `[[r2_buckets]]` altında tanımlanamaz. `PHOTO_TEMP` R2 olarak kalır. `npm run staging:config-check` KV türünü ve staging yer tutucusunu doğrular.
 
 ## Şema ve sürüm durumu
 

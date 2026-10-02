@@ -327,6 +327,11 @@ test('staging Wrangler templates keep isolated binding placeholders',()=>{
   assert.match(deniz,/binding = "PHOTO_TEMP"/);
   assert.match(zaman,/binding = "PHOTO_TEMP"/);
   assert.match(zaman,/binding = "MEDIA_STORE"/);
+  const mediaBlocks=zaman.split(/(?=^\[\[)/m).filter(block=>/binding\s*=\s*"MEDIA_STORE"/.test(block));
+  assert.equal(mediaBlocks.length,1);
+  assert.match(mediaBlocks[0],/^\[\[kv_namespaces\]\]/);
+  assert.match(mediaBlocks[0],/id = "REPLACE_WITH_STAGING_MEDIA_KV_ID"/);
+  assert.doesNotMatch(mediaBlocks[0],/bucket_name/);
   assert.match(zaman,/REQUIRE_CF_ACCESS = "true"/);
 });
 
@@ -683,7 +688,7 @@ test('contact admin and product v19 public contract',()=>{
     'p==="/yonetici"',
     'class="desc"'
   ]) assert.ok(logicalText(commerce).includes(token),token);
-  assert.match(logicalText(commerce),/!Number\.isFinite\(n\)\|\|n<=0/);
+  assert.match(logicalText(commerce),/!Number\.isFinite\(n\)\|\|n<0/);
   assert.ok(logicalText(commerce).includes("description:String(x.detail||x.description||'')"));
 });
 
@@ -693,8 +698,8 @@ test('commerce admin controls both contacts and admin URL',()=>{
   assert.ok(admin.includes("url.pathname === '/commerce'"));
 });
 
-test('product cards do not publish zero as a real price',()=>{
-  assert.ok(logicalText(commerce).includes('n<=0'));
+test('product cards preserve explicit zero and quote missing prices',()=>{
+  assert.ok(logicalText(commerce).includes('v==null||v===""||!Number.isFinite(n)||n<0'));
   assert.ok(logicalText(commerce).includes('Fiyat için teklif alın'));
   assert.ok(logicalText(commerce).includes('p.description||p.detail'));
   assert.ok(logicalText(commerce).includes("image:String(x.image||x.image_url||x.imageUrl||'')"));
