@@ -33,6 +33,9 @@ test('served final CSS bounds mobile hero artwork and locks categories before pr
  assert.match(compact,/height:clamp\(140px,33\.3vw,230px\)!important;min-height:0!important/);
  assert.match(compact,/\.commerceMain>\.homeCategories\{order:1!important/);
  assert.match(compact,/\.commerceMain>\.homeBest\{order:2!important/);
+ for(const [selector,order] of [['homePromo',3],['homeSeafood',4],['homeNew',5],['homeManaged',6],['homeTools',7],['homeNewsletter',9],['contactStrip',10]])assert.ok(compact.includes('.commerceMain>.'+selector+'{order:'+order+'!important}'),selector);
+ assert.ok(compact.includes('.commerceMain>#commerce-seo-guide{order:8!important}'));
+
 
  assert.match(css,/\.commerceMain>\.hero\{order:0\}/);
  assert.match(css,/\.homeCategories\{[^}]*order:1/);

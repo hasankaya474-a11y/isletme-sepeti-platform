@@ -7776,7 +7776,7 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
 const { commerceRoute, OKY_COMMERCE_V2_BUILD, commerceProductImage } = (() => {
 
 // Compatibility baseline: commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col
-const BUILD="commerce-v2-2026-10-02-admin-sync-r33";
+const BUILD="commerce-v2-2026-10-02-admin-sync-r34";
 function commerceProductImage(product){
  if(!product)return "";
  // A saved empty/null image is authoritative; never restore a catalogue fallback.
@@ -7990,6 +7990,7 @@ function css(){return `
  .homeCategories .cat img{height:42px;object-fit:contain}
  .homeCategories .cat b{font-size:10px;line-height:1.2}
  .commerceMain>.homeBest{order:2!important}
+ .commerceMain>.homePromo{order:3!important}.commerceMain>.homeSeafood{order:4!important}.commerceMain>.homeNew{order:5!important}.commerceMain>.homeManaged{order:6!important}.commerceMain>.homeTools{order:7!important}.commerceMain>#commerce-seo-guide{order:8!important}.commerceMain>.homeNewsletter{order:9!important}.commerceMain>.contactStrip{order:10!important}
 }
 
 `}

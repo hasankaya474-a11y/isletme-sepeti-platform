@@ -60,3 +60,7 @@ Mobil/tablette ana vitrin → sekiz kategori → seçili ürünler sırası sabi
 ### R33 mobil vitrin
 
 Mobil/tablette vitrin yüksekliği 140–230px aralığına indirildi. Sekiz kategori hemen altında dört sütun ve iki satır; ardından seçili ürünler. Son CSS sıralama kuralı öncelikli. 111 Worker testi geçti. Canlı dağıtım yapılmadı. `docs/RELEASE_R33_2026-10-02.json`.
+
+### R34 doğrulama ve canlı farkı
+
+Tüm ana sayfa bölümlerinin sırası 1024px altında birlikte tanımlandı; tablet bölümleri kategorilerin önüne geçmez. 111 Worker testi geçti. Canlı DOM kontrolünde 9 kategori ve eksik R33 stili doğrulandı. Cloudflare dağıtım bağlantısı/kimliği bu oturumda yok; canlı değiştirilmedi. Ana vitrine gerçek iki satış bağlantısı eklenmesi önceki taleplerden açık kalan iştir. Piksel QA tarayıcı executable bulunmadığı için yapılamadı.

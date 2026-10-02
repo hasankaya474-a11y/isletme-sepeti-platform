@@ -1,0 +1,41 @@
+{
+  "build": "commerce-v2-2026-10-02-admin-sync-r34",
+  "baseline": "user-upload-2026-10-02",
+  "architecture": "DENIZ_PUBLIC_ZAMAN_ADMIN_SHARED_COMMERCE_D1",
+  "code": {
+    "DENIZ": {
+      "path": "dist/deniz-worker.single.js",
+      "bytes": 4081526,
+      "lines": 8784,
+      "sha256": "ad876431fdf742826984b16c7c085c92316eb3a03893305afe55a105a6c328b1",
+      "gzipBytes": 1978148
+    },
+    "ZAMAN": {
+      "path": "dist/zaman-admin-worker.single.js",
+      "bytes": 780068,
+      "lines": 1823,
+      "sha256": "464816da7e60c412e69978dbcd96b258f8c826d3495a8efa159d98e277d42cd4",
+      "gzipBytes": 101950
+    }
+  },
+  "deployment": "not-deployed",
+  "testing": {
+    "root": {
+      "pass": 278,
+      "skip": 4,
+      "fail": 0
+    },
+    "worker": {
+      "pass": 111,
+      "skip": 0,
+      "fail": 0
+    },
+    "atomicSaveScenarios": 7,
+    "selectedProductScenarios": "0/1/28/all plus conflicting DB bindings"
+  },
+  "visualQA": "Actual served HTML, client scripts and final CSS tested. No mobile pixel render. Production not deployed.",
+  "liveObservation": "2026-10-02 live DOM: nine homepage category cards; R33 compact style absent. Latest code not deployed.",
+  "changes": [
+    "Complete order map at all widths <=1024: hero/categories/products/promo/seafood/new/managed/tools/SEO/newsletter/contact"
+  ]
+}
