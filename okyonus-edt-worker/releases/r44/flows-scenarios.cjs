@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const s=fs.readFileSync(process.argv[2],'utf8');let script;
+const start=s.indexOf('function commerceCartPage(){'),end=s.indexOf('function commerceProductPage(',start);
+vm.runInNewContext(s.slice(start,end)+';commerceCartPage()', {html:x=>x,contactStrip:()=>'',commerceClientShell:(t,b,x)=>script=x});new vm.Script(script);
+const fn=script.slice(script.indexOf('function unavailable('),script.indexOf('function reconcile('));
+const catalog=new Map([['A',{id:'A',name:'Same product',price:null,effectivePrice:null,list_price:null,stock_status:'OUT',qty_step:.5,min_order_qty:1}]]);
+const ctx={catalog,catalogVerified:true};vm.runInNewContext(fn+';this.item=currentItem({id:"A",name:"Old",price:200,image:"old.webp",package_text:"old pack"});this.unavailable=unavailable;',ctx);
+assert.equal(ctx.item.image,'');assert.equal(ctx.item.package_text,'');assert.equal(ctx.item.price,null,'admin price removal must clear old cart price');assert.equal(ctx.item.stock_status,'OUT');assert(ctx.unavailable(ctx.item));assert(!ctx.unavailable({stock_status:'ORDER'}));assert(!ctx.unavailable({stock_status:'LIMITED'}));
+assert(script.includes('a.some(unavailable)'));assert(script.includes('await loadCatalog(true);const a=read();'));
+assert.equal((s.match(/inactive\|out of stock\|\^OUT\$\/i.test\(stock\)/g)||[]).length,3);
+console.log('PASS actual generated cart script syntax; admin OUT blocks cart; ORDER/LIMITED remain available; removed price clears old 200; pre-submit catalog refresh; all 3 add routes guard OUT');

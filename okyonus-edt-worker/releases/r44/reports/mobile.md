@@ -1,0 +1,7 @@
+# R44 compact mobile card patch
+
+Reviewed the supplied 13:28 screenshot and the complete R43 source, including its three body-end `oky-r43-final-mobile` styles. Those final overrides keep phone quantities on one row with 32px-wide, 44px-high buttons. The screenshot shows uneven card bottoms from unbounded product names and metadata; Sriracha also visibly uses a browser screenshot instead of a clean product image (reported for asset correction).
+
+`patch-mobile-r44.py` extends all three final style blocks. It retains three phone columns below 600px and four tablet columns from 600–1024px, preserves one-row quantity controls, fixes image slots to 88px phone / 116px tablet, uses two title lines and two metadata lines, gives prices a 32px minimum with automatic height for discounts, and aligns price/control/add rows by stretching cards within each grid row. Long product names retain their full DOM text and product detail link, while the visible heading is clamped to two lines. No Worker file was edited.
+
+Validation: temporary patched R43 passed `node --check`. Exactly three final style blocks were extended and removing the added CSS reproduces the original source byte-for-byte. Conservative width calculations at 320, 360, 390, 599, 600, 768 and 1024px retain positive quantity-input space with their specified columns. Browser viewport emulation was not used; screenshot plus source cascade were audited.
