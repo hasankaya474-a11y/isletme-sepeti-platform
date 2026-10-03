@@ -16,6 +16,13 @@ def apply(source):
  function serviceStatusScript(){return `<script>(function(){var e=document.getElementById('okyServiceStatus');if(!e)return;var busy=false;async function check(){if(busy)return;if(!navigator.onLine){e.textContent='İnternet bağlantısı yok';return}busy=true;var c=new AbortController(),t=setTimeout(function(){c.abort()},8000);try{var r=await fetch('/api/health',{cache:'no-store',headers:{accept:'application/json'},signal:c.signal}),j=await r.json();if(!r.ok||j.ok!==true)throw Error('health');e.textContent='Site çevrimiçi · Kontrol '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});e.title='Site sunucusuna bağlantı doğrulandı. Bu gösterge satış ekibinin çevrimiçi olduğunu belirtmez.'}catch(_){e.textContent=navigator.onLine?'Site bağlantısı doğrulanamadı':'İnternet bağlantısı yok'}finally{clearTimeout(t);busy=false}}check();addEventListener('online',check);addEventListener('offline',function(){e.textContent='İnternet bağlantısı yok'});document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});setInterval(function(){if(!document.hidden)check()},60000)})();</script>`}
  function commerceAboutPage(){return commerceClientShell('Hakkımızda | Okyanus EDT','<main class="wrap"><section class="page"><a href="/">← Ana Sayfa</a><h1>Okyanus EDT Hakkında</h1><p>Restoran, kafe, otel, catering ve profesyonel mutfakların ürün ve teklif ihtiyaçları için çalışıyoruz.</p><h2>Ürün seçimi ve teklif</h2><p>Deniz ürünleri, donuk ürünler, et ve şarküteri, süt ürünleri, yağlar, soslar, kuru gıda ve baharat kategorilerinden ihtiyacınızı seçebilir; miktarları teklif listenizde bir araya getirebilirsiniz. Hazır alış listenizi fotoğrafla da gönderebilirsiniz.</p><h2>Açık iletişim</h2><p>Ürün, fiyat, stok ve teslimat bilgilerini teklif aşamasında satış ekibimizle doğrulayabilirsiniz. Hasan Kaya ve Orhan Güngör ile iletişim sayfamızdaki telefon, e-posta ve WhatsApp bağlantılarından görüşebilirsiniz.</p><h2>Dijital Menü</h2><p>İşletmenizin menüsünü düzenlemek için Dijital Menü alanını kullanabilirsiniz.</p><p><a class="btn" href="/urunler">Ürün Seç • Teklif Al</a> <a class="btn" href="/fotografla-teklif">Listeni Fotoğrafla Gönder</a> <a class="btn" href="/iletisim">Bize Ulaşın</a></p><p><a href="/kvkk">KVKK</a> · <a href="/gizlilik">Gizlilik</a> · <a href="/yardim">Site Yardım</a></p></section></main>','')}
  '''
+ # About must share the lexical scope of commerceClientShell.
+ start=s.index(' function commerceAboutPage(){')
+ about=s[start:].strip()
+ s=s[:start]
+ anchor='async function commerceRoute(request,env){'
+ assert s.count(anchor)==1
+ s=s.replace(anchor,about+'\n'+anchor,1)
  return s
 
 if __name__ == "__main__":

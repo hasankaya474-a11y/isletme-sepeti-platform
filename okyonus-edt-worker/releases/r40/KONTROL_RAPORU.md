@@ -9,7 +9,7 @@ Altı uzman: SEO, mobil/tablet, müşteri akışları, yönetim/banner, logo/çe
 | Canlı 200 SEO adresi + canonical + sitemap | 200/200 açıldı, 200/200 sitemap içinde |
 | R40 dört bölüm × 50 benzersiz bağlantı | Geçti |
 | Türkçe başlık, H1, canonical, sosyal paylaşım bilgisi | Geçti |
-| SQLite/VM müşteri–yönetim çapraz kontrolü | 15/15 |
+| SQLite/VM müşteri–yönetim çapraz kontrolü | 16/16 |
 | 16 seçili ürünün panel → müşteri API aktarımı, seçimi kaldırma, owner-only | Geçti |
 | Teklif tekrar/çift gönderim, oturum hatası, miktar/istek sınırı | Geçti |
 | Görsel yükleme yetki/imza/hata/mevcut depoya dönüş | Geçti; uzak yükleme mock |
@@ -43,3 +43,7 @@ Test hatası senaryosunda görülen `INQUIRIES_INSERT_UNSUCCESSFUL`, başarısı
 ## Canlı doğrulama sınırı
 
 R40 canlıya dağıtılmadı. Yerel geçişler canlı yayın kanıtı değildir. Tam mobil cihaz/gerçek yönetici oturumu/gerçek teklif ve görsel yükleme/Cloudflare CPU ölçümü henüz doğrulanmadı. Ayrı workers.dev yönetim hostuna okuma otomatik onay incelemesinde kapsam dışı bulunarak reddedildi; tekrar denenmedi. Ürün fiyatları veya yeni ticari kimlik/adres/sertifika bilgisi uydurulmadı. HTTPS ve sağlık kontrolü sunucu erişimini destekler, ticari güvenilirliği bağımsız olarak kanıtlamaz.
+
+## 3 Ekim kapsam onarımı
+
+Ekran görüntüsündeki `Cannot find name commerceClientShell` sorunu giderildi: Hakkımızda renderer fonksiyonu aynı ticaret modülünün kapsamına taşındı. `/hakkimizda` ve `/about` GET/HEAD çalıştırma, Türkçe içerik ve oluşturulan JavaScript kontrolleri eklendi; 16/16 çapraz kontrol geçti. Düzeltilmiş tam DENİZ: `DENIZ_R40_DUZELTILMIS_TAM_KOD.txt`. ZAMAN içeriği değişmedi.

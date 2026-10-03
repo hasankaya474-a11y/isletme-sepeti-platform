@@ -37,7 +37,10 @@ deniz = deniz.replace('commerce-v2-2026-10-02-admin-sync-r36-resource-fix', 'com
 checksums = {'base_commit': 'b6905b3a98121bcc267e28dbcce6eacc48b3a954', 'files': {}}
 for name, source in [('deniz', deniz), ('zaman', zaman)]:
     source = ascii_js(source)
-    for filename in [f'{name}.mjs', f'{name.upper()}_R40_TAM_KOD.txt']:
+    filenames = [f'{name}.mjs', f'{name.upper()}_R40_TAM_KOD.txt']
+    if name == 'deniz':
+        filenames.append('DENIZ_R40_DUZELTILMIS_TAM_KOD.txt')
+    for filename in filenames:
         (root / filename).write_text(source, encoding='ascii')
         checksums['files'][filename] = {'bytes': len(source), 'sha256': hashlib.sha256(source.encode()).hexdigest()}
     base = root.parent / f'r39/{name}.mjs'

@@ -18,6 +18,16 @@ const req=(route,method='GET',body)=>new Request('https://www.okyonusedt.com'+ro
 async function test(name,fn){try{await fn();results.push({name,pass:true});console.log('PASS',name)}catch(e){results.push({name,pass:false,error:e.message});console.log('FAIL',name,e.message)}}
 let home='';
 await test('public pages reachable without membership',async()=>{for(const r of ['/','/urunler','/sepet','/iletisim','/yardim','/markalar','/kampanyalar','/teslimat']){const response=await deniz.fetch(req(r),{},{});assert.equal(response.status,200,r);const text=await response.text();assert.ok(text.includes('<html'),r);if(r==='/')home=text}});
+await test('About routes execute the commerce shell in its lexical scope',async()=>{
+ for(const path of ['/hakkimizda','/about']){
+  const response=await deniz.fetch(req(path),{},{});assert.equal(response.status,200,path);
+  const html=await response.text();assert.ok(html.includes('Okyanus EDT Hakkında'),path);
+  assert.ok(html.includes('Hasan Kaya'));assert.ok(html.includes('Orhan Güngör'));
+  assert.ok(html.includes('rel="canonical"'));assert.ok(!html.includes('COST Radar'));
+  for(const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))if(!match[0].includes('application/ld+json'))new vm.Script(match[1]);
+  const head=await deniz.fetch(req(path,'HEAD'),{},{});assert.equal(head.status,200);assert.equal(await head.text(),'');
+ }
+});
 await test('HEAD suppresses all public bodies',async()=>{for(const r of ['/','/urunler','/sepet','/iletisim','/api/storefront-v2']){const response=await deniz.fetch(req(r,'HEAD'),{},{});assert.equal((await response.text()).length,0,r)}});
 await test('eight category links and hero before category markup',async()=>{for(const c of ['deniz-urunleri','donuk-urunler','et-sarkuteri','sut-sarkuteri','yaglar','soslar','kuru-gida','baharat'])assert.ok(home.includes('category='+c),c);const hero=home.indexOf('class="hero'),categories=home.indexOf('id="commerce-categories"');assert.ok(hero>=0);assert.ok(categories>hero,'categoryGrid must follow hero');});
 await test('anonymous quote blocked',async()=>{const r=await deniz.fetch(req('/api/quote','POST',{products:[]}),{},{});assert.equal(r.status,401);assert.equal((await r.json()).error,'UNAUTHENTICATED')});

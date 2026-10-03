@@ -21,7 +21,7 @@ Altı uzman denetimiyle, en son Türkçe karakter düzeltmesi bulunan R39 kaynak
 
 ## Doğrulama
 
-`tests/last-results.json`: 15/15 SQLite/VM çapraz kontrol. `tests/seo-status.mjs`: yayımlanmamış sürümde 200 rota, canonical/site haritası, dört bölüm, Türkçe/H1/noindex ve gerçek durum scriptinin başarılı/hatalı/çevrimdışı senaryoları. Sepet/teklif, görsel yükleme, ürün kimliği, banner ve güvenlik testleri ayrıca geçti. Tam test komutları `KONTROL_RAPORU.md` içinde.
+`tests/last-results.json`: 16/16 SQLite/VM çapraz kontrol. `tests/seo-status.mjs`: yayımlanmamış sürümde 200 rota, canonical/site haritası, dört bölüm, Türkçe/H1/noindex ve gerçek durum scriptinin başarılı/hatalı/çevrimdışı senaryoları. Sepet/teklif, görsel yükleme, ürün kimliği, banner ve güvenlik testleri ayrıca geçti. Tam test komutları `KONTROL_RAPORU.md` içinde.
 
 Canlı denetimde 200 SEO adresinin tamamı HTTP 200 ve site haritasında; kanıt `reports/live-seo-200.json`. Site açılır, favicon/manifest erişilir. HTTPS teknik bağlantıyı korur; işletmenin ticari güvenilirliği veya bağımsız sertifikasyonu kanıtlanmış değildir.
 
@@ -30,3 +30,7 @@ Gerçek mobil/tablet cihaz testi, canlı yönetici oturumu/ürün kaydetme/yükl
 ## Yeniden üretim ve geri dönüş
 
 `python3 build.py` değişmemiş R39'dan R40'ı tekrar üretir. `checksums.json` tam dosyaların ve başlangıç R39'un SHA-256 değerlerini içerir. Önceki R39/R38 dosyaları değişmeden durur; geri dönüş için önceki Worker dosyaları ve mevcut yapılandırma kullanılır. Bu değişiklik veri tablosu silmez veya üretim verisini değiştirmez. Canlıya geçişten önce iki ayrı test Worker'ında gerçek bindings ile panel → müşteri ekranı kontrolü yapılmalıdır.
+
+## 3 Ekim kapsam onarımı
+
+Ekran görüntüsündeki `Cannot find name commerceClientShell` sorunu giderildi: Hakkımızda renderer fonksiyonu aynı ticaret modülünün kapsamına taşındı. `/hakkimizda` ve `/about` GET/HEAD çalıştırma, Türkçe içerik ve oluşturulan JavaScript kontrolleri eklendi; 16/16 çapraz kontrol geçti. Düzeltilmiş tam DENİZ: `DENIZ_R40_DUZELTILMIS_TAM_KOD.txt`. ZAMAN içeriği değişmedi.

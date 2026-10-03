@@ -1,11 +1,15 @@
 {
   "target": "/workspace/scratch/31d12a4f6f99/repo/okyonus-edt-worker/releases/r40",
-  "date": "2026-10-03T05:54:21.386Z",
-  "passed": 15,
+  "date": "2026-10-03T06:06:44.014Z",
+  "passed": 16,
   "failed": 0,
   "results": [
     {
       "name": "public pages reachable without membership",
+      "pass": true
+    },
+    {
+      "name": "About routes execute the commerce shell in its lexical scope",
       "pass": true
     },
     {
