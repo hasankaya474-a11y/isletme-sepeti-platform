@@ -1,0 +1,18 @@
+{
+  "deniz.mjs": {
+    "bytes": 2395122,
+    "sha256": "a775fcab5da9ee8ee837419b2a983db129cca720e2afd4c7193bd114ec18ecca"
+  },
+  "DENIZ_R45_TAM_KOD.txt": {
+    "bytes": 2395122,
+    "sha256": "a775fcab5da9ee8ee837419b2a983db129cca720e2afd4c7193bd114ec18ecca"
+  },
+  "zaman.mjs": {
+    "bytes": 875588,
+    "sha256": "eb4e952170c434e004ebb9234fea678a936d745f08e38ea95d497b501a8b9e31"
+  },
+  "ZAMAN_R45_TAM_KOD.txt": {
+    "bytes": 875588,
+    "sha256": "eb4e952170c434e004ebb9234fea678a936d745f08e38ea95d497b501a8b9e31"
+  }
+}
