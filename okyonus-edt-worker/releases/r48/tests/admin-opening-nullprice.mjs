@@ -1,0 +1,29 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import {DatabaseSync} from 'node:sqlite';import {pathToFileURL} from 'node:url';
+class D1 {
+ constructor(){this.db=new DatabaseSync(':memory:');this.queries=[]}
+ prepare(sql){const owner=this;let values=[];return {bind(...args){values=args;return this},async first(column){owner.queries.push(sql);const row=owner.db.prepare(sql).get(...values);return column?row?.[column]:row||null},async all(){owner.queries.push(sql);return {success:true,results:owner.db.prepare(sql).all(...values)}},async run(){owner.queries.push(sql);const r=owner.db.prepare(sql).run(...values);return {success:true,meta:{changes:Number(r.changes),last_row_id:Number(r.lastInsertRowid)}}}}}
+ async batch(items){this.db.exec('BEGIN');try{const out=[];for(const item of items)out.push(await item.run());this.db.exec('COMMIT');return out}catch(e){this.db.exec('ROLLBACK');throw e}}
+}
+
+
+import vm from 'node:vm';
+const deniz=(await import(pathToFileURL(process.argv[2]||'repo/okyonus-edt-worker/releases/r47/deniz.mjs'))).default;
+const source=fs.readFileSync(process.argv[3]||'repo/okyonus-edt-worker/releases/r47/zaman.mjs','utf8');const m=await import('data:text/javascript;base64,'+Buffer.from(source+'\nexport {commerceAdminApi,commerceAdminPage};').toString('base64'));
+const db=new D1(),env={DB:db,ADMIN_DB:db},owner={user:{role:'owner',id:'test-owner'}};
+const req=(r,method='GET',b)=>new Request('https://www.okyonusedt.com'+r,{method,...(b!==undefined?{headers:{'content-type':'application/json'},body:JSON.stringify(b)}:{})});
+const call=(r,b)=>m.commerceAdminApi(req('/api/commerce/'+r,b===undefined?'GET':'POST',b),env,owner,new Headers());
+const home=async()=>{const r=await deniz.fetch(req('/'),env,{});assert.equal(r.status,200);return r.text()};
+const sf=async()=>{const r=await deniz.fetch(req('/api/storefront-v2'),env,{});assert.equal(r.status,200);return r.json()};
+await call('summary');
+assert.equal((await call('settings',{openingCampaignEnabled:'true',openingCampaignImage:'https://example.com/opening.webp',openingCampaignTitle:'Controlled campaign title',openingCampaignDescription:'Controlled description',openingCampaignCtaText:'Browse selected',openingCampaignCtaUrl:'/urunler?category=deniz-urunleri'})).status,200);
+let html=await home();assert.match(html,/id="campaignPopup"[^>]*data-enabled="true"/);assert.ok(html.includes('https://example.com/opening.webp'));assert.ok(html.includes('Controlled campaign title'));assert.ok(html.includes('Controlled description'));assert.ok(html.includes('Browse selected'));
+for(const disabled of ['false','0','off','FALSE']){await call('settings',{openingCampaignEnabled:disabled});html=await home();assert.match(html,/id="campaignPopup"[^>]*data-enabled="false"/);await call('settings',{openingCampaignTitle:'Edited while disabled'});html=await home();assert.match(html,/id="campaignPopup"[^>]*data-enabled="false"/);const settings=(await sf()).settings;assert.equal(settings.openingCampaignEnabled,disabled);assert.equal(settings.openingCampaignImage,'https://example.com/opening.webp')}
+await call('settings',{openingCampaignEnabled:'true',openingCampaignImage:''});html=await home();assert.match(html,/id="campaignPopup"[^>]*data-enabled="true"/);const campaignHtml=html.slice(html.indexOf('<dialog id="campaignPopup"'),html.indexOf('</dialog>',html.indexOf('<dialog id="campaignPopup"')));assert.ok(!campaignHtml.includes('<img'));assert.equal((await sf()).settings.openingCampaignImage,'');console.log('PASS opening enabled/title/image/CTA propagate; disabling preserved on unrelated title edits; removed image stays empty');
+const response=await call('products',{name:'Missing price quote product',category:'Deniz Ürünleri',imageUrl:'',featured:true,price:null,listPrice:null,salePrice:null,stockStatus:'ORDER'});assert.equal(response.status,201);const id=(await response.json()).id;
+let p=(await sf()).products.find(p=>p.id===id);assert.equal(p.basePrice,null);assert.equal(p.effectivePrice,null);assert.equal(Number(p.featured),1);assert.equal(p.stock_status,'ORDER');
+await call('products/'+id,{description:'Keep price missing'});p=(await sf()).products.find(p=>p.id===id);assert.equal(p.basePrice,null);assert.equal(p.effectivePrice,null);
+const fetchOriginal=globalThis.fetch;globalThis.fetch=async()=>new Response(JSON.stringify(await sf()));const publication=await(await call('publication-check')).json();globalThis.fetch=fetchOriginal;assert.equal(publication.match,true);assert.equal(db.db.prepare('SELECT count(*) n FROM b2b_prices_v1 WHERE product_id=?').get(id).n,0);console.log('PASS no-price product remains selected/public with null price; no fake zero/price rows; publication matches');
+await call('products/'+id,{stockStatus:'OUT'});p=(await sf()).products.find(p=>p.id===id);assert.equal(p.stock_status,'OUT');assert.equal(p.effectivePrice,null);console.log('PASS admin OUT stock retained in canonical API, no price introduced');
+const rendered=await(await m.commerceAdminPage(new Headers())).text();const script=[...rendered.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]).find(x=>x.includes('function openingUI'));new vm.Script(script);const start=script.indexOf('function openingUI'),end=script.indexOf('function bindOpening',start),ctx={esc:String};vm.createContext(ctx);vm.runInContext(script.slice(start,end),ctx);
+for(const disabled of ['false','0','off','FALSE']){const ui=ctx.openingUI({openingCampaignEnabled:disabled});const passive=/option value="false" selected/.test(ui);if(process.env.EXPECT_PATCHED)assert.equal(passive,true,disabled);else console.log('baseline openingUI disabled state',disabled,passive)}
+console.log('PASS rendered opening settings JS parses'+(process.env.EXPECT_PATCHED?' and all supported false states match public':''));
