@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {pathToFileURL} from 'node:url';
+import path from 'node:path';
+const worker=await import(process.argv[2]?pathToFileURL(path.resolve(process.argv[2])).href:new URL('../deniz.mjs',import.meta.url).href);
+const response=await worker.default.fetch(new Request('https://www.okyonusedt.com/'),{}, {waitUntil(){}});
+assert.equal(response.status,200);
+const html=await response.text();
+const script=html.slice(html.indexOf('const approvedHeroHtml='),html.indexOf('}if(hero)',html.indexOf('const approvedHeroHtml='))+1);
+assert.ok(script.includes('function managedHero'));
+const hero={innerHTML:'APPROVED_FOUR_SLIDES',querySelectorAll(){return[]}};
+let binds=0;
+const context={hero,i:0,bindCarousel(){binds++},esc:v=>String(v).replace(/"/g,'&quot;'),safeHeroUrl:v=>/^\/(?!\/)|^https:\/\//.test(v)?v:'/urunler'};
+vm.createContext(context);vm.runInContext(script,context);
+const banner={active:1,title:'Managed title',desktop_image:'https://example.com/banner.webp',cta_url:'/urunler'};
+context.managedHero([banner]);assert.match(hero.innerHTML,/Managed title/);assert.match(hero.innerHTML,/banner.webp/);
+context.managedHero([]);assert.equal(hero.innerHTML,'APPROVED_FOUR_SLIDES');
+context.managedHero([{...banner,active:0}]);assert.equal(hero.innerHTML,'APPROVED_FOUR_SLIDES');
+context.managedHero(Array.from({length:15},(_,i)=>({...banner,title:'Banner '+i})));assert.equal((hero.innerHTML.match(/data-slide/g)||[]).length,15);
+for(const url of ['javascript:alert(1)','//evil.example/x','/\\evil.example','https://example.com/\ninvalid']){context.managedHero([{...banner,desktop_image:url}]);assert.ok(!hero.innerHTML.includes('<picture'),'Unsafe image '+JSON.stringify(url));}
+console.log('PASS managed, empty, inactive, 15 banners, unsafe images, rebind '+binds);
