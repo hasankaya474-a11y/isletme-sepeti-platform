@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const source=fs.readFileSync(process.argv[2],'utf8');
+const start=source.indexOf('function runtimeSettingsScript(){');
+const end=source.indexOf('\nfunction commerceClientShell',start);
+const ctx={serviceStatusScript:()=>''};vm.createContext(ctx);vm.runInContext(source.slice(start,end),ctx);
+const html=ctx.runtimeSettingsScript();
+const script=html.slice('<script>'.length,-'</script>'.length);
+// DOM textContent semantics: updating a container removes its descendants.
+const nodes={};
+const status=nodes.okyServiceStatus={textContent:'Site çevrimiçi · Kontrol 09:30'};
+const text=nodes.siteAnnouncementText={textContent:'Önceki duyuru'};
+nodes.siteAnnouncement={set textContent(value){delete nodes.siteAnnouncementText;delete nodes.okyServiceStatus}};
+assert.match(source,/<span id="siteAnnouncementText">\$\{esc\(DEFAULT_SETTINGS.announcement\)\}<\/span><span id="okyServiceStatus"/);
+const doc={getElementById:id=>nodes[id]||null,querySelectorAll:()=>[]};
+const run={document:doc,window:{okyStorefrontRead:()=>Promise.resolve({settings:{announcement:'Yeni duyuru'}})}};
+vm.createContext(run);vm.runInContext(script,run);
+await new Promise(resolve=>setImmediate(resolve));
+assert.equal(nodes.siteAnnouncementText.textContent,'Yeni duyuru');
+assert.equal(nodes.okyServiceStatus,status);
+assert.equal(nodes.okyServiceStatus.textContent,'Site çevrimiçi · Kontrol 09:30');
+console.log('Announcement settings hydrate without deleting online status');
