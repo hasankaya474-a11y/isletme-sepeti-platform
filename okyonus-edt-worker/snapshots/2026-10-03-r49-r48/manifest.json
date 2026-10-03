@@ -1,0 +1,19 @@
+{
+  "baseline_commit": "612738aff1e68d7f78d2be47d8bdcedec6f80b6a",
+  "repository": "hasankaya474-a11y/isletme-sepeti-platform",
+  "workers": [
+    {
+      "worker": "DENIZ",
+      "file": "releases/r49/DENIZ_R49_TAM_KOD.txt",
+      "bytes": 2392194,
+      "sha256": "8c9ff5307ad0ad482ee2ba430b8a219c89ba66545e5d909145ab79eaf573a7b6"
+    },
+    {
+      "worker": "ZAMAN",
+      "file": "releases/r48/ZAMAN_R48_TAM_KOD.txt",
+      "bytes": 876687,
+      "sha256": "4cede6161d52af6082d23163a8efd6798e1f4509b3b05a603b2a54a3f0017580"
+    }
+  ],
+  "live_deployment_verified": false
+}
