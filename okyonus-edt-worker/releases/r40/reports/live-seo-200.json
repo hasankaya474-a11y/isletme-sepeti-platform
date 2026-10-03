@@ -1,0 +1,1402 @@
+[
+  {
+    "path": "/edt-restoran-gida-tedarikcisi",
+    "status": "200",
+    "len": 16496,
+    "canonical": true,
+    "title": "EDT Restoran Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-gida-tedarikcisi",
+    "status": "200",
+    "len": 16478,
+    "canonical": true,
+    "title": "EDT HORECA Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-tedarikcisi",
+    "status": "200",
+    "len": 16541,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-gida-tedarikcisi",
+    "status": "200",
+    "len": 16478,
+    "canonical": true,
+    "title": "EDT Toptan Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-gida-tedarikcisi",
+    "status": "200",
+    "len": 16460,
+    "canonical": true,
+    "title": "EDT Otel Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kafe-gida-tedarikcisi",
+    "status": "200",
+    "len": 16460,
+    "canonical": true,
+    "title": "EDT Kafe Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-lokanta-gida-tedarikcisi",
+    "status": "200",
+    "len": 16487,
+    "canonical": true,
+    "title": "EDT Lokanta Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-bufe-gida-tedarikcisi",
+    "status": "200",
+    "len": 16460,
+    "canonical": true,
+    "title": "EDT Büfe Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-catering-gida-tedarikcisi",
+    "status": "200",
+    "len": 16496,
+    "canonical": true,
+    "title": "EDT Catering Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-endustriyel-mutfak-tedarikcisi",
+    "status": "200",
+    "len": 16541,
+    "canonical": true,
+    "title": "EDT Endüstriyel Mutfak Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-urunleri",
+    "status": "200",
+    "len": 16424,
+    "canonical": true,
+    "title": "EDT Restoran Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kafe-urunleri",
+    "status": "200",
+    "len": 16388,
+    "canonical": true,
+    "title": "EDT Kafe Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-mutfak-urunleri",
+    "status": "200",
+    "len": 16451,
+    "canonical": true,
+    "title": "EDT Otel Mutfak Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-catering-urunleri",
+    "status": "200",
+    "len": 16424,
+    "canonical": true,
+    "title": "EDT Catering Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-urunleri",
+    "status": "200",
+    "len": 16514,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-urunleri",
+    "status": "200",
+    "len": 16406,
+    "canonical": true,
+    "title": "EDT HORECA Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-mutfak-urunleri",
+    "status": "200",
+    "len": 16469,
+    "canonical": true,
+    "title": "EDT Toptan Mutfak Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-isletme-gida-urunleri",
+    "status": "200",
+    "len": 16460,
+    "canonical": true,
+    "title": "EDT İşletme Gıda Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-satin-alma",
+    "status": "200",
+    "len": 16442,
+    "canonical": true,
+    "title": "EDT Restoran Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-satin-alma",
+    "status": "200",
+    "len": 16424,
+    "canonical": true,
+    "title": "EDT HORECA Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/edt-deniz-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16555,
+    "canonical": true,
+    "title": "EDT Deniz Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-deniz-urunleri",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "EDT Toptan Deniz Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-deniz-urunleri",
+    "status": "200",
+    "len": 16528,
+    "canonical": true,
+    "title": "EDT Restoran Deniz Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-deniz-urunleri",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "EDT HORECA Deniz Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-donuk-deniz-urunleri",
+    "status": "200",
+    "len": 16501,
+    "canonical": true,
+    "title": "EDT Donuk Deniz Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-balik-tedarikcisi",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "EDT Balık Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-balik-tedarikcisi",
+    "status": "200",
+    "len": 16537,
+    "canonical": true,
+    "title": "EDT Toptan Balık Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-balik-tedarikcisi",
+    "status": "200",
+    "len": 16555,
+    "canonical": true,
+    "title": "EDT Restoran Balık Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-balik",
+    "status": "200",
+    "len": 16537,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Balık | Okyanus EDT"
+  },
+  {
+    "path": "/edt-deniz-urunleri-teklif",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "EDT Deniz Ürünleri Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-et-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16522,
+    "canonical": true,
+    "title": "EDT Et Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-et-urunleri",
+    "status": "200",
+    "len": 16477,
+    "canonical": true,
+    "title": "EDT Toptan Et Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-et-tedarikcisi",
+    "status": "200",
+    "len": 16522,
+    "canonical": true,
+    "title": "EDT Restoran Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-et-tedarikcisi",
+    "status": "200",
+    "len": 16504,
+    "canonical": true,
+    "title": "EDT HORECA Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-dana-eti-tedarikcisi",
+    "status": "200",
+    "len": 16495,
+    "canonical": true,
+    "title": "EDT Dana Eti Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kirmizi-et-tedarikcisi",
+    "status": "200",
+    "len": 16513,
+    "canonical": true,
+    "title": "EDT Kırmızı Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-et",
+    "status": "200",
+    "len": 16504,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Et | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-et-tedarikcisi",
+    "status": "200",
+    "len": 16486,
+    "canonical": true,
+    "title": "EDT Otel Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-catering-et-tedarikcisi",
+    "status": "200",
+    "len": 16522,
+    "canonical": true,
+    "title": "EDT Catering Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-et-urunleri-teklif",
+    "status": "200",
+    "len": 16477,
+    "canonical": true,
+    "title": "EDT Et Ürünleri Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-tavuk-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16543,
+    "canonical": true,
+    "title": "EDT Tavuk Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-tavuk-urunleri",
+    "status": "200",
+    "len": 16498,
+    "canonical": true,
+    "title": "EDT Toptan Tavuk Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-tavuk-tedarikcisi",
+    "status": "200",
+    "len": 16543,
+    "canonical": true,
+    "title": "EDT Restoran Tavuk Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-tavuk-tedarikcisi",
+    "status": "200",
+    "len": 16525,
+    "canonical": true,
+    "title": "EDT HORECA Tavuk Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kanatli-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16561,
+    "canonical": true,
+    "title": "EDT Kanatlı Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-tavuk",
+    "status": "200",
+    "len": 16525,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Tavuk | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-tavuk-tedarikcisi",
+    "status": "200",
+    "len": 16507,
+    "canonical": true,
+    "title": "EDT Otel Tavuk Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-catering-tavuk-tedarikcisi",
+    "status": "200",
+    "len": 16543,
+    "canonical": true,
+    "title": "EDT Catering Tavuk Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-donuk-tavuk-urunleri",
+    "status": "200",
+    "len": 16489,
+    "canonical": true,
+    "title": "EDT Donuk Tavuk Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-tavuk-urunleri-teklif",
+    "status": "200",
+    "len": 16498,
+    "canonical": true,
+    "title": "EDT Tavuk Ürünleri Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-donuk-gida-tedarikcisi",
+    "status": "200",
+    "len": 16506,
+    "canonical": true,
+    "title": "EDT Donuk Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-donuk-gida",
+    "status": "200",
+    "len": 16461,
+    "canonical": true,
+    "title": "EDT Toptan Donuk Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-donuk-gida",
+    "status": "200",
+    "len": 16479,
+    "canonical": true,
+    "title": "EDT Restoran Donuk Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-donuk-gida",
+    "status": "200",
+    "len": 16461,
+    "canonical": true,
+    "title": "EDT HORECA Donuk Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/edt-donuk-patates-tedarikcisi",
+    "status": "200",
+    "len": 16537,
+    "canonical": true,
+    "title": "EDT Donuk Patates Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-patates-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16564,
+    "canonical": true,
+    "title": "EDT Patates Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-patates-tedarikcisi",
+    "status": "200",
+    "len": 16564,
+    "canonical": true,
+    "title": "EDT Restoran Patates Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-patates-tedarikcisi",
+    "status": "200",
+    "len": 16546,
+    "canonical": true,
+    "title": "EDT HORECA Patates Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-donuk-urunler",
+    "status": "200",
+    "len": 16596,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Donuk Ürünler | Okyanus EDT"
+  },
+  {
+    "path": "/edt-donuk-urunler-teklif",
+    "status": "200",
+    "len": 16488,
+    "canonical": true,
+    "title": "EDT Donuk Ürünler Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-bakliyat-tedarikcisi",
+    "status": "200",
+    "len": 16483,
+    "canonical": true,
+    "title": "EDT Bakliyat Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-bakliyat",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "EDT Toptan Bakliyat | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-bakliyat",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "EDT Restoran Bakliyat | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-bakliyat",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "EDT HORECA Bakliyat | Okyanus EDT"
+  },
+  {
+    "path": "/edt-mercimek-tedarikcisi",
+    "status": "200",
+    "len": 16483,
+    "canonical": true,
+    "title": "EDT Mercimek Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-nohut-tedarikcisi",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "EDT Nohut Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kuru-fasulye-tedarikcisi",
+    "status": "200",
+    "len": 16519,
+    "canonical": true,
+    "title": "EDT Kuru Fasulye Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-bulgur-tedarikcisi",
+    "status": "200",
+    "len": 16461,
+    "canonical": true,
+    "title": "EDT Bulgur Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-pirinc-tedarikcisi",
+    "status": "200",
+    "len": 16465,
+    "canonical": true,
+    "title": "EDT Pirinç Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-bakliyat",
+    "status": "200",
+    "len": 16546,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Bakliyat | Okyanus EDT"
+  },
+  {
+    "path": "/edt-yag-tedarikcisi",
+    "status": "200",
+    "len": 16432,
+    "canonical": true,
+    "title": "EDT Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-yag-tedarikcisi",
+    "status": "200",
+    "len": 16495,
+    "canonical": true,
+    "title": "EDT Toptan Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-yag-tedarikcisi",
+    "status": "200",
+    "len": 16513,
+    "canonical": true,
+    "title": "EDT Restoran Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-yag-tedarikcisi",
+    "status": "200",
+    "len": 16495,
+    "canonical": true,
+    "title": "EDT HORECA Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-aycicek-yagi-tedarikcisi",
+    "status": "200",
+    "len": 16513,
+    "canonical": true,
+    "title": "EDT Ayçiçek Yağı Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-zeytinyagi-tedarikcisi",
+    "status": "200",
+    "len": 16495,
+    "canonical": true,
+    "title": "EDT Zeytinyağı Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-kizartmalik-yag-tedarikcisi",
+    "status": "200",
+    "len": 16540,
+    "canonical": true,
+    "title": "EDT Kızartmalık Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-yaglari",
+    "status": "200",
+    "len": 16531,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Yağları | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-mutfak-yaglari",
+    "status": "200",
+    "len": 16468,
+    "canonical": true,
+    "title": "EDT Otel Mutfak Yağları | Okyanus EDT"
+  },
+  {
+    "path": "/edt-yag-urunleri-teklif",
+    "status": "200",
+    "len": 16468,
+    "canonical": true,
+    "title": "EDT Yağ Ürünleri Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-sut-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16531,
+    "canonical": true,
+    "title": "EDT Süt Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-sut-urunleri",
+    "status": "200",
+    "len": 16486,
+    "canonical": true,
+    "title": "EDT Toptan Süt Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-sut-urunleri",
+    "status": "200",
+    "len": 16504,
+    "canonical": true,
+    "title": "EDT Restoran Süt Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-sut-urunleri",
+    "status": "200",
+    "len": 16486,
+    "canonical": true,
+    "title": "EDT HORECA Süt Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-peynir-tedarikcisi",
+    "status": "200",
+    "len": 16477,
+    "canonical": true,
+    "title": "EDT Peynir Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-tereyagi-tedarikcisi",
+    "status": "200",
+    "len": 16495,
+    "canonical": true,
+    "title": "EDT Tereyağı Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-krema-tedarikcisi",
+    "status": "200",
+    "len": 16468,
+    "canonical": true,
+    "title": "EDT Krema Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-profesyonel-mutfak-sut-urunleri",
+    "status": "200",
+    "len": 16594,
+    "canonical": true,
+    "title": "EDT Profesyonel Mutfak Süt Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-otel-sut-urunleri",
+    "status": "200",
+    "len": 16468,
+    "canonical": true,
+    "title": "EDT Otel Süt Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/edt-sut-urunleri-teklif",
+    "status": "200",
+    "len": 16486,
+    "canonical": true,
+    "title": "EDT Süt Ürünleri Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/edt-sos-tedarikcisi",
+    "status": "200",
+    "len": 16441,
+    "canonical": true,
+    "title": "EDT Sos Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-toptan-sos",
+    "status": "200",
+    "len": 16396,
+    "canonical": true,
+    "title": "EDT Toptan Sos | Okyanus EDT"
+  },
+  {
+    "path": "/edt-restoran-soslari",
+    "status": "200",
+    "len": 16450,
+    "canonical": true,
+    "title": "EDT Restoran Sosları | Okyanus EDT"
+  },
+  {
+    "path": "/edt-horeca-soslari",
+    "status": "200",
+    "len": 16432,
+    "canonical": true,
+    "title": "EDT HORECA Sosları | Okyanus EDT"
+  },
+  {
+    "path": "/edt-ketcap-tedarikcisi",
+    "status": "200",
+    "len": 16468,
+    "canonical": true,
+    "title": "EDT Ketçap Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-mayonez-tedarikcisi",
+    "status": "200",
+    "len": 16477,
+    "canonical": true,
+    "title": "EDT Mayonez Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-salca-tedarikcisi",
+    "status": "200",
+    "len": 16459,
+    "canonical": true,
+    "title": "EDT Salça Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-konserve-tedarikcisi",
+    "status": "200",
+    "len": 16486,
+    "canonical": true,
+    "title": "EDT Konserve Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-ithal-gida-tedarikcisi",
+    "status": "200",
+    "len": 16502,
+    "canonical": true,
+    "title": "EDT İthal Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/edt-ithal-urunler-teklif",
+    "status": "200",
+    "len": 16484,
+    "canonical": true,
+    "title": "EDT İthal Ürünler Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-icin-toptan-gida",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Restoran İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/kafeler-icin-toptan-gida",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Kafeler İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/oteller-icin-toptan-gida",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Oteller İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/catering-icin-toptan-gida",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Catering İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/lokantalar-icin-toptan-gida",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "Lokantalar İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/bufeler-icin-toptan-gida",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Büfeler İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-icin-gida",
+    "status": "200",
+    "len": 16483,
+    "canonical": true,
+    "title": "Profesyonel Mutfak İçin Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/isletmeler-icin-toptan-gida",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "İşletmeler İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-icin-toptan-gida",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "HORECA İçin Toptan Gıda | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-yemek-gida-tedariki",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Toplu Yemek Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-urun-tedariki",
+    "status": "200",
+    "len": 16429,
+    "canonical": true,
+    "title": "Restoran Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/kafe-urun-tedariki",
+    "status": "200",
+    "len": 16393,
+    "canonical": true,
+    "title": "Kafe Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/otel-urun-tedariki",
+    "status": "200",
+    "len": 16393,
+    "canonical": true,
+    "title": "Otel Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/catering-urun-tedariki",
+    "status": "200",
+    "len": 16429,
+    "canonical": true,
+    "title": "Catering Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/lokanta-urun-tedariki",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "Lokanta Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/bufe-urun-tedariki",
+    "status": "200",
+    "len": 16393,
+    "canonical": true,
+    "title": "Büfe Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-urun-tedariki",
+    "status": "200",
+    "len": 16519,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-urun-tedariki",
+    "status": "200",
+    "len": 16411,
+    "canonical": true,
+    "title": "HORECA Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/isletme-urun-tedariki",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "İşletme Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-gida-urun-tedariki",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Toplu Gıda Ürün Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-toplu-satin-alma",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Restoran Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/kafe-toplu-satin-alma",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "Kafe Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/otel-toplu-satin-alma",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "Otel Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/catering-toplu-satin-alma",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Catering Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/lokanta-toplu-satin-alma",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Lokanta Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-toplu-satin-alma",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "HORECA Toplu Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-satin-alma",
+    "status": "200",
+    "len": 16492,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/isletme-satin-alma-listesi",
+    "status": "200",
+    "len": 16465,
+    "canonical": true,
+    "title": "İşletme Satın Alma Listesi | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-gida-satin-alma",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "Toplu Gıda Satın Alma | Okyanus EDT"
+  },
+  {
+    "path": "/mutfak-satin-alma-urunleri",
+    "status": "200",
+    "len": 16465,
+    "canonical": true,
+    "title": "Mutfak Satın Alma Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-teklif-al",
+    "status": "200",
+    "len": 16393,
+    "canonical": true,
+    "title": "Restoran Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/kafe-teklif-al",
+    "status": "200",
+    "len": 16357,
+    "canonical": true,
+    "title": "Kafe Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/otel-teklif-al",
+    "status": "200",
+    "len": 16357,
+    "canonical": true,
+    "title": "Otel Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/catering-teklif-al",
+    "status": "200",
+    "len": 16393,
+    "canonical": true,
+    "title": "Catering Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/lokanta-teklif-al",
+    "status": "200",
+    "len": 16384,
+    "canonical": true,
+    "title": "Lokanta Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-teklif-al",
+    "status": "200",
+    "len": 16375,
+    "canonical": true,
+    "title": "HORECA Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-teklif-al",
+    "status": "200",
+    "len": 16483,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/gida-urunleri-teklif-al",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "Gıda Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/toptan-gida-teklif-al",
+    "status": "200",
+    "len": 16420,
+    "canonical": true,
+    "title": "Toptan Gıda Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/isletme-urunleri-teklif-al",
+    "status": "200",
+    "len": 16465,
+    "canonical": true,
+    "title": "İşletme Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/deniz-urunleri-teklif-al",
+    "status": "200",
+    "len": 16497,
+    "canonical": true,
+    "title": "Deniz Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/balik-teklif-al",
+    "status": "200",
+    "len": 16416,
+    "canonical": true,
+    "title": "Balık Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/et-urunleri-teklif-al",
+    "status": "200",
+    "len": 16464,
+    "canonical": true,
+    "title": "Et Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/dana-eti-teklif-al",
+    "status": "200",
+    "len": 16437,
+    "canonical": true,
+    "title": "Dana Eti Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/tavuk-urunleri-teklif-al",
+    "status": "200",
+    "len": 16485,
+    "canonical": true,
+    "title": "Tavuk Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/kanatli-urunleri-teklif-al",
+    "status": "200",
+    "len": 16503,
+    "canonical": true,
+    "title": "Kanatlı Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/donuk-gida-teklif-al",
+    "status": "200",
+    "len": 16448,
+    "canonical": true,
+    "title": "Donuk Gıda Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/patates-urunleri-teklif-al",
+    "status": "200",
+    "len": 16506,
+    "canonical": true,
+    "title": "Patates Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/bakliyat-teklif-al",
+    "status": "200",
+    "len": 16425,
+    "canonical": true,
+    "title": "Bakliyat Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/yag-urunleri-teklif-al",
+    "status": "200",
+    "len": 16455,
+    "canonical": true,
+    "title": "Yağ Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/sut-urunleri-teklif-al",
+    "status": "200",
+    "len": 16473,
+    "canonical": true,
+    "title": "Süt Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/peynir-teklif-al",
+    "status": "200",
+    "len": 16419,
+    "canonical": true,
+    "title": "Peynir Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/tereyagi-teklif-al",
+    "status": "200",
+    "len": 16419,
+    "canonical": true,
+    "title": "Tereyağı Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/sos-urunleri-teklif-al",
+    "status": "200",
+    "len": 16464,
+    "canonical": true,
+    "title": "Sos Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/ketcap-teklif-al",
+    "status": "200",
+    "len": 16410,
+    "canonical": true,
+    "title": "Ketçap Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/mayonez-teklif-al",
+    "status": "200",
+    "len": 16419,
+    "canonical": true,
+    "title": "Mayonez Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/salca-teklif-al",
+    "status": "200",
+    "len": 16401,
+    "canonical": true,
+    "title": "Salça Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/konserve-teklif-al",
+    "status": "200",
+    "len": 16428,
+    "canonical": true,
+    "title": "Konserve Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/ithal-gida-teklif-al",
+    "status": "200",
+    "len": 16444,
+    "canonical": true,
+    "title": "İthal Gıda Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-urunleri-teklif-al",
+    "status": "200",
+    "len": 16564,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Ürünleri Teklif Al | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-restoran-gida-tedariki",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "İstanbul Restoran Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-kafe-gida-tedariki",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "İstanbul Kafe Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-otel-gida-tedariki",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "İstanbul Otel Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-catering-gida-tedariki",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "İstanbul Catering Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-lokanta-gida-tedariki",
+    "status": "200",
+    "len": 16501,
+    "canonical": true,
+    "title": "İstanbul Lokanta Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-bufe-gida-tedariki",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "İstanbul Büfe Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-profesyonel-mutfak-tedariki",
+    "status": "200",
+    "len": 16555,
+    "canonical": true,
+    "title": "İstanbul Profesyonel Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-toptan-gida-tedariki",
+    "status": "200",
+    "len": 16492,
+    "canonical": true,
+    "title": "İstanbul Toptan Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-isletme-gida-tedariki",
+    "status": "200",
+    "len": 16501,
+    "canonical": true,
+    "title": "İstanbul İşletme Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-toplu-yemek-tedariki",
+    "status": "200",
+    "len": 16492,
+    "canonical": true,
+    "title": "İstanbul Toplu Yemek Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-deniz-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16596,
+    "canonical": true,
+    "title": "İstanbul Deniz Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-balik-tedarikcisi",
+    "status": "200",
+    "len": 16515,
+    "canonical": true,
+    "title": "İstanbul Balık Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-et-tedarikcisi",
+    "status": "200",
+    "len": 16482,
+    "canonical": true,
+    "title": "İstanbul Et Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-tavuk-tedarikcisi",
+    "status": "200",
+    "len": 16503,
+    "canonical": true,
+    "title": "İstanbul Tavuk Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-donuk-gida-tedarikcisi",
+    "status": "200",
+    "len": 16547,
+    "canonical": true,
+    "title": "İstanbul Donuk Gıda Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-patates-tedarikcisi",
+    "status": "200",
+    "len": 16524,
+    "canonical": true,
+    "title": "İstanbul Patates Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-bakliyat-tedarikcisi",
+    "status": "200",
+    "len": 16524,
+    "canonical": true,
+    "title": "İstanbul Bakliyat Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-yag-tedarikcisi",
+    "status": "200",
+    "len": 16473,
+    "canonical": true,
+    "title": "İstanbul Yağ Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-sut-urunleri-tedarikcisi",
+    "status": "200",
+    "len": 16572,
+    "canonical": true,
+    "title": "İstanbul Süt Ürünleri Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/istanbul-sos-tedarikcisi",
+    "status": "200",
+    "len": 16482,
+    "canonical": true,
+    "title": "İstanbul Sos Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-mutfak-tedariki",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Restoran Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/otel-mutfak-tedariki",
+    "status": "200",
+    "len": 16411,
+    "canonical": true,
+    "title": "Otel Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/kafe-mutfak-tedariki",
+    "status": "200",
+    "len": 16411,
+    "canonical": true,
+    "title": "Kafe Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/catering-mutfak-tedariki",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Catering Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/lokanta-mutfak-tedariki",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "Lokanta Mutfak Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/endustriyel-mutfak-gida-tedariki",
+    "status": "200",
+    "len": 16519,
+    "canonical": true,
+    "title": "Endüstriyel Mutfak Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-gida-urunleri",
+    "status": "200",
+    "len": 16519,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Gıda Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-mutfak-urunleri",
+    "status": "200",
+    "len": 16429,
+    "canonical": true,
+    "title": "HORECA Mutfak Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-tuketim-gida-urunleri",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "Toplu Tüketim Gıda Ürünleri | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-tuketim-tedarikcisi",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "Toplu Tüketim Tedarikçisi | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-haftalik-gida-tedariki",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "Restoran Haftalık Gıda Tedariki | Okyanus EDT"
+  },
+  {
+    "path": "/restoran-toplu-urun-teklifi",
+    "status": "200",
+    "len": 16474,
+    "canonical": true,
+    "title": "Restoran Toplu Ürün Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/otel-toplu-urun-teklifi",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "Otel Toplu Ürün Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/kafe-toplu-urun-teklifi",
+    "status": "200",
+    "len": 16438,
+    "canonical": true,
+    "title": "Kafe Toplu Ürün Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-toplu-urun-teklifi",
+    "status": "200",
+    "len": 16456,
+    "canonical": true,
+    "title": "HORECA Toplu Ürün Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-toplu-teklif",
+    "status": "200",
+    "len": 16510,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Toplu Teklif | Okyanus EDT"
+  },
+  {
+    "path": "/isletmelere-gida-teklifi",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "İşletmelere Gıda Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/toplu-gida-fiyat-teklifi",
+    "status": "200",
+    "len": 16447,
+    "canonical": true,
+    "title": "Toplu Gıda Fiyat Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/horeca-fiyat-teklifi",
+    "status": "200",
+    "len": 16411,
+    "canonical": true,
+    "title": "HORECA Fiyat Teklifi | Okyanus EDT"
+  },
+  {
+    "path": "/profesyonel-mutfak-fiyat-teklifi",
+    "status": "200",
+    "len": 16519,
+    "canonical": true,
+    "title": "Profesyonel Mutfak Fiyat Teklifi | Okyanus EDT"
+  }
+]

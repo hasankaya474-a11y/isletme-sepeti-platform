@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
+const p=process.argv[2]||new URL('../zaman.mjs',import.meta.url).pathname,s=await readFile(p,'utf8');const a=s.indexOf('async function okyR45BoundedFormData');assert(a>=0);
+const c={Response,Uint8Array,AbortController,setTimeout,clearTimeout,fetch:async()=>{throw Error('network')}};vm.createContext(c);vm.runInContext(s.slice(a),c);
+const fd=new FormData();fd.append('file',new Blob([new Uint8Array([137,80,78,71,13,10,26,10])],{type:'image/png'}),'image.png');
+let form=await c.okyR45BoundedFormData(new Request('https://example.com/upload',{method:'POST',body:fd}));assert.equal(form.get('file').size,8);
+await assert.rejects(c.okyR45BoundedFormData(new Request('https://example.com/upload',{method:'POST',headers:{'content-type':'multipart/form-data; boundary=x'},body:'not-form'})),e=>e.status===400&&e.message==='INVALID_UPLOAD_FORM');
+let canceled=false;const largeBody=new ReadableStream({start(q){q.enqueue(new Uint8Array(15));q.enqueue(new Uint8Array(15))},cancel(){canceled=true}});await assert.rejects(c.okyR45BoundedFormData(new Request('https://example.com/upload',{method:'POST',headers:{'content-type':'multipart/form-data; boundary=x'},body:largeBody,duplex:'half'}),20),e=>e.status===413);assert(canceled);
+await assert.rejects(c.okyR45BoundedFormData(new Request('https://example.com/upload',{method:'POST',headers:{'content-length':'21'},body:'x'}),20),e=>e.status===413);
+await assert.rejects(c.okyR45GithubMediaFetch('https://example.com',{}),e=>e.status===502&&e.message==='GITHUB_MEDIA_UNAVAILABLE');
+c.setTimeout=callback=>{queueMicrotask(callback);return 1};c.clearTimeout=()=>{};c.fetch=(_url,{signal})=>new Promise((_r,reject)=>{if(signal.aborted)reject(Error('abort'));else signal.addEventListener('abort',()=>reject(Error('abort')))});await assert.rejects(c.okyR45GithubMediaFetch('https://example.com',{}),e=>e.status===504&&e.message==='GITHUB_MEDIA_TIMEOUT');
+console.log('R45 image security PASS: valid multipart, malformed400, declared/streaming oversized413+cancellation, remote timeout504 and network failure502.');

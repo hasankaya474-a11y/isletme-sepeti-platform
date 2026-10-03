@@ -1,0 +1,18 @@
+{
+  "deniz.mjs": {
+    "bytes": 2391629,
+    "sha256": "af796c66ced690f838720cbe49f4db140599a35ef378d940daa30fb2f1a9fa7e"
+  },
+  "DENIZ_R44_TAM_KOD.txt": {
+    "bytes": 2391629,
+    "sha256": "af796c66ced690f838720cbe49f4db140599a35ef378d940daa30fb2f1a9fa7e"
+  },
+  "zaman.mjs": {
+    "bytes": 871207,
+    "sha256": "fc809d555a3dea7f3e014efd3c5e0a271b654242359a2448382ff9ba9521d1f4"
+  },
+  "ZAMAN_R44_TAM_KOD.txt": {
+    "bytes": 871207,
+    "sha256": "fc809d555a3dea7f3e014efd3c5e0a271b654242359a2448382ff9ba9521d1f4"
+  }
+}

@@ -1,0 +1,21 @@
+const vm=require('node:vm'), assert=require('node:assert/strict');
+(async()=>{
+ const worker=(await import('../deniz.mjs')).default;
+ const html=await (await worker.fetch(new Request('https://www.okyonusedt.com/'),{},{})).text();
+ const start=html.indexOf('if(seafood){seafood.innerHTML=');
+ const seafoodCode=html.slice(start,html.indexOf('}',start)+1);
+ const newStart=html.indexOf('if(commerceNew){commerceNew.innerHTML=');
+ const newCode=html.slice(newStart,html.indexOf('}',newStart)+1);
+ assert.ok(seafoodCode.includes("seafood.closest('section').hidden"));
+ assert.ok(newCode.includes("commerceNew.closest('section').hidden"));
+ const make=()=>{const section={hidden:true};return {innerHTML:'',closest:()=>section,querySelector(){return this.innerHTML.includes('class="product"')?{}:null},section}};
+ const seafood=make(),commerceNew=make(),context={seafood,commerceNew,featured:[],Date,htmlCard:x=>'<article class="product">'+x.name+'</article>'};
+ vm.createContext(context);
+ const run=()=>{vm.runInContext(seafoodCode,context);vm.runInContext(newCode,context)};
+ run();assert.ok(seafood.section.hidden&&commerceNew.section.hidden);
+ context.featured=[{name:'Fish',category:'Deniz Ürünleri',new_until:new Date(Date.now()+86400000).toISOString()},{name:'Oil',category:'Yağlar'}];
+ run();assert.ok(!seafood.section.hidden&&!commerceNew.section.hidden);assert.ok(!seafood.innerHTML.includes('Oil'));
+ context.featured=[{name:'Old',category:'Yağlar',new_until:'2020-01-01'}];
+ run();assert.ok(seafood.section.hidden&&commerceNew.section.hidden);
+ console.log('PASS actual generated collection scripts: empty, populated, expired; category filtering.');
+})().catch(e=>{console.error(e);process.exitCode=1});

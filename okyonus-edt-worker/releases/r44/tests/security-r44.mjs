@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';import {webcrypto} from 'node:crypto';
+const root=process.argv[2]||new URL('..',import.meta.url).pathname;
+const z=await readFile(root+'/zaman.mjs','utf8'),d=await readFile(root+'/deniz.mjs','utf8');
+function extract(s,start,end){const a=s.indexOf(start);assert(a>=0,start);return s.slice(a,end?s.indexOf(end,a):undefined)}
+const c={Headers,Request,Response,URL,Uint8Array,crypto:webcrypto,http:(status,message)=>Object.assign(new Error(message),{status})};vm.createContext(c);
+vm.runInContext(extract(z,'function okyR40SecureResponse','\nexport default {')+extract(z,'function okyR44ImageMime')+extract(d,'function okyR44ProductUnavailable'),c);
+const strong="default-src 'self'; script-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
+let r=c.okyR40SecureResponse(new Request('https://example.com/commerce'),new Response('OK',{headers:{'content-security-policy':strong,'referrer-policy':'no-referrer','permissions-policy':'camera=(), microphone=(), geolocation=()'}}),true);
+assert(r.headers.get('content-security-policy').includes(strong));assert(r.headers.get('content-security-policy').includes("object-src 'none'"));assert.equal(r.headers.get('referrer-policy'),'no-referrer');assert.equal(r.headers.get('permissions-policy'),'camera=(), microphone=(), geolocation=()');assert.equal(r.headers.get('cache-control'),'private, no-store');
+for(const s of ['OUT','INACTIVE','DISABLED','UNAVAILABLE','SOLD_OUT','OUT_OF_STOCK','stok yok','tükendi','pasif','out of stock'])assert(c.okyR44ProductUnavailable({stock_status:s}),s);
+for(const s of ['ORDER','IN_STOCK','Siparişe uygun',''])assert(!c.okyR44ProductUnavailable({stock_status:s}),s);assert(c.okyR44ProductUnavailable({active:0}));
+assert.equal(c.okyR44ImageMime(new TextEncoder().encode('<script>x</script>')),'');assert.equal(c.okyR44ImageMime(new Uint8Array([255,216,255])),'image/jpeg');assert.equal(c.okyR44ImageMime(new Uint8Array([137,80,78,71,13,10,26,10])),'image/png');
+vm.runInContext(extract(z,'async function studioMediaRoute','    async function '),c);
+const uploadReq={method:'POST',headers:new Headers({'content-type':'multipart/form-data'}),formData:async()=>new Map([['file',{type:'image/png',size:10,arrayBuffer:async()=>new TextEncoder().encode('not-an-img').buffer}]])};let writes=0;const env={MEDIA_STORE:{put:()=>{writes++}}};
+await assert.rejects(c.studioMediaRoute(uploadReq,env,{user:{role:'viewer'}},{},null,null,new URL('https://example.com/api/studio-media')),e=>e.status===403);
+await assert.rejects(c.studioMediaRoute(uploadReq,env,{user:{role:'editor'}},{},null,null,new URL('https://example.com/api/studio-media')),e=>e.status===415&&e.message==='IMAGE_SIGNATURE_MISMATCH');assert.equal(writes,0);
+for(const role of ['owner','admin','editor'])await assert.rejects(c.studioMediaRoute(uploadReq,env,{user:{role}},{},null,null,new URL('https://example.com/api/studio-media')),e=>e.status===415&&e.message==='IMAGE_SIGNATURE_MISMATCH');
+for(const role of ['viewer','editor','unknown'])await assert.rejects(c.studioMediaRoute({...uploadReq,method:'DELETE'},env,{user:{role}},{},'test.png',null,new URL('https://example.com/api/studio-media/test.png')),e=>e.status===403);
+assert.equal(writes,0);
+vm.runInContext(extract(z,'async function requireCsrf','    function enforceAccess'),c);await assert.rejects(c.requireCsrf(new Request('https://example.com/api/studio-media',{method:'POST'}),{},{}),e=>e.status===403&&e.message==='CSRF_REQUIRED');
+vm.runInContext(extract(z,'function enforceOrigin','    async function readJson'),c);assert.throws(()=>c.enforceOrigin(new Request('https://example.com/api',{headers:{'Sec-Fetch-Site':'cross-site'}})),e=>e.status===403);
+console.log('R44 security PASS: stronger policies preserved, role/CSRF/origin refusal, spoofed image refused before storage, stock status guard.');

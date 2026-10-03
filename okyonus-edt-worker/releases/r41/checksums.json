@@ -1,0 +1,33 @@
+{
+  "base_commit": "b6905b3a98121bcc267e28dbcce6eacc48b3a954",
+  "files": {
+    "deniz.mjs": {
+      "bytes": 2371320,
+      "sha256": "e19747bd3e24a44c763d4438938931d95a9487778859c1f6ce81d980d9e7d490"
+    },
+    "DENIZ_R41_TAM_KOD.txt": {
+      "bytes": 2371320,
+      "sha256": "e19747bd3e24a44c763d4438938931d95a9487778859c1f6ce81d980d9e7d490"
+    },
+    "DENIZ_R41_CANLI_KONTROL_TAM_KOD.txt": {
+      "bytes": 2371320,
+      "sha256": "e19747bd3e24a44c763d4438938931d95a9487778859c1f6ce81d980d9e7d490"
+    },
+    "../r39/deniz.mjs": {
+      "bytes": 2363260,
+      "sha256": "d5aab3003bfb0588d713f464a97d2852cc06cffd2d198a2ddd8aa66f66599def"
+    },
+    "zaman.mjs": {
+      "bytes": 867718,
+      "sha256": "19294c1dfddfb57e1e4d0c541dcb9598baf5515f875b98e7cb8403b5478f26f9"
+    },
+    "ZAMAN_R41_TAM_KOD.txt": {
+      "bytes": 867718,
+      "sha256": "19294c1dfddfb57e1e4d0c541dcb9598baf5515f875b98e7cb8403b5478f26f9"
+    },
+    "../r39/zaman.mjs": {
+      "bytes": 865897,
+      "sha256": "3a20c96bb3d9f162368498bd765cba2472a2de79594732c611ae177ea45a7201"
+    }
+  }
+}

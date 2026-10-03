@@ -1,0 +1,72 @@
+{
+  "target": "/workspace/scratch/31d12a4f6f99/repo/okyonus-edt-worker/releases/r47",
+  "date": "2026-10-03T12:06:24.658Z",
+  "passed": 16,
+  "failed": 0,
+  "results": [
+    {
+      "name": "public pages reachable without membership",
+      "pass": true
+    },
+    {
+      "name": "About routes execute the commerce shell in its lexical scope",
+      "pass": true
+    },
+    {
+      "name": "HEAD suppresses all public bodies",
+      "pass": true
+    },
+    {
+      "name": "eight category links and hero before category markup",
+      "pass": true
+    },
+    {
+      "name": "anonymous quote blocked",
+      "pass": true
+    },
+    {
+      "name": "admin pages and API require auth",
+      "pass": true
+    },
+    {
+      "name": "real SQLite D1 commerce schema initializes",
+      "pass": true
+    },
+    {
+      "name": "schema initialization memoized",
+      "pass": true
+    },
+    {
+      "name": "SQLite storefront returns eight categories and 200 SEO entries",
+      "pass": true
+    },
+    {
+      "name": "admin featured selection propagates with no twelve-card cap",
+      "pass": true
+    },
+    {
+      "name": "cart badge runtime preserves count across reload",
+      "pass": true
+    },
+    {
+      "name": "catalog browser add, quantities and stock guards",
+      "pass": true
+    },
+    {
+      "name": "HTML inline browser scripts parse",
+      "pass": true
+    },
+    {
+      "name": "admin generated inline scripts parse",
+      "pass": true
+    },
+    {
+      "name": "SQLite inbox union, status transitions, filters, role and audit",
+      "pass": true
+    },
+    {
+      "name": "separate D1 bindings preserve inbox source, details and auth audit",
+      "pass": true
+    }
+  ]
+}
