@@ -4,7 +4,8 @@ import {spawnSync} from 'node:child_process';
 
 for(const [name,file] of [
  ['catalog migration preserves seafood, exact EDT data, admin edits and transaction rollback','verify-catalog-migration.mjs'],
- ['integrated worker serves exact paginated catalog, categories, detail, seafood and selected home products','verify-integrated-worker.mjs']
+ ['integrated worker serves updated paginated prices, categories, detail, seafood and selected home products','verify-integrated-worker.mjs'],
+ ['price increase excludes all seafood and preserves identities, admin edits, audit and atomic rollback','verify-price15.mjs']
 ])test(name,()=>{
  const result=spawnSync(process.execPath,[new URL(file,import.meta.url).pathname],{cwd:new URL('..',import.meta.url),encoding:'utf8',timeout:30000});
  assert.ifError(result.error);

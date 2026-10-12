@@ -24,7 +24,7 @@ if(process.argv[1]===new URL(import.meta.url).pathname){
 const ctx=migrationContext();
 const source=JSON.parse(vm.runInContext('JSON.stringify(OKY_EDT_SOURCE_CATALOG)',ctx));
 const sea=JSON.parse(vm.runInContext('JSON.stringify(OKY_EDT_SEAFOOD_SNAPSHOT)',ctx));
-const ddl=vm.runInContext('['+migrationPrelude().split('const ddl=[')[1].split('];for(const sql of ddl)')[0]+']',ctx);
+const ddl=vm.runInContext('['+migrationPrelude().split('async function okyEnsureEdtCatalog')[1].split('const ddl=[')[1].split('];for(const sql of ddl)')[0]+']',ctx);
 const adminSchemaSource=fs.readFileSync(new URL('../src/zaman-admin-worker.js',import.meta.url),'utf8');
 const actualAdminDdl=new Map();for(const match of adminSchemaSource.matchAll(/`(CREATE TABLE IF NOT EXISTS ([a-z0-9_]+)\([^`]+)`/g)){if(!actualAdminDdl.has(match[2]))actualAdminDdl.set(match[2],match[1]);}
 function setup(seed=true){const db=new MockD1();for(const sql of ddl){const table=sql.match(/CREATE TABLE IF NOT EXISTS ([a-z0-9_]+)/)[1];db.sqlite.exec(actualAdminDdl.get(table)||sql);}

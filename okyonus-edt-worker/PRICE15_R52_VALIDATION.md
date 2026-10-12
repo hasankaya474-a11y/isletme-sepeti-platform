@@ -1,0 +1,9 @@
+# R52 Seafood-exempt15% sale price change and performance
+
+PublicR51 baseline833:786 eligible,47 seafood excluded. Seafood44 plus3 imported canned tuna edt_473/474/476 remain unchanged. Database migration discovers all live/inactive products and classifies seafood categories/subcategories/descendants and ton baligi names; actual affectedDB count may include nonpublic rows. Featured nonseafood included. Current and futurebase/customerprices and product list/sale fields scale once with integer-cent halfup rounding. Past/expired price rows and historical audit records unchanged. Auditbefore/after rows, atomic SQLCHECK, durable marker prevent double increases on redeployment and retain subsequent admin edits.
+
+Validated: standalone price tests786/47, metadata unchanged, featured coverage, future/customer prices, repeat/adminedit retention, forcedandactualCHECK rollback, category descendants, snapshot no doubleincrease. Actual integrated paginatedcatalog verifies833 products and publicprices; cold R51-readyD1 invocation44queries within50. Freshcatalog and pricemigration phased. npm run verify4 tests; JavaScript checkJs0 diagnostics.
+
+Performance: category15second cache withmanualprice refresh, abort superseded requests, progressive windows maximum200cardDOM, CDN320px card images, indexed currentprices/activecategory/featured queries, bounded schema inventory and EXISTS checks. Admin48/page,180ms searchdebounce, normalizedsearchWeakMap, oneinflightproductreadwithwriteinvalidation,160pxCDNthumbnail sources/80px display dimensions/lazyload. Runtimeimages and sourceAPI metadata preserve original sources. Realbrowserdeviceperformance and production15% update not verified until deployment.
+
+Deployment: DENIZR52 first then ZAMANR52 UI. /api/catalog-status exposes priceIncreaseApplied and priceAffectedProducts aggregate. No Cloudflarewrite session available; GitHub publication does not deploy Cloudflare.
