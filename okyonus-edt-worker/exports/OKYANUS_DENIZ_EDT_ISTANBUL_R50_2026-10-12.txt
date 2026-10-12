@@ -5,6 +5,8 @@ const OKY_EDT_SEAFOOD_SNAPSHOT = Object.freeze({"category":{"id":"ef104d55-073e-
 /* EDT replacement: all catalog mutations below share one atomic D1.batch. */
 const OKY_EDT_MIGRATION = 'oky-edt-replacement-2026-10-12-v1';
 const OKY_EDT_TASKS = new WeakMap();
+const OKY_EDT_COMMITTED_AT = new WeakMap();
+const OKY_EDT_LAST_FAILURE = new WeakMap();
 function okyEdtIsSeafood(p){const s=String(p.category||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').toLowerCase();return /^(deniz urunleri|su urunleri|balik|kalamar|karides|ahtapot|black tiger|unagi)$/.test(s)}
 /** @param {ReadonlyArray<Record<string, any>>} [legacy] @returns {Array<Record<string, any>>} */
 function okyEdtPublicFallback(legacy=[]){return [...OKY_EDT_SEAFOOD_SNAPSHOT.products.map(p=>({...p})),...OKY_EDT_SOURCE_CATALOG.map(p=>({id:p.id,source_product_id:p.id,name:p.name,brand:p.brand,category:p.category,subcategory:p.subcategory,category_path:p.category+' > '+p.subcategory,unit:p.sales_unit,package_text:'',image:p.image,card_image:p.image,stock_status:p.stock_status==='OutOfStock'?'OUT':'ORDER',active:1,featured:0,description:p.description,effectivePrice:p.price,basePrice:p.price,currency:'TRY',vat_included:true}))]}
@@ -13,7 +15,10 @@ async function okyEdtImage(request,id){const p=OKY_EDT_SOURCE_CATALOG.find(p=>p.
 async function okyEnsureEdtCatalog(env,DB,legacy=[]){
  if(!DB)throw Error('EDT_DATABASE_REQUIRED');
  if(OKY_EDT_TASKS.has(DB))return await OKY_EDT_TASKS.get(DB);
+ let stage='MARKER_READ';
  const task=(async()=>{
+ try{if(await DB.prepare('SELECT id FROM oky_catalog_import_batches_v1 WHERE id=?').bind(OKY_EDT_MIGRATION).first()){OKY_EDT_LAST_FAILURE.delete(DB);return true}}catch(error){if(!/no such table/i.test(String(error?.message||error)))throw error}
+ stage='SCHEMA';
  const ddl=[
  "CREATE TABLE IF NOT EXISTS oky_catalog_import_batches_v1(id TEXT PRIMARY KEY,completed_at TEXT NOT NULL DEFAULT(datetime('now')),total INTEGER NOT NULL)",
  "CREATE TABLE IF NOT EXISTS b2b_products_v1(id TEXT PRIMARY KEY,source_product_id TEXT,name TEXT NOT NULL,category TEXT NOT NULL DEFAULT 'Deniz Ürünleri',origin TEXT,freshness TEXT,processing TEXT,unit TEXT NOT NULL DEFAULT 'Kg',package_text TEXT,image_url TEXT,min_order REAL,stock_status TEXT NOT NULL DEFAULT 'ORDER',active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL DEFAULT(datetime('now')),updated_at TEXT NOT NULL DEFAULT(datetime('now')))",
@@ -26,14 +31,18 @@ async function okyEnsureEdtCatalog(env,DB,legacy=[]){
  "CREATE TABLE IF NOT EXISTS oky_edt_migration_checks_v1(migration_id TEXT PRIMARY KEY,passed INTEGER NOT NULL CHECK(passed=1))",
  "CREATE TABLE IF NOT EXISTS oky_edt_source_meta_v1(product_id TEXT PRIMARY KEY,source_url TEXT NOT NULL,source_code TEXT,vat_included INTEGER NOT NULL CHECK(vat_included=1),source_price REAL NOT NULL,description_status TEXT)"
  ];for(const sql of ddl){const r=await DB.prepare(sql).run();if(r?.success===false)throw Error('EDT_SCHEMA_FAILED')}
- if(await DB.prepare('SELECT id FROM oky_catalog_import_batches_v1 WHERE id=?').bind(OKY_EDT_MIGRATION).first())return true;
- const tableRows=(await DB.prepare("SELECT name FROM sqlite_master WHERE type='table'").all()).results||[];
- const columns=new Map();for(const t of tableRows)if(/^[a-zA-Z0-9_]+$/.test(t.name))columns.set(t.name,new Set(((await DB.prepare('PRAGMA table_info('+t.name+')').all()).results||[]).map(c=>c.name)));
+ if(await DB.prepare('SELECT id FROM oky_catalog_import_batches_v1 WHERE id=?').bind(OKY_EDT_MIGRATION).first()){OKY_EDT_LAST_FAILURE.delete(DB);return true};
+ stage='SCHEMA_INVENTORY';
+ const inventory=(await DB.prepare("SELECT m.name AS table_name,p.name AS column_name FROM sqlite_master m JOIN pragma_table_info(m.name) p WHERE m.type='table' AND (m.name IN ('b2b_products_v1','b2b_prices_v1','b2b_customer_prices_v1','oky_product_meta_v1','oky_product_commerce_v1','oky_brands_v1','oky_storefront_categories_v1','oky_edt_source_meta_v1') OR m.name GLOB 'oky_product_*' OR m.name GLOB 'oky_catalog_product_*' OR m.name GLOB 'oky_inventory_*' OR m.name='oky_supplier_prices_v1')").all()).results||[];
+ const columns=new Map();for(const row of inventory)if(/^[a-zA-Z0-9_]+$/.test(row.table_name)){if(!columns.has(row.table_name))columns.set(row.table_name,new Set());columns.get(row.table_name).add(row.column_name)}
+ stage='SCHEMA_UPGRADE';
  const upgrades={oky_product_meta_v1:{brand_id:'TEXT',description:'TEXT',featured:'INTEGER NOT NULL DEFAULT 0',sort_order:'INTEGER NOT NULL DEFAULT 0'},oky_product_commerce_v1:{sku:'TEXT',subcategory:'TEXT',list_price:'REAL',sale_price:'REAL',cold_chain:'INTEGER NOT NULL DEFAULT 0',min_order_qty:'REAL DEFAULT 1',qty_step:'REAL DEFAULT 1',best_seller:'INTEGER NOT NULL DEFAULT 0'},oky_brands_v1:{slug:'TEXT',active:'INTEGER NOT NULL DEFAULT 1',sort_order:'INTEGER NOT NULL DEFAULT 0'},oky_storefront_categories_v1:{parent_id:'TEXT',slug:'TEXT',active:'INTEGER NOT NULL DEFAULT 1',sort_order:'INTEGER NOT NULL DEFAULT 0'}};for(const [table,fields]of Object.entries(upgrades))for(const [column,type]of Object.entries(fields))if(!columns.get(table)?.has(column)){try{const r=await DB.prepare('ALTER TABLE '+table+' ADD COLUMN '+column+' '+type).run();if(r?.success===false)throw Error('EDT_SCHEMA_UPGRADE_FAILED')}catch(error){const actual=(await DB.prepare('PRAGMA table_info('+table+')').all()).results||[];if(!actual.some(c=>c.name===column))throw error}columns.get(table).add(column)}
  const required={b2b_products_v1:['id','source_product_id','name','category','unit','image_url','active'],b2b_prices_v1:['id','product_id','price','currency','active'],oky_product_meta_v1:['product_id','brand_id','description','featured'],oky_product_commerce_v1:['product_id','sku','subcategory','list_price','sale_price'],oky_brands_v1:['id','name'],oky_storefront_categories_v1:['id','parent_id','name','slug']};for(const [t,cs]of Object.entries(required))for(const c of cs)if(!columns.get(t)?.has(c))throw Error('EDT_INCOMPATIBLE_SCHEMA:'+t+':'+c);
+ stage='SNAPSHOT_VALIDATE';
  const snapshots=OKY_EDT_SEAFOOD_SNAPSHOT.products;
  if(snapshots.length!==44||OKY_EDT_SOURCE_CATALOG.length!==789)throw Error('EDT_SNAPSHOT_COUNT_INVALID');
  const allIds=new Set(OKY_EDT_SOURCE_CATALOG.map(p=>p.id));if(allIds.size!==789||OKY_EDT_SOURCE_CATALOG.some(p=>!p.name||!p.image||!Number.isFinite(p.price)||p.price<=0))throw Error('EDT_SOURCE_INVALID');
+ stage='READ_SEAFOOD';
  const existing=(await DB.prepare('SELECT id,source_product_id,category FROM b2b_products_v1').all()).results||[];
  const snapshotIds=new Set(snapshots.flatMap(p=>[String(p.id),String(p.source_product_id||'')]));
  const keep=existing.filter(p=>okyEdtIsSeafood(p)||snapshotIds.has(String(p.id))||snapshotIds.has(String(p.source_product_id||'')));
@@ -41,8 +50,9 @@ async function okyEnsureEdtCatalog(env,DB,legacy=[]){
  const covered=new Set(keep.flatMap(p=>[String(p.id),String(p.source_product_id||'')]));
  const restore=snapshots.filter(p=>!covered.has(String(p.id))&&!covered.has(String(p.source_product_id||'')));
  const guard="NOT EXISTS(SELECT 1 FROM oky_catalog_import_batches_v1 WHERE id='"+OKY_EDT_MIGRATION+"')";
+ stage='BUILD_BATCH';
  const commands=[];const add=(sql,...args)=>commands.push(DB.prepare(sql).bind(...args));
- const insertRows=(table,rows)=>{if(!rows.length)return;const cs=[...new Set(rows.flatMap(p=>Object.keys(p)))].filter(c=>columns.get(table)?.has(c));for(let i=0;i<rows.length;i+=80){const slice=rows.slice(i,i+80);add('INSERT OR IGNORE INTO '+table+'('+cs.join(',')+') SELECT '+cs.map(c=>"json_extract(value,'$."+c+"')").join(',')+' FROM json_each(?) WHERE '+guard,JSON.stringify(slice));}};
+ const insertRows=(table,rows)=>{if(!rows.length)return;const cs=[...new Set(rows.flatMap(p=>Object.keys(p)))].filter(c=>columns.get(table)?.has(c));const sql='INSERT OR IGNORE INTO '+table+'('+cs.join(',')+') SELECT '+cs.map(c=>"json_extract(value,'$."+c+"')").join(',')+' FROM json_each(?) WHERE '+guard;const emit=slice=>{const payload=JSON.stringify(slice);if(new TextEncoder().encode(payload).byteLength<=1800000){add(sql,payload);return}if(slice.length<2)throw Error('EDT_PAYLOAD_TOO_LARGE');const half=Math.ceil(slice.length/2);emit(slice.slice(0,half));emit(slice.slice(half))};emit(rows)};
  insertRows('b2b_products_v1',restore.map(p=>({id:p.id,source_product_id:p.source_product_id,name:p.name,category:p.category,unit:p.unit,package_text:p.package_text||'',image_url:p.image,stock_status:p.stock_status||'ORDER',active:p.active??1})));
  const keepIds=[...new Set([...keep.map(p=>String(p.id)),...restore.map(p=>String(p.id))])];
  add('INSERT OR IGNORE INTO oky_edt_preserved_products_v1(migration_id,product_id) SELECT ?,value FROM json_each(?) WHERE '+guard,OKY_EDT_MIGRATION,JSON.stringify(keepIds));
@@ -72,10 +82,13 @@ async function okyEnsureEdtCatalog(env,DB,legacy=[]){
  // CHECK failure aborts the entire batch, including deletions. Verification precedes marker.
  add("INSERT INTO oky_edt_migration_checks_v1(migration_id,passed) SELECT ?,CASE WHEN (SELECT COUNT(*) FROM b2b_products_v1 WHERE id IN(SELECT json_extract(value,'$.id') FROM json_each(?)))=789 AND NOT EXISTS(SELECT 1 FROM json_each(?) s LEFT JOIN b2b_products_v1 p ON p.id=json_extract(s.value,'$.id') LEFT JOIN b2b_prices_v1 pr ON pr.id='edt-initial-'||p.id LEFT JOIN oky_product_meta_v1 m ON m.product_id=p.id LEFT JOIN oky_product_commerce_v1 pc ON pc.product_id=p.id LEFT JOIN oky_brands_v1 b ON b.id=m.brand_id LEFT JOIN oky_edt_source_meta_v1 sm ON sm.product_id=p.id WHERE p.id IS NULL OR m.product_id IS NULL OR pc.product_id IS NULL OR b.name IS NULL OR b.name<>json_extract(s.value,'$.brand') OR sm.vat_included IS NULL OR sm.vat_included<>1 OR pc.subcategory<>json_extract(s.value,'$.subcategory') OR p.name<>json_extract(s.value,'$.name') OR p.image_url<>json_extract(s.value,'$.image') OR pr.price IS NULL OR ABS(pr.price-json_extract(s.value,'$.price'))>0.001) AND NOT EXISTS(SELECT 1 FROM json_each(?) s WHERE NOT EXISTS(SELECT 1 FROM b2b_products_v1 p WHERE p.id=json_extract(s.value,'$.id') OR p.source_product_id=json_extract(s.value,'$.source_product_id'))) AND NOT EXISTS(SELECT 1 FROM b2b_products_v1 p WHERE p.id NOT IN(SELECT json_extract(value,'$.id') FROM json_each(?)) AND p.id NOT IN(SELECT product_id FROM oky_edt_preserved_products_v1 WHERE migration_id=?)) THEN 1 ELSE 0 END WHERE "+guard,OKY_EDT_MIGRATION,source,source,sea,source,OKY_EDT_MIGRATION);
  add('INSERT OR IGNORE INTO oky_catalog_import_batches_v1(id,total) SELECT ?,789 WHERE EXISTS(SELECT 1 FROM oky_edt_migration_checks_v1 WHERE migration_id=? AND passed=1)',OKY_EDT_MIGRATION,OKY_EDT_MIGRATION);
+ stage='ATOMIC_COMMIT';
  const result=await DB.batch(commands);if(result.some(r=>r?.success===false))throw Error('EDT_ATOMIC_BATCH_FAILED');
+ stage='COMMIT_VERIFY';
  if(!await DB.prepare('SELECT id FROM oky_catalog_import_batches_v1 WHERE id=?').bind(OKY_EDT_MIGRATION).first())throw Error('EDT_COMMIT_NOT_VERIFIED');
- return true;
- })();OKY_EDT_TASKS.set(DB,task);try{return await task}catch(error){OKY_EDT_TASKS.delete(DB);throw error}
+ OKY_EDT_COMMITTED_AT.set(DB,Date.now());
+ OKY_EDT_LAST_FAILURE.delete(DB);return true;
+ })();OKY_EDT_TASKS.set(DB,task);try{return await task}catch(error){OKY_EDT_TASKS.delete(DB);const message=String(error?.message||error),reason=/too many|limit|subrequest/i.test(message)?'QUERY_LIMIT':/constraint/i.test(message)?'CONSTRAINT':/no such|schema|column|table/i.test(message)?'SCHEMA':/timeout|timed out/i.test(message)?'TIMEOUT':/overloaded/i.test(message)?'OVERLOADED':'DATABASE';const wrapped=Object.assign(new Error('EDT_MIGRATION_'+reason+':'+stage),{code:'EDT_MIGRATION_'+reason,stage,cause:error});OKY_EDT_LAST_FAILURE.set(DB,{code:wrapped.code,stage,message:wrapped.message.slice(0,180)});throw wrapped}
 }
 
 const OKY_IMPORTED_CATALOG=OKY_EDT_SOURCE_CATALOG.map(p=>({...p,source_id:p.id,image_url:p.image,category_path:p.category+' > '+p.subcategory,hold:[]}));
@@ -7653,7 +7666,7 @@ body.okyHomeAdmin .main>.products .cats>.cat.productSpot b{white-space:normal!im
        ========================================================================== */
     async function b2bEnsureSchema(env){
       if(!env||!env.DB) throw new Error("B2B_DB_NOT_BOUND");
-      await okyEnsureEdtCatalog(env,env.DB);
+      if(!env.__okyCatalogFallback&&!env.__okyCatalogBootstrap)await okyEnsureEdtCatalog(env,env.DB);
       const sql=[
     `CREATE TABLE IF NOT EXISTS b2b_customers_v1(
      id TEXT PRIMARY KEY,business_id TEXT,company_name TEXT NOT NULL,contact_name TEXT,phone TEXT,email TEXT,
@@ -7734,6 +7747,7 @@ body.okyHomeAdmin .main>.products .cats>.cat.productSpot b{white-space:normal!im
     // D1 overrides the same product IDs; new D1 products extend the existing catalog.
     // An explicit inactive D1 row withdraws its matching legacy item.
     async function b2bMergedCatalog(env){
+      if(env.__okyCatalogFallback||env.__okyCatalogBootstrap)return {products:OKY_EDT_SEAFOOD_SNAPSHOT.products.map(p=>({...p,id:String(p.source_product_id||p.id),price:p.effectivePrice,package:p.package_text||'',stockStatus:p.stock_status})),source:'SOURCE_SNAPSHOT_PENDING_MIGRATION'};
       const base=b2bPublicCatalog();
       const rows=(await env.DB.prepare(`SELECT * FROM b2b_products_v1 ORDER BY updated_at DESC`).all()).results||[];
       /** @type {Map<string, any>} \u00dcr\u00fcn alanlar\u0131 D1 kay\u0131tlar\u0131yla geni\u015fletilir. */
@@ -7914,7 +7928,7 @@ fetch('/api/b2b/products',{headers:{accept:'application/json'},cache:'no-store'}
 const { commerceRoute, OKY_COMMERCE_V2_BUILD, commerceProductImage, commerceStorefront } = (() => {
 
 // Compatibility baseline: commerce-v2-2026-10-01-mobile-storefront-v24-fluid-3col
-const BUILD="commerce-v2-2026-10-12-r50-edt-catalog";
+const BUILD="commerce-v2-2026-10-12-r51-edt-migration-recovery";
 function commerceProductImage(product){
  if(!product)return "";
  // A saved empty/null image is authoritative; never restore a catalogue fallback.
@@ -8319,6 +8333,7 @@ function openingCampaignSettings(input={}){
  return {enabled,image,title,description,ctaText,ctaUrl,photoCtaText,photoCtaUrl,key:'opening-v26-'+hash.toString(16)};
 }
 function commerceDatabase(env){
+ if(env?.__okyCatalogFallback||env?.__okyCatalogBootstrap)return null;
  return env&&(env.COMMERCE_DB||env.ADMIN_DB||env.DB||env['Veritaban\u0131']||env['Veritabani']||env['Veritaban\u01311'])||null;
 }
 function openingImagePublicUrl(value,revision=''){
@@ -8494,7 +8509,7 @@ async function storefront(env,productTarget="",homepageOnly=false,asData=false,p
    products=target?[target,...products.filter(p=>p!==target&&p.category===target.category).slice(0,5)]:[];
    return (asData?x=>x:json)({ok:true,build:BUILD,catalogAuthoritative,homepageAuthoritative,catalogReadError,products:products.map(p=>{p.image=commerceProductImage(p);return p}),settings:publicStorefrontSettings(settings),detailView:true});
   }
- const data={ok:true,build:BUILD,hasMore:pageHasMore,nextOffset:pageHasMore?pageOffset+pageSize:null,pageSize,catalogAuthoritative,catalogComplete:!pageHasMore,homepageAuthoritative,catalogReadError,products:products.map(p=>{p.image=commerceProductImage(p);return p}),banners,categories,sections,campaigns,campaignRules,brands,delivery,help:helpArticles,seo:seoLinks,settings:publicStorefrontSettings(settings),legacyCatalogEndpoint:"/api/products"};
+ const data={ok:true,build:BUILD,hasMore:pageHasMore,nextOffset:pageHasMore?pageOffset+pageSize:null,pageSize,catalogAuthoritative,catalogComplete:!pageHasMore,homepageAuthoritative,catalogReadError,products:products.map(p=>{p.image=commerceProductImage(p);return p}),banners,categories,sections,campaigns,campaignRules,brands,delivery,help:helpArticles,seo:seoLinks,settings:publicStorefrontSettings(settings),migrationPending:!!env?.__okyCatalogFallback,catalogSource:(env?.__okyCatalogFallback||env?.__okyCatalogBootstrap)?"VERIFIED_SOURCE_SNAPSHOT":"D1",legacyCatalogEndpoint:"/api/products"};
  if(!storefrontDB&&!homepageOnly){data.count=data.products.length;data.categoryCount=new Set(data.products.map(p=>p.category)).size;okyStaticCatalogData=data;okyStaticCatalogBody=JSON.stringify(data);for(const p of data.products){okyStaticCatalogById.set(String(p.id),p);if(p.source_product_id)okyStaticCatalogById.set(String(p.source_product_id),p);okyStaticCatalogById.set(String(p.name||'').replace(/İ/g,'i').replace(/I/g,'ı').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''),p)}}return asData?data:json(data);
 }
 
@@ -8689,7 +8704,7 @@ const denizWorker = {
         try {
   const priceRequestPath=new URL(request.url).pathname;
   if(priceRequestPath==='/'||/^\/(?:urunler|urun|kampanyalar|markalar|sepet|yonetici|zaman)(?:\/|$)/.test(priceRequestPath)||/^\/api\/(?:storefront-v2|products|b2b|admin|commerce)(?:\/|$)/.test(priceRequestPath)){
-   const priceDB=env&&(env.COMMERCE_DB||env.ADMIN_DB||env.DB||env['Veritaban\u0131']||env['Veritabani']||env['Veritaban\u01311']);if(priceDB)try{const imported=await okyEnsureImportedCatalog(env,priceDB,ACTIVE_PRODUCT_CATALOG);if(!imported)throw Error('PRICE_CATALOG_NOT_READY');await okyApplyPriceIncrease20(priceDB)}catch(error){console.error('OKY_CATALOG_MIGRATION_FAILED',String(error?.message||error));return okyR40SecureResponse(request,new Response(JSON.stringify({ok:false,error:'CATALOG_MIGRATION_NOT_READY'}),{status:503,headers:{'content-type':'application/json','cache-control':'no-store'}}))}
+   const priceDB=env&&(env.COMMERCE_DB||env.ADMIN_DB||env.DB||env['Veritaban\u0131']||env['Veritabani']||env['Veritaban\u01311']);if(priceDB)try{const catalogRequestStarted=Date.now();const imported=await okyEnsureImportedCatalog(env,priceDB,ACTIVE_PRODUCT_CATALOG);if(!imported)throw Error('PRICE_CATALOG_NOT_READY');await okyApplyPriceIncrease20(priceDB);if(Number(OKY_EDT_COMMITTED_AT.get(priceDB)||0)>=catalogRequestStarted)env={...env,__okyCatalogBootstrap:true};}catch(error){console.error('OKY_CATALOG_MIGRATION_FAILED',String(error?.message||error));env={...env,__okyCatalogFallback:true};}
   }
 
 
@@ -9226,6 +9241,15 @@ export default {
   const legacyLoginUrl=new URL(request.url);
   if(['/uye-giris','/giris'].includes(legacyLoginUrl.pathname)&&['GET','HEAD'].includes(request.method)){legacyLoginUrl.pathname='/uye';return okyR40SecureResponse(request,new Response(null,{status:302,headers:{location:legacyLoginUrl.pathname+legacyLoginUrl.search,'cache-control':'no-store','x-robots-tag':'noindex, nofollow'}}));}
   if(new URL(request.url).pathname.startsWith('/studio-media/'))return okyR40SecureResponse(request,await okyR44ReadStudioAsset(request,env));
+
+  if(new URL(request.url).pathname==='/api/catalog-status'){
+   if(!['GET','HEAD'].includes(request.method))return new Response(null,{status:405,headers:{allow:'GET, HEAD'}});
+   const DB=env&&(env.COMMERCE_DB||env.ADMIN_DB||env.DB||env['Veritabanı']||env['Veritabani']||env['Veritabanı1']);let complete=false,errorCode=null;
+   try{if(DB)complete=!!await DB.prepare('SELECT id FROM oky_catalog_import_batches_v1 WHERE id=?').bind(OKY_EDT_MIGRATION).first();else errorCode='DATABASE_NOT_BOUND'}catch{errorCode='STATUS_READ_FAILED'}
+   const failure=DB?OKY_EDT_LAST_FAILURE.get(DB):null;
+   return new Response(request.method==='HEAD'?null:JSON.stringify({ok:true,migrationComplete:complete,catalogSource:complete?'D1':'VERIFIED_SOURCE_SNAPSHOT',expectedImported:789,preservedSeafood:44,lastFailure:failure?{code:failure.code,stage:failure.stage}:errorCode?{code:errorCode}:null}),{headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-robots-tag':'noindex'}});
+  }
+
   if(new URL(request.url).pathname==='/api/health'){
    const allowed=request.method==='GET'||request.method==='HEAD';
    const response=new Response(allowed?JSON.stringify({ok:true,service:'okyanus-edt-web',checkedAt:new Date().toISOString(),scope:'web-worker'}):JSON.stringify({ok:false,error:'METHOD_NOT_ALLOWED'}),{status:allowed?200:405,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','allow':'GET, HEAD','x-robots-tag':'noindex'}});
